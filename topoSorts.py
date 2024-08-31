@@ -1,5 +1,5 @@
 from typing import List, Dict, Any
-from enum import Enum
+from equivalenceClass import EquivalenceClass
 from digraph import NodeState, isRoot, isLeaf, nx
 from scipy.special import comb
 import math
@@ -64,7 +64,7 @@ def allTopoSorts(dag : nx.DiGraph):
     dag.remove_node('Root')
     return res
 
-def is_topological_sort(G, ordering):
+def isTopologicalSort(G, ordering):
     position = {node: i for i, node in enumerate(ordering)}
     
     # Check that for each edge (u, v) in the graph, u appears before v in the ordering
@@ -72,6 +72,17 @@ def is_topological_sort(G, ordering):
         if position[u] >= position[v]:
             return False
     return True
+
+def hashEquivClasses(equivClasses : List[EquivalenceClass], hasher : TopoSortHasher , feature_node, dag : nx.DiGraph):
+    hashedClasses = {}
+    for eqClass in equivClasses:
+        topoSortForClass = eqClass.topologicalSort(feature_node)
+        if not isTopologicalSort(dag, topoSortForClass):
+            raise AssertionError(f"The topological sort {topoSortForClass} is not a valid topological sort for the graph, for the feature node {feature_node}")
+        hash = hasher.hashTopoSort(topoSortForClass, feature_node)
+        hashedClasses[hash] = [topoSortForClass,  eqClass.classSize()]
+    
+    return hashedClasses
 
 def multinomial_coefficient(args) -> int:
     n = sum(args)

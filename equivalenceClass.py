@@ -1,4 +1,6 @@
 from typing import Any, List
+from digraph import isLeaf, classifyNodes, nx
+import math
 
 class NodePosition:
 
@@ -77,3 +79,27 @@ class EquivalenceClass:
 
     def addLeftTopo(self, leftTopos : int):
         self.left_topo *= leftTopos
+
+#Number of equivalence classes
+
+def numberOfEquivalenceClasses(dag : nx.DiGraph, feature_nodes : Any):
+    nodes_classification = {}
+    unrelated_roots = classifyNodes(dag, feature_nodes, nodes_classification)
+    if unrelated_roots == []:
+        return 1
+
+    dag.add_node('Root')
+    for root in unrelated_roots:
+        dag.add_edge('Root', root)
+    res = numOfClasses(dag, 'Root') -1 #The root node is not a class, so it cannot go after the feature node. That is why we substract 1.
+    dag.remove_node('Root')
+    return res
+    
+
+def numOfClasses(dag : nx.DiGraph, node):
+    if isLeaf(node, dag):
+        return 2
+    
+    childResult = list(map(lambda child : numOfClasses(dag, child), dag.successors(node)))
+
+    return 1 + math.prod(childResult)
