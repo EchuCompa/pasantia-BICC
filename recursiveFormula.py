@@ -1,5 +1,5 @@
 from typing import List, Dict, Any, Tuple
-from digraph import nx, orderedNodes, NodeState, isLeaf, isRoot, hasUnrelatedTree
+from digraph import nx, orderedNodes, NodeState, isLeaf, isRoot
 from topoSorts import TopoSortHasher, topoSortsFrom, hashEquivClasses, multinomial_coefficient
 from equivalenceClass import EquivalenceClass, NodePosition
 import itertools
@@ -111,10 +111,10 @@ def lastUnionOf(unr_classes : List[List[EquivalenceClass]], ancestors : List[Any
 
     else:
         memorization = {}
+        #TODO : Check if there is a better way to create the states so that more calls can be the same and the memoization can be more effective.
         for unr_class in classes_combinations:
-            leftElements, unrelatedTrees = getLeftElementsOfClasses(ancestors, dag, unr_class)
-            classesToUse = unrelatedTrees
-            ascendantsCombinationsWithUnrelated = possibleLeftOrders(0, leftElements, 0, classesToUse , list(ancestors), dag, classification, memorization)
+            leftElements = getLeftElementsOfClasses(ancestors, dag, unr_class)
+            ascendantsCombinationsWithUnrelated = possibleLeftOrders(0, leftElements, 0 , list(ancestors), dag, classification, memorization)
 
             eqClass = unionOf(unr_class, False)
 
@@ -129,20 +129,16 @@ def lastUnionOf(unr_classes : List[List[EquivalenceClass]], ancestors : List[Any
     return classes
 
 def getLeftElementsOfClasses(ancestors : List[Any], dag : nx.DiGraph, unrClasses : List[EquivalenceClass]):
-    leftElements = []
-    unrelatedTrees = 0
+    leftElements = [0]*(len(ancestors)+1)
 
     for unrClass in unrClasses: #These trees will always be available to use, because they are not related to any ancestor. They can go before the root of the ancestors even.
             if isRoot(unrClass.classParent(), dag):
-                leftElements.append(unrClass.num_nodes_before())
-                unrelatedTrees += 1
+                leftElements[0] = unrClass.num_nodes_before()
+            else:
+                parent = list(dag.predecessors(unrClass.classParent()))[0]
+                leftElements[ancestors.index(parent)+1] = unrClass.num_nodes_before()
 
-    for ancestor in ancestors:
-        ancestorChildren = list(dag.successors(ancestor))
-        for unrClass in unrClasses:
-            if unrClass.classParent() in ancestorChildren:
-                leftElements.append(unrClass.num_nodes_before())
-    return leftElements, unrelatedTrees
+    return leftElements
 
 # The idea would be that it has the left elements of each unrelated class, ordered by the ascendant node that is their parent. 
 
@@ -175,9 +171,9 @@ def addPutElements(putElements, leftElementsOfClasses : List[int]):
     for i, put in enumerate(putElements):
         leftElementsOfClasses[i] += put
 
-def possibleLeftOrders(actualPosition : int, leftElementsOfClasses : List[int], ancestorIndex : int, classesToUse : int , ancestors : List[Any], dag : nx.DiGraph, classification : Dict[Any, NodeState], memo: Dict[Tuple[int, Tuple[int], int, int], int]) -> int:
+def possibleLeftOrders(actualPosition : int, leftElementsOfClasses : List[int], ancestorIndex : int, ancestors : List[Any], dag : nx.DiGraph, classification : Dict[Any, NodeState], memo: Dict[Tuple[int, Tuple[int], int, int], int]) -> int:
     global memoHits
-    state = (actualPosition, tuple(leftElementsOfClasses), ancestorIndex, classesToUse)
+    state = (actualPosition, tuple(leftElementsOfClasses), ancestorIndex)
 
     if state in memo:
         memoHits += 1
@@ -196,15 +192,13 @@ def possibleLeftOrders(actualPosition : int, leftElementsOfClasses : List[int], 
         memo[state] = totalOrders
         return totalOrders
 
-    actualAncestor = ancestors[ancestorIndex]
-    usableElements = leftElementsOfClasses[:classesToUse]
+    usableElements = leftElementsOfClasses[:ancestorIndex+1]
 
     for ancestorPosition in range(actualPosition, actualPosition + sum(usableElements) + 1):
         positionsToFill = ancestorPosition - actualPosition
         for comb in getPossibleCombinations(usableElements, positionsToFill):
             removePutElements(comb, leftElementsOfClasses)
-            newClassesToUse = classesToUse +  hasUnrelatedTree(actualAncestor, dag, classification)
-            totalOrders += multinomial_coefficient(comb) * possibleLeftOrders(ancestorPosition+1, leftElementsOfClasses, ancestorIndex + 1, newClassesToUse, ancestors, dag, classification, memo)
+            totalOrders += multinomial_coefficient(comb) * possibleLeftOrders(ancestorPosition+1, leftElementsOfClasses, ancestorIndex + 1, ancestors, dag, classification, memo)
             addPutElements(comb, leftElementsOfClasses)
     
     memo[state] = totalOrders

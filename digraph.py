@@ -50,12 +50,6 @@ def isLeaf(node, dag : nx.DiGraph):
 def isRoot(node, dag : nx.DiGraph):
     return dag.in_degree(node) == 0
 
-def hasUnrelatedTree(node, dag : nx.DiGraph, classification : Dict[Any, NodeState]) -> int:
-    return 1 if hasUnrelatedSubtrees(node, dag, classification) else 0
-    
-def hasUnrelatedSubtrees(node, dag : nx.DiGraph, classification : Dict[Any, NodeState]) -> bool:
-    return len([child for child in dag.successors(node) if classification[child] == NodeState.UNRELATED]) > 0
-
 def drawGraph(dag : nx.DiGraph):
     pos = nx.spring_layout(dag)
     nx.draw(dag, pos, with_labels=True)
