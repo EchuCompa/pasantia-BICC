@@ -10,8 +10,7 @@ def assertTopoSortsAndEquivalenceClasses(dag, feature_node, recursiveClassesSize
     assert (sumOfAllClasses == allTopoSorts(dag)), f"Number of topological sorts is different than the sum of all equivalence classes. \n Topological Sorts: {allTopoSorts(dag)}, Sum of all classes: {sumOfAllClasses}"
     assert (len(recursiveClassesSizes) == numberOfEquivalenceClasses(dag, feature_node)), f"Number of equivalence classes is different than the expected. \n Expected: {numberOfEquivalenceClasses(dag, feature_node)}, Actual: {len(recursiveClassesSizes)}"
 
-
-def measure_graph_data(dag: nx.DiGraph, nodesToEvaluate : List[Any]) -> Dict[str, Any]:
+def measureGraphTime(dag: nx.DiGraph, nodesToEvaluate : List[Any]) -> Dict[str, Any]:
 
     times_per_node = []
     equiv_classes_per_node = []
@@ -84,7 +83,7 @@ def timeRecursiveFunctionFor(dag, nodesToEvaluate):
     global memoHits
     timing_dict = {}
     for feature_node in nodesToEvaluate:
-        #(f'Running for node {feature_node} which has {numberOfEquivalenceClasses(dag, feature_node)} equivalence classes')
+        print(f'Running for node {feature_node} which has {numberOfEquivalenceClasses(dag, feature_node)} equivalence classes')
         memoHits = 0
         timing_dict[feature_node] = {}
         nodes_classification = {}
@@ -98,5 +97,30 @@ def timeRecursiveFunctionFor(dag, nodesToEvaluate):
         timing_dict[feature_node]['Total Time'] = end_time - start_time
         timing_dict[feature_node]['Memoization Hits'] = memoHits
     
-        #print(f'Node {feature_node} took {timing_dict[feature_node]["Total Time"]} seconds to run')
+        print(f'Node {feature_node} took {timing_dict[feature_node]["Total Time"]} seconds to run')
     return timing_dict
+
+def measureGraphInfo(dag: nx.DiGraph, nodesToEvaluate : List[Any]) -> Dict[str, Any]:
+
+    equiv_classes_per_node = []
+
+    for node in nodesToEvaluate:
+        equiv_classes_per_node.append(numberOfEquivalenceClasses(dag, node))
+
+
+    def obtainMaxMinAvg(data):
+        maxValue = max(data)
+        maxValue = maxValue  # f', Index of node: {data.index(maxValue)}'
+        minValue = min(data)
+        minValue = minValue #+ f', Index of node: {data.index(minValue)}'
+        average = sum(data) / len(data)
+        return maxValue, minValue, average
+   
+    biggest_equiv_classes, smallest_equiv_classes, average_equiv_classes = obtainMaxMinAvg(equiv_classes_per_node)
+
+    return {
+        "allTopoSortsNumber": allTopoSorts(dag),
+        "biggestEquivClasses": biggest_equiv_classes,
+        "smallestEquivClasses": smallest_equiv_classes,
+        "averageEquivClasses": average_equiv_classes,
+    }
