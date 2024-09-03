@@ -26,9 +26,9 @@ def measure_graph_data(dag: nx.DiGraph, nodesToEvaluate : List[Any]) -> Dict[str
 
     def obtainMaxMinAvg(data):
         maxValue = max(data)
-        maxValue = str(maxValue) + f', Index of node: {data.index(maxValue)}'
+        maxValue = maxValue  # f', Index of node: {data.index(maxValue)}'
         minValue = min(data)
-        minValue = str(minValue) + f', Index of node: {data.index(minValue)}'
+        minValue = minValue #+ f', Index of node: {data.index(minValue)}'
         average = sum(data) / len(data)
         return maxValue, minValue, average
    
@@ -84,7 +84,7 @@ def timeRecursiveFunctionFor(dag, nodesToEvaluate):
     global memoHits
     timing_dict = {}
     for feature_node in nodesToEvaluate:
-        print(f'Running for node {feature_node} which has {numberOfEquivalenceClasses(dag, feature_node)} equivalence classes')
+        #(f'Running for node {feature_node} which has {numberOfEquivalenceClasses(dag, feature_node)} equivalence classes')
         memoHits = 0
         timing_dict[feature_node] = {}
         nodes_classification = {}
@@ -98,5 +98,5 @@ def timeRecursiveFunctionFor(dag, nodesToEvaluate):
         timing_dict[feature_node]['Total Time'] = end_time - start_time
         timing_dict[feature_node]['Memoization Hits'] = memoHits
     
-        print(f'Node {feature_node} took {timing_dict[feature_node]["Total Time"]} seconds to run')
+        #print(f'Node {feature_node} took {timing_dict[feature_node]["Total Time"]} seconds to run')
     return timing_dict

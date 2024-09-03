@@ -4,6 +4,7 @@ from topoSorts import TopoSortHasher, topoSortsFrom, hashEquivClasses, multinomi
 from equivalenceClass import EquivalenceClass, NodePosition
 import itertools
 import math
+memoHits = 0
 
 
 def recursiveEquivalenceClassesSizes(dag : nx.DiGraph, unr_roots : List[Any], hasher : TopoSortHasher, feature_node, nodes_classification : Dict[Any, NodeState]) -> List[EquivalenceClass]:
@@ -17,7 +18,6 @@ def recursiveEquivalenceClassesSizes(dag : nx.DiGraph, unr_roots : List[Any], ha
 
     recursiveClassesSizes = hashEquivClasses(recursiveClassesSizes, hasher, feature_node, dag)
     return recursiveClassesSizes
-
 
 def unrelatedEquivalenceClassesSizes(node, dag : nx.DiGraph) -> List[EquivalenceClass]:
     if isLeaf(node, dag):
@@ -128,7 +128,6 @@ def lastUnionOf(unr_classes : List[List[EquivalenceClass]], ancestors : List[Any
     
     return classes
 
-
 def getLeftElementsOfClasses(ancestors : List[Any], dag : nx.DiGraph, unrClasses : List[EquivalenceClass]):
     leftElements = []
     unrelatedTrees = 0
@@ -176,7 +175,6 @@ def addPutElements(putElements, leftElementsOfClasses : List[int]):
     for i, put in enumerate(putElements):
         leftElementsOfClasses[i] += put
 
-memoHits = 0
 def possibleLeftOrders(actualPosition : int, leftElementsOfClasses : List[int], ancestorIndex : int, classesToUse : int , ancestors : List[Any], dag : nx.DiGraph, classification : Dict[Any, NodeState], memo: Dict[Tuple[int, Tuple[int], int, int], int]) -> int:
     global memoHits
     state = (actualPosition, tuple(leftElementsOfClasses), ancestorIndex, classesToUse)
