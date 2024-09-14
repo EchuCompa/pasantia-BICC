@@ -1,8 +1,8 @@
 from typing import Any, Dict, List
-from digraph import nx, classifyNodes, orderedNodes, NodeState
-from topoSorts import allTopoSorts, TopoSortHasher, topoSortsFrom
-from equivalenceClass import EquivalenceClass, numberOfEquivalenceClasses
-from recursiveFormula import unrelatedEquivalenceClassesSizes, lastUnionOf, uniteClassesWithSameParent, hashEquivClasses
+from ASVformula.digraph import nx, classifyNodes, orderedNodes, NodeState
+from ASVformula.topoSorts import allTopoSorts, TopoSortHasher, topoSortsFrom
+from ASVformula.equivalenceClass import EquivalenceClass, numberOfEquivalenceClasses
+from ASVformula.recursiveFormula import unrelatedEquivalenceClassesSizes, lastUnionOf, uniteClassesWithSameParent, hashEquivClasses
 import time
 
 def assertTopoSortsAndEquivalenceClasses(dag, feature_node, recursiveClassesSizes):
