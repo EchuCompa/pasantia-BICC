@@ -1,10 +1,19 @@
 from typing import List, Dict, Any, Tuple
-from .digraph import nx, orderedNodes, NodeState, isLeaf, isRoot
+from .digraph import nx, orderedNodes, NodeState, isLeaf, isRoot, classifyNodes
 from .topoSorts import TopoSortHasher, topoSortsFrom, hashEquivClasses, multinomial_coefficient
 from .equivalenceClass import EquivalenceClass, NodePosition
 import itertools
 import math
 memoHits = 0
+
+def equivalenceClassesFor(dag, feature_node):
+   
+    nodes_classification = {}
+    unr_roots = classifyNodes(dag, feature_node, nodes_classification)
+    hasher = TopoSortHasher(nodes_classification)
+    equivClasses = recursiveEquivalenceClassesSizes(dag, unr_roots, hasher, feature_node, nodes_classification)   
+
+    return equivClasses
 
 
 def recursiveEquivalenceClassesSizes(dag : nx.DiGraph, unr_roots : List[Any], hasher : TopoSortHasher, feature_node, nodes_classification : Dict[Any, NodeState]) -> List[EquivalenceClass]:
