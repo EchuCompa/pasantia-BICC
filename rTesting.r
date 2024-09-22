@@ -121,4 +121,3 @@ p <- p + theme_bw() + theme(
 p <- p + xlab(NULL) + ylab("Average Shapley effect (baseline is .23)") + labs(fill = "Algorithm") +
   ggtitle("Average Shapley Feature Effects Based on 3 Causal Assumptions")
 p
-

@@ -1,7 +1,7 @@
 from typing import List, Dict, Any, Tuple
-from .digraph import nx, orderedNodes, NodeState, isLeaf, isRoot, classifyNodes
-from .topoSorts import TopoSortHasher, topoSortsFrom, hashEquivClasses, multinomial_coefficient
-from .equivalenceClass import EquivalenceClass, NodePosition
+from digraph import nx, orderedNodes, NodeState, isLeaf, isRoot, classifyNodes
+from topoSorts import TopoSortHasher, topoSortsFrom, hashEquivClasses, multinomial_coefficient
+from equivalenceClass import EquivalenceClass, NodePosition
 import itertools
 import math
 memoHits = 0

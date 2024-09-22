@@ -1,6 +1,6 @@
 from typing import List, Dict, Any
-from .equivalenceClass import EquivalenceClass
-from .digraph import NodeState, isRoot, isLeaf, nx
+from equivalenceClass import EquivalenceClass
+from digraph import NodeState, isRoot, isLeaf, nx
 from scipy.special import comb
 import math
 

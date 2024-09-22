@@ -1,5 +1,5 @@
 from typing import Any, List
-from .digraph import isLeaf, classifyNodes, nx
+from digraph import isLeaf, classifyNodes, nx
 import math
 
 class NodePosition:

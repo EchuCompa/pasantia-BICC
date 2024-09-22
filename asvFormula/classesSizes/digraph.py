@@ -51,7 +51,7 @@ def isRoot(node, dag : nx.DiGraph):
     return dag.in_degree(node) == 0
 
 def drawGraph(dag : nx.DiGraph):
-    pos = nx.spring_layout(dag)
+    pos = nx.nx_agraph.graphviz_layout(dag, prog="dot") #To have a tree layout
     nx.draw(dag, pos, with_labels=True)
     plt.show()
 
