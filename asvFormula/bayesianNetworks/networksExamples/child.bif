@@ -13,7 +13,7 @@ variable CO2 {
   type discrete [ 3 ] { Normal, Low, High };
 }
 variable ChestXray {
-  type discrete [ 5 ] { Normal, Oligaemic, Plethoric, Grd_Glass, Asy/Patch };
+  type discrete [ 5 ] { Normal, Oligaemic, Plethoric, Grd_Glass, Asy_Patch };
 }
 variable Grunting {
   type discrete [ 2 ] { yes, no };
@@ -31,7 +31,7 @@ variable CO2Report {
   type discrete [ 2 ] { <7.5, >=7.5 };
 }
 variable XrayReport {
-  type discrete [ 5 ] { Normal, Oligaemic, Plethoric, Grd_Glass, Asy/Patchy };
+  type discrete [ 5 ] { Normal, Oligaemic, Plethoric, Grd_Glass, Asy_Patch };
 }
 variable Disease {
   type discrete [ 6 ] { PFC, TGA, Fallot, PAIVS, TAPVD, Lung };
@@ -142,7 +142,7 @@ probability ( XrayReport | ChestXray ) {
   (Oligaemic) 0.10, 0.80, 0.02, 0.02, 0.06;
   (Plethoric) 0.10, 0.02, 0.80, 0.02, 0.06;
   (Grd_Glass) 0.08, 0.02, 0.10, 0.60, 0.20;
-  (Asy/Patch) 0.08, 0.02, 0.10, 0.10, 0.70;
+  (Asy_Patch) 0.08, 0.02, 0.10, 0.10, 0.70;
 }
 probability ( Disease | BirthAsphyxia ) {
   (yes) 0.20, 0.30, 0.25, 0.15, 0.05, 0.05;

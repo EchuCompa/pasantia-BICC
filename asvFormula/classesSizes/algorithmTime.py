@@ -1,10 +1,4 @@
 from typing import Any, Dict, List
-import os, sys
-# This is to import the digraph module from the parent directory
-module_path = os.path.join(os.path.dirname(os.path.abspath(__file__)))
-if module_path not in sys.path:
-    sys.path.append(module_path)
-
 from digraph import nx, classifyNodes, orderedNodes, NodeState
 from topoSorts import allTopoSorts, TopoSortHasher, topoSortsFrom
 from equivalenceClass import EquivalenceClass, numberOfEquivalenceClasses
