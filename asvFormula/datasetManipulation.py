@@ -5,7 +5,7 @@ def encodeCategoricalColumns(dataset):
     le = LabelEncoder()
     encodedDataset = dataset.copy()
     categorical_columns = dataset.select_dtypes(include=['object', 'category', 'bool']).columns
-    for column in categorical_columns:
-        encodedDataset[column] = le.fit_transform(encodedDataset[column])
-        encodingDict[column] =  dict(zip(le.classes_, range(len(le.classes_))))
+    for columnName in categorical_columns:
+        encodedDataset[columnName] = le.fit_transform(encodedDataset[columnName])
+        encodingDict[columnName] =  le.classes_
     return encodingDict, encodedDataset

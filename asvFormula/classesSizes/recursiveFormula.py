@@ -6,17 +6,22 @@ import itertools
 import math
 memoHits = 0
 
-def equivalenceClassesFor(dag, feature_node):
+
+def equivalenceClassesFor(dag, feature_node) -> List[EquivalenceClass]:
    
+    return equivalanceClassesSizesWithHashes(dag, feature_node).values()
+
+
+def equivalanceClassesSizesWithHashes(dag, feature_node) -> Dict[int, Any]:
     nodes_classification = {}
     unr_roots = classifyNodes(dag, feature_node, nodes_classification)
     hasher = TopoSortHasher(nodes_classification)
-    equivClasses = recursiveEquivalenceClassesSizes(dag, unr_roots, hasher, feature_node, nodes_classification)   
+    equivClasses = recursiveEquivalenceClassesSizes(dag, unr_roots, hasher, feature_node, nodes_classification) 
 
     return equivClasses
 
 
-def recursiveEquivalenceClassesSizes(dag : nx.DiGraph, unr_roots : List[Any], hasher : TopoSortHasher, feature_node, nodes_classification : Dict[Any, NodeState]) -> List[EquivalenceClass]:
+def recursiveEquivalenceClassesSizes(dag : nx.DiGraph, unr_roots : List[Any], hasher : TopoSortHasher, feature_node, nodes_classification : Dict[Any, NodeState]) -> Dict[int, Any]:
     unr_classes = list(map(lambda child : unrelatedEquivalenceClassesSizes(child,dag), unr_roots))
     unr_classes = uniteClassesWithSameParent(unr_classes, dag)
     ancestors = orderedNodes(dag, nx.ancestors(dag, feature_node))
