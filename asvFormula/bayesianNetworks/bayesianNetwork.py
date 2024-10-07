@@ -61,7 +61,8 @@ def decisionTreeFromDataset(dataset : pd.DataFrame, target_feature, maximum_dept
     rf_model = tree.DecisionTreeClassifier(max_depth=maximum_depth, random_state=rand_state)
     # These trees will always be binary ones, that's the implementation is sklearn.
     rf_model.fit(X_train, y_train)
-
+    print(f'The model accuracy is : {rf_model.score(X_test, y_test)}')
+    
     return rf_model
 
 def datasetFromBayesianNetwork(model, n):
