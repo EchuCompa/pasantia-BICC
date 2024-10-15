@@ -5,8 +5,8 @@ from sklearn import tree
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 import pandas as pd
-import pgmpy
 from pgmpy.inference import VariableElimination
+import shap
 from classesSizes.digraph import *
 
 
@@ -68,36 +68,56 @@ def decisionTreeFromDataset(dataset : pd.DataFrame, target_feature, maximum_dept
 def datasetFromBayesianNetwork(model, n):
     return model.simulate(n_samples=n)
 
-def meanForDTinBN(dtClassifer : DecisionTreeClassifier, bayesianNetwork : VariableElimination, valuesPerFeature : dict[str, list], variableToPredict : str, expectedValue : str, featureNames : list[str]) -> float:
-    dtAsNetwork = obtainNetworkXTreeStructure(dtClassifer, featureNames)
+def meanForDTinBN(dtClassifer : DecisionTreeClassifier, bayesianNetwork : VariableElimination, valuesPerFeature : dict[str, list], variableToPredict : str, expectedValue : str) -> float:
+    assert variableToPredict in valuesPerFeature.keys(), "The variable to predict must be in the valuesPerFeature dictionary"
+    assert expectedValue in valuesPerFeature[variableToPredict], "The expected value must be in the valuesPerFeature dictionary"
+    dtAsNetwork = obtainNetworkXTreeStructure(dtClassifer, list(valuesPerFeature.keys()))
 
     rootNodes = [node for node in dtAsNetwork.nodes if isRoot(node, dtAsNetwork)] 
     root = rootNodes[0]
     probPerLeafNode = {node : dtClassifer.tree_.value[node][0][0] for node in dtAsNetwork.nodes if isLeaf(node, dtAsNetwork)}
 
-    return meanForDTinBN(probPerLeafNode, dtAsNetwork, root, bayesianNetwork, {}, valuesPerFeature, variableToPredict, expectedValue)
+    return meanForDTinBNWithEvidence(probPerLeafNode, dtAsNetwork, root, bayesianNetwork, {}, valuesPerFeature, variableToPredict, expectedValue)
 
 
     
 
-def meanForDTinBN(probPerLeafNode : Dict[Any,float], tree : nx.DiGraph, node, bayesianNetwork : VariableElimination, actualEvidence : dict[str, str], valuesPerFeature : dict[str, list], variableToPredict : str, expectedValue : str) -> float:
-    feature = nodeLabel(node, tree)
-    probs = bayesianNetwork.query(variables=[feature], evidence = actualEvidence)
-
+def meanForDTinBNWithEvidence(probPerLeafNode : Dict[Any,float], tree : nx.DiGraph, node, bayesianNetwork : VariableElimination, actualEvidence : dict[str, str], valuesPerFeature : dict[str, list], variableToPredict : str, expectedValue : str) -> float:
     if isLeaf(node, tree):
         return probPerLeafNode[node]
-    if variableToPredict == feature:
-        return probs.get_value(**{variableToPredict : expectedValue})
+    
+    feature = nodeLabel(node, tree)
+    probOfActualEvidence = bayesianNetwork.query(variables=[feature], evidence = actualEvidence)
+
+    if variableToPredict == feature: #If the feature is the one we want to predict, we return the probability of the expected value
+        return probOfActualEvidence.get_value(**{variableToPredict : expectedValue})
     
     featureValues = valuesPerFeature[feature]
     children = list(tree.successors(node))
     
     actualEvidence[feature] = featureValues[0]
-    leftMean = meanForDTinBN(probPerLeafNode, tree, children[0] , bayesianNetwork, actualEvidence, valuesPerFeature, variableToPredict)
-    leftProbability = probs.get_value(**{feature : featureValues[0]})
+    leftMean = meanForDTinBNWithEvidence(probPerLeafNode, tree, children[0] , bayesianNetwork, actualEvidence, valuesPerFeature, variableToPredict, expectedValue)
+    leftProbability = probOfActualEvidence.get_value(**{feature : featureValues[0]})
 
     actualEvidence[feature] = featureValues[1]
-    rightMean = meanForDTinBN(probPerLeafNode, tree, children[1], bayesianNetwork, actualEvidence, valuesPerFeature, variableToPredict)
-    rightProbability = probs.get_value(**{feature : featureValues[1]})
+    rightMean = meanForDTinBNWithEvidence(probPerLeafNode, tree, children[1], bayesianNetwork, actualEvidence, valuesPerFeature, variableToPredict, expectedValue)
+    rightProbability = probOfActualEvidence.get_value(**{feature : featureValues[1]})
 
+    del actualEvidence[feature]
     return leftMean * leftProbability + rightMean * rightProbability
+
+def showMeanPredictionOfModel(variableValue : str, variableToPredict : str, completeBNInference : VariableElimination, valuesPerFeature : dict[str,list], dtTreeClassifier : DecisionTreeClassifier):
+    encodedValue,  = np.where(valuesPerFeature[variableToPredict] ==(variableValue))
+    encodedValue = encodedValue[0]
+
+    print(f"Predicting the value {variableValue} for the variable {variableToPredict}")
+    meanValueForModel = meanForDTinBN(dtTreeClassifier, completeBNInference, valuesPerFeature, variableToPredict, variableValue)
+    print(f"Mean prediction value for the model: {meanValueForModel}")
+
+    explainer = shap.TreeExplainer(dtTreeClassifier)
+    meanValueForShap = explainer.expected_value[encodedValue]
+    print(f"Estimated value for shap explainer: {meanValueForShap}")
+
+    variableProbability = completeBNInference.query([variableToPredict])
+    valueOrderInBN = variableProbability.state_names[variableToPredict].index(variableValue)
+    print(f"Probability in the bayesian network: {variableProbability.values[valueOrderInBN]}")
