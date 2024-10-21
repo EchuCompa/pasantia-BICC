@@ -69,6 +69,7 @@ class ASV:
 
         return consistentInstances
 
+    # TODO: See if there is a better way to cache/encode instances to generate more hits.
     @lru_cache(maxsize=None)
     def cached_prob_of_instance(self, tuple_instance: Tuple, realFeaturesTuple: Tuple[str], rowIndex : Tuple) -> float:
         # Convert tuple back to pandas Series
