@@ -3,10 +3,11 @@
 from pgmpy.inference import VariableElimination
 from bayesianNetworks.bayesianNetwork import *
 from datasetManipulation import *
-from  classesSizes.recursiveFormula import *
+from classesSizes.recursiveFormula import *
+from classesSizes.topoSorts import allTopoSorts
 from functools import lru_cache
 import shap
-
+import time
 
 class ASV:
     def __init__(self, dag : nx.DiGraph, model, feature_distributions : VariableElimination, valuesPerFeature : dict[str, list]):
@@ -15,18 +16,22 @@ class ASV:
         self.feature_distributions = feature_distributions
         self.valuesPerFeature = valuesPerFeature
 
-    def asvForFeature(self, feature : str, instance : pd.Series) -> float:
+    def asvForFeature(self, feature : str, instance : pd.Series, showProgress = False) -> float:
         equivalenceClasses = equivalenceClassesFor(self.dag, feature)
         asvValue = 0
         totalTopologicalOrders = 0
-        for equivalenceClass in equivalenceClasses:
+        allTopologicalOrders = allTopoSorts(self.dag)
+
+        for i, equivalenceClass in enumerate(equivalenceClasses):
             classFeaturesOrder = equivalenceClass[0]
             classSize = equivalenceClass[1]
             totalTopologicalOrders += classSize
             asvValue += classSize * (self.meanPredictionForEquivalenceClass(classFeaturesOrder, feature, instance, True) -  
                                     self.meanPredictionForEquivalenceClass(classFeaturesOrder, feature, instance, False))
+            if showProgress: print(f'Progress of classes processed: {i/len(equivalenceClass)}%')
 
-        return asvValue/totalTopologicalOrders #This is the normalization for the ASV value
+        assert totalTopologicalOrders == allTopologicalOrders, f"The total number of topological orders for the equivalence classes is {totalTopologicalOrders} and the total number of topological orders for the graph is {allTopologicalOrders}"
+        return asvValue/allTopologicalOrders #This is the normalization for the ASV value
 
     def meanPredictionForEquivalenceClass(self, classFeaturesOrder : List[str], feature : str, instance : pd.Series, featureFixed : bool) -> float:
         
@@ -34,28 +39,34 @@ class ASV:
         fixedFeatures = classFeaturesOrder[:fixedFeaturesFrom]
         variableFeatures = classFeaturesOrder[fixedFeaturesFrom:]
 
+        #TODO: Optimize this section, it takes too much time
         consistentDataset = self.consistentInstances(instance, fixedFeatures, variableFeatures)
 
         predictions = self.model.predict(consistentDataset)
+
         realFeaturesTuple = tuple(fixedFeatures)
-        probabilities = consistentDataset.apply(lambda row: self.cached_prob_of_instance(tuple(row), realFeaturesTuple, tuple(row.index)), axis=1)
 
+        probabilities = consistentDataset.apply(
+            lambda row: self.probOfInstance(row, fixedFeatures), 
+            axis=1
+        )
+        #print(self.cached_prob_of_instance.cache_info())
         meanPrediction = np.dot(predictions, probabilities)
-
         return meanPrediction
 
     def consistentInstances(self, instance: pd.Series, fixedFeatures: list[str], variableFeatures: list[str]) -> pd.DataFrame:
-        
         fixed_values = {feature: instance[feature] for feature in fixedFeatures}
+        fixed_part_df = pd.DataFrame([fixed_values])
 
-        variable_values = [list(range(0,len(self.valuesPerFeature[feature]))) for feature in variableFeatures] #This is because the LabelEncoder() encodes the values from [0: n_values]
-        all_combinations = list(itertools.product(*variable_values))
+        variable_values = [range(len(self.valuesPerFeature[feature])) for feature in variableFeatures] #This is because the LabelEncoder() encodes the values from [0: n_values]
+        variable_combinations_df = pd.DataFrame(itertools.product(*variable_values), columns=variableFeatures)
 
-        variable_combinations_df = pd.DataFrame(all_combinations, columns=variableFeatures)
+        fixed_part_repeated = pd.concat([fixed_part_df] * len(variable_combinations_df), ignore_index=True)
 
-        fixed_part_df = pd.DataFrame([fixed_values] * len(variable_combinations_df))
-        consistentInstances = pd.concat([fixed_part_df.reset_index(drop=True), variable_combinations_df.reset_index(drop=True)], axis=1)
-        consistentInstances = consistentInstances[instance.index] #This is to ensure that the order of the columns is the same as the instance
+        # Step 4: Concatenate fixed and variable parts and reorder columns
+        consistentInstances = pd.concat([fixed_part_repeated, variable_combinations_df], axis=1)
+        consistentInstances = consistentInstances[instance.index]  # Ensure column order matches the original instance
+
         return consistentInstances
 
     @lru_cache(maxsize=None)
@@ -85,11 +96,11 @@ class ASV:
         return decodedInstance
     
 
-def showASVandShapleyFor(first_instance : pd.Series, features : list[str], dtTreeClassifier : DecisionTreeClassifier, asv : ASV):
+def showASVandShapleyFor(first_instance : pd.Series, features : list[str], dtTreeClassifier : DecisionTreeClassifier, asv : ASV , progress = False):
     sumOfAsv = 0   
     print("ASV values for the first instance:")
     for feature in features:
-        asvValue = asv.asvForFeature(feature, first_instance)
+        asvValue = asv.asvForFeature(feature, first_instance, showProgress=progress)
         sumOfAsv += asvValue
         print(f"ASV for {feature}: {asvValue}")
 

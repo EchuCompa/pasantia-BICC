@@ -115,3 +115,14 @@ def balancedTree(height: int, branchingFactor: int = 2) -> nx.DiGraph:
         current_level_nodes = next_level_nodes
     
     return balanced_tree
+
+def hasUnderlyingTree(G : nx.DiGraph) -> bool:
+    undirected_G = G.to_undirected()
+
+    if not nx.is_connected(undirected_G):
+        return False
+
+    if undirected_G.number_of_edges() != len(undirected_G.nodes()) - 1:
+        return False
+
+    return True

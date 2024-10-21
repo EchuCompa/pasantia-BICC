@@ -54,14 +54,20 @@ def topoSortsFrom(node, dag : nx.DiGraph):
 def allTopoSorts(dag : nx.DiGraph):
     #Add a root node to the graph that is connected to all the roots of the graph.
     roots = [node for node in dag.nodes() if isRoot(node, dag)]
+    
 
-    dag.add_node('Root')
+    if len(roots) == 1:
+        root = roots[0]
+        res = topoSortsFrom(root, dag)
+    else:
+        newRoot = 'Root'
+        dag.add_node(newRoot)
 
-    for root in roots:
-        dag.add_edge('Root', root)
-        
-    res = topoSortsFrom('Root', dag)
-    dag.remove_node('Root')
+        for root in roots:
+            dag.add_edge(newRoot, root)
+        res = topoSortsFrom(newRoot, dag)
+        dag.remove_node(newRoot)    
+    
     return res
 
 def isTopologicalSort(G, ordering):

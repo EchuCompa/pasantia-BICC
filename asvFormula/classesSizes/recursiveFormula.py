@@ -9,7 +9,7 @@ memoHits = 0
 
 def equivalenceClassesFor(dag, feature_node) -> List[EquivalenceClass]:
    
-    return equivalanceClassesSizesWithHashes(dag, feature_node).values()
+    return list(equivalanceClassesSizesWithHashes(dag, feature_node).values())
 
 
 def equivalanceClassesSizesWithHashes(dag, feature_node) -> Dict[int, Any]:
