@@ -50,8 +50,20 @@ def isLeaf(node, dag : nx.DiGraph):
 def isRoot(node, dag : nx.DiGraph):
     return dag.in_degree(node) == 0
 
+def nodeAttribute(node, dag : nx.DiGraph, attribute : str):
+    return dag.nodes[node].get(attribute, str(node))
+
 def nodeLabel(node, dag : nx.DiGraph):
-    return dag.nodes[node].get('label', str(node))
+    return nodeAttribute(node, dag, 'label')
+
+def nodeThreshold(node, dag : nx.DiGraph):
+    return nodeAttribute(node, dag, 'threshold')
+
+def nodeMeanPrediction(node, dag : nx.DiGraph):
+    return nodeAttribute(node, dag, 'meanPrediction')
+
+def nodeFeature(node, dag : nx.DiGraph):
+    return nodeAttribute(node, dag, 'feature')
 
 def drawGraph(dag : nx.DiGraph):
     pos = nx.nx_agraph.graphviz_layout(dag, prog="dot") #To have a tree layout
