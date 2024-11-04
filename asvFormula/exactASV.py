@@ -10,13 +10,20 @@ import shap
 import time
 
 class ASV:
-    def __init__(self, dag : nx.DiGraph, model, feature_distributions : VariableElimination, valuesPerFeature : dict[str, list]):
+    def __init__(self, dag : nx.DiGraph, model, feature_distributions : VariableElimination, valuesPerFeature : dict[str, list], feature : str, predictionFunction : str = 'Exact'):
         self.dag = dag
         self.model = model
         self.feature_distributions = feature_distributions
         self.valuesPerFeature = valuesPerFeature
+        self.predictionFunction = (lambda n, tree : tree.nodeMeanPrediction(n)) if predictionFunction == 'Mean' else lambda n, tree : tree.nodePrediction(n)
 
-    def asvForFeature(self, feature : str, instance : pd.Series, showProgress = False) -> float:
+        modelFeatures = list(valuesPerFeature.keys())
+        modelFeatures.remove(feature)
+        self.modelAsTree = obtainDecisionTreeDigraph(model, list(modelFeatures))
+
+    #It returns the ASV value for each possible value of the feature. 
+    def asvForFeature(self, feature : str, instance : pd.Series, showProgress = False) -> list[float]: 
+        
         equivalenceClasses = equivalenceClassesFor(self.dag, feature)
         asvValue = 0
         totalTopologicalOrders = 0
@@ -34,6 +41,16 @@ class ASV:
         return asvValue/allTopologicalOrders #This is the normalization for the ASV value
 
     def meanPredictionForEquivalenceClass(self, classFeaturesOrder : List[str], feature : str, instance : pd.Series, featureFixed : bool) -> float:
+        fixedFeaturesFrom = classFeaturesOrder.index(feature) + (1 if featureFixed else 0)
+        fixedFeatures = classFeaturesOrder[:fixedFeaturesFrom]
+
+        priorEvidence = {feature : instance[feature] for feature in fixedFeatures}
+        rootNodes = [node for node in self.modelAsTree.nodes if isRoot(node, self.modelAsTree)] 
+        root = rootNodes[0]
+
+        return meanPredictionForDTinBNWithEvidence(self.modelAsTree, root, self.feature_distributions, PathCondition(self.valuesPerFeature), priorEvidence, nodePrediction=self.predictionFunction)
+    
+    def oldMeanPredictionForEquivalenceClass(self, classFeaturesOrder : List[str], feature : str, instance : pd.Series, featureFixed : bool) -> float:
         
         fixedFeaturesFrom = classFeaturesOrder.index(feature) + (1 if featureFixed else 0)
         fixedFeatures = classFeaturesOrder[:fixedFeaturesFrom]
@@ -43,8 +60,6 @@ class ASV:
         consistentDataset = self.consistentInstances(instance, fixedFeatures, variableFeatures)
 
         predictions = self.model.predict(consistentDataset)
-
-        realFeaturesTuple = tuple(fixedFeatures)
 
         probabilities = consistentDataset.apply(
             lambda row: self.probOfInstance(row, fixedFeatures), 
@@ -117,3 +132,21 @@ def showASVandShapleyFor(first_instance : pd.Series, features : list[str], dtTre
         print(f"Feature: {feature}, Shapley Value: {shap_value[1]}")
 
     print(f"Sum of Shapley values: {sumOfAShapleyValues}")
+
+#I want to the same as the previous function but saving the results in a file
+
+def writeASVAndShapleyIntoFile(first_instance : pd.Series, features : list[str], dtTreeClassifier : DecisionTreeClassifier, asv : ASV, file : str, valuesPerFeature : dict[str,list], variableToPredict : str, progress = False):
+    # I want it in a CSV format as a table. With the features as the columns and the values as the rows
+    explainer = shap.TreeExplainer(dtTreeClassifier)
+    shap_values = explainer.shap_values(first_instance)
+    predictionValues = valuesPerFeature[variableToPredict]
+    with open(file, 'w') as f:
+        f.write(f"Feature,{variableToPredict} value, ASV,Shapley\n")
+        sumOfAsv = np.zeros(dtTreeClassifier.n_classes_)
+        for i, feature in enumerate(features):
+            asvValue = asv.asvForFeature(feature, first_instance, showProgress=progress)
+            sumOfAsv += asvValue
+            shapleyValue = shap_values[i]
+            for i in range(len(shapleyValue)):
+                f.write(f"{feature},{predictionValues[i]},{asvValue[i]},{shapleyValue[i]}\n")
+        f.write(f"Sum,{sumOfAsv},{sum(shap_values)}\n")

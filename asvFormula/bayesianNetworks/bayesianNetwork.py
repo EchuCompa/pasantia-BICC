@@ -11,11 +11,39 @@ from classesSizes.digraph import *
 from pgmpy.models import BayesianNetwork
 from pathCondition import PathCondition
 import math
+from typing import Callable
 
 
-def obtainNetworkXTreeStructure(decisionTree : tree.DecisionTreeClassifier, featureNames : list[str]) -> nx.DiGraph:
+class DecisionTreeDigraph(nx.DiGraph):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def nodeAttribute(self , node, attribute : str):
+        return self.nodes[node].get(attribute, str(node))
+
+    def nodeLabel(self , node):
+        return self.nodeAttribute(node, 'label')
+
+    def nodeThreshold(self , node):
+        return self.nodeAttribute(node, 'threshold')
+
+    #It asumes that is a binary classifier, so it returns the probability for each class
+    def nodeMeanPrediction(self , node):
+        return self.nodeAttribute(node, 'classesProbabilities') 
+    
+    #It asumes that is a binary classifier, so it returns 0 or 1 for each class. It will return 1 for the class with the highest probability
+    def nodePrediction(self , node):
+        probs = self.nodeAttribute(node, 'classesProbabilities')
+        maxValues = probs == max(probs)
+        return maxValues.astype(int)
+
+    def nodeFeature(self , node):
+        return self.nodeAttribute(node, 'feature')
+
+def obtainDecisionTreeDigraph(decisionTree : tree.DecisionTreeClassifier, featureNames : list[str]) -> DecisionTreeDigraph:
     # Extract the necessary details from the tree
-    G = nx.DiGraph()
+    G = DecisionTreeDigraph()
     children_left = decisionTree.tree_.children_left
     children_right = decisionTree.tree_.children_right
     feature = decisionTree.tree_.feature
@@ -25,13 +53,11 @@ def obtainNetworkXTreeStructure(decisionTree : tree.DecisionTreeClassifier, feat
     # Stack to keep track of nodes to visit
     stack = [(0, 0)]  # start with the root node id (0) and its depth (0)
     
-    nodeMeanPrediction = lambda x : sum([i * x[i] for i in range(len(x))])
-    
     while len(stack) > 0:
         node_id, depth = stack.pop()
-        meanPredictionPerNode = nodeMeanPrediction(values[node_id][0])
+        classesValues = values[node_id][0]
         # Modify the label to show the actual feature name, we asume that feature names has the same order as the original dataset
-        G.add_node(node_id, label=f"{featureNames[feature[node_id]]}, node: {node_id}", threshold = thresholds[node_id], meanPrediction = meanPredictionPerNode, feature = featureNames[feature[node_id]])
+        G.add_node(node_id, label=f"{featureNames[feature[node_id]]}, node: {node_id}", threshold = thresholds[node_id], classesProbabilities = classesValues, feature = featureNames[feature[node_id]])
 
         # Check if it's a split node (non-leaf)
         is_split_node = children_left[node_id] != children_right[node_id]
@@ -47,7 +73,8 @@ def obtainNetworkXTreeStructure(decisionTree : tree.DecisionTreeClassifier, feat
         else:
             #G.add_node(node_id, label=f"Leaf {node_id}: {np.around(values[node_id], 3)}")
             # Obtains the prediction of the node instead of the probabilities
-            G.add_node(node_id, label=f"{node_id}: {round(meanPredictionPerNode,2)}")
+            prediction = np.argmax(classesValues)
+            G.add_node(node_id, label=f"{node_id}: {prediction}")
     return G
 
 def drawDecisionTree(decisionTree : nx.DiGraph):
@@ -77,52 +104,67 @@ def decisionTreeFromDataset(dataset : pd.DataFrame, target_feature, maximum_dept
 def datasetFromBayesianNetwork(model, n):
     return model.simulate(n_samples=n)
 
-# TODO: Add the possibility to have a different number of values for each feature, with a variable expectedValue. 
-
-def meanForDTinBN(dtClassifer : DecisionTreeClassifier, bayesianNetwork : VariableElimination, valuesPerFeature : dict[str, list], variableToPredict : str) -> float:
+#It returns the mean value for each possible value of the feature. 
+def meanPredictionForDTinBN(dtClassifer : DecisionTreeClassifier, bayesianNetwork : VariableElimination, valuesPerFeature : dict[str, list], variableToPredict : str) -> list[float]:
     assert variableToPredict in valuesPerFeature.keys(), "The variable to predict must be in the valuesPerFeature dictionary"
 
     featureNames = list(valuesPerFeature.keys())
     featureNames.remove(variableToPredict) # The variable to predict is not a feature, it was not present in the original dataset
-    dtAsNetwork = obtainNetworkXTreeStructure(dtClassifer, featureNames)
+    dtAsNetwork = obtainDecisionTreeDigraph(dtClassifer, featureNames)
 
     rootNodes = [node for node in dtAsNetwork.nodes if isRoot(node, dtAsNetwork)] 
     root = rootNodes[0]
     
-    return meanForDTinBNWithEvidence(dtAsNetwork, root, bayesianNetwork, PathCondition(valuesPerFeature), variableToPredict)
+    return meanPredictionForDTinBNWithEvidence(dtAsNetwork, root, bayesianNetwork, PathCondition(valuesPerFeature))
 
-def meanForDTinBNWithEvidence(decisionTreeGraph : nx.DiGraph, node, bayesianNetwork : VariableElimination, pathCondition : PathCondition, modelFeature : str, priorEvidence : dict[str, list] = None) -> float:
+def meanPredictionForDTinBNWithEvidence(decisionTreeGraph : DecisionTreeDigraph, node, bayesianNetwork : VariableElimination, pathCondition : PathCondition, priorEvidence : dict[str, list] = None, nodePrediction : Callable = lambda n, tree : tree.nodeMeanPrediction(n)) -> list[float]:
     
-    if isLeaf(node, decisionTreeGraph):  
+    if pathCondition.doesNotMatchEvidence(priorEvidence):
+        possibleOutputs = len(nodePrediction(node, decisionTreeGraph))
+        return np.zeros(possibleOutputs)
+
+    if isLeaf(node, decisionTreeGraph):
+
+        pathCondition.removeEvidence(priorEvidence)
         pathVariables = pathCondition.getVariables()
-        inferenceWithEvidence = bayesianNetwork.query(variables=pathVariables, evidence = priorEvidence)
+        
+        if pathVariables != []: #This means that the path we took is not included in the prior evidence
+            probOfAllEvents = 0
+            decodedEvidence = pathCondition.decodeEvidence(priorEvidence)
+            inferenceWithEvidence = bayesianNetwork.query(variables=pathVariables, evidence = decodedEvidence)
+        
+            for event in pathCondition.allPossibleEvents():
+                query = {pathVariables[i] : event[i] for i in range(len(pathVariables))}
+                probOfAllEvents += inferenceWithEvidence.get_value(**query)
+        else:
+            probOfAllEvents = 1 #The evidence is the same as the path condition, so the probability is 1
 
-        probOfAllEvents = 0
-        for event in pathCondition.allPossibleEvents():
-            query = {pathVariables[i] : event[i] for i in range(len(pathVariables))}
-            probOfAllEvents += inferenceWithEvidence.get_value(**query)
-        return nodeMeanPrediction(node, decisionTreeGraph) * probOfAllEvents
+        return  nodePrediction(node, decisionTreeGraph) * probOfAllEvents
     
-    feature = nodeFeature(node, decisionTreeGraph)
-    treshold = nodeThreshold(node, decisionTreeGraph) 
+    feature = decisionTreeGraph.nodeFeature(node)
+    treshold = decisionTreeGraph.nodeThreshold(node) 
     children = list(decisionTreeGraph.successors(node))
+    previousUpperLimit = pathCondition.getUpperLimit(feature)
+    previousLowerLimit = pathCondition.getLowerLimit(feature)
     
     pathCondition.setVariableUpperLimit(feature, math.floor(treshold))
-    leftMean = meanForDTinBNWithEvidence(decisionTreeGraph, children[0] , bayesianNetwork, pathCondition, modelFeature)
-    pathCondition.removeVariable(feature)
+    leftMean = meanPredictionForDTinBNWithEvidence(decisionTreeGraph, children[0] , bayesianNetwork, pathCondition, priorEvidence, nodePrediction)
+    pathCondition.setVariableUpperLimit(feature, previousUpperLimit) 
 
     pathCondition.setVariableLowerLimit(feature, math.ceil(treshold))
-    rightMean = meanForDTinBNWithEvidence(decisionTreeGraph, children[1], bayesianNetwork, pathCondition, modelFeature)
-    pathCondition.removeVariable(feature)
+    rightMean = meanPredictionForDTinBNWithEvidence(decisionTreeGraph, children[1], bayesianNetwork, pathCondition, priorEvidence, nodePrediction)
+    pathCondition.setVariableLowerLimit(feature, previousLowerLimit)
 
     return leftMean + rightMean
 
 def showMeanPredictionOfModel(variableToPredict : str, completeBNInference : VariableElimination, valuesPerFeature : dict[str,list], dtTreeClassifier : DecisionTreeClassifier):
 
-
     print(f"Mean prediction of model for the variable {variableToPredict}")
 
-    meanValueForModel = meanForDTinBN(dtTreeClassifier, completeBNInference, valuesPerFeature, variableToPredict)
+    meanValueForModel = 0
+    meanPredictions = meanPredictionForDTinBN(dtTreeClassifier, completeBNInference, valuesPerFeature, variableToPredict)
+    for value, prob in enumerate(meanPredictions):
+        meanValueForModel += value * prob
     print(f"Mean prediction value for the model: {meanValueForModel}")
 
     meanValueForShap = 0
@@ -136,6 +178,7 @@ def showMeanPredictionOfModel(variableToPredict : str, completeBNInference : Var
     for prediction, featureValue in enumerate(valuesPerFeature[variableToPredict]):
         meanPrediction += prediction * variableProbability.get_value(**{variableToPredict : featureValue})
     print(f"Mean prediction if we only use the bayesian network: {meanPrediction}")
+
 
 def removeEdgeAndMarginalizeCPD(treeBNChild : BayesianNetwork, tail, head):
     treeBNChild.remove_edge(tail, head)
