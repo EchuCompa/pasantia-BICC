@@ -1,6 +1,6 @@
 from typing import List, Dict, Any, Tuple
 from asvFormula.digraph import nx, orderedNodes, NodeState, isLeaf, isRoot, classifyNodes
-from asvFormula.topoSorts.topoSorts import TopoSortHasher, topoSortsFrom, hashEquivClasses, multinomial_coefficient
+from asvFormula.topoSorts.utils import TopoSortHasher, topoSortsFrom, hashEquivClasses, multinomial_coefficient
 from equivalenceClass import EquivalenceClass, NodePosition
 import itertools
 import math

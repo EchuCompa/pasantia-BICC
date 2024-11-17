@@ -1,5 +1,5 @@
 from typing import List, Any
-from asvFormula.topoSorts.topoSorts import TopoSortHasher
+from asvFormula.topoSorts.utils import TopoSortHasher
 
 def naiveEquivalenceClassesSizes(all_topo_sorts : List[List[Any]], feature_node : Any, hasher : TopoSortHasher):
       

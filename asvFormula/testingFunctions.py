@@ -1,7 +1,8 @@
 import time
 from asvFormula.digraph import *
 from classesSizes.equivalenceClass import numberOfEquivalenceClasses
-from asvFormula.topoSorts.topoSorts import TopoSortHasher, allTopoSorts, nx, naivePositionsInToposorts, positionsInToposorts
+from asvFormula.topoSorts.utils import TopoSortHasher, allTopoSorts, nx
+from asvFormula.topoSorts.toposPositions import naivePositionsInToposorts, positionsInToposorts
 from classesSizes.algorithmTime import assertTopoSortsAndEquivalenceClasses
 from classesSizes.recursiveFormula import *
 from classesSizes.naiveFormula import *

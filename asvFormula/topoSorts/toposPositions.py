@@ -1,7 +1,7 @@
 from typing import Dict, Any
 from asvFormula.digraph import isRoot, nx
-from topoSorts import *
 from typing import NamedTuple
+from asvFormula.topoSorts.utils import sizeAndNumberOfTopoSortsTree, multinomial_coefficient
 
 #Returns a dict with the possible positions of a node in all the toposorts and who many exists. This works for trees.
 # {pos_x : number of toposorts with x in position pos_x}
@@ -13,8 +13,9 @@ def positionsInToposorts(node, tree : nx.DiGraph) -> Dict[Any, int]:
     return positions
 
 def positionsInToposortsAndNodesBelow(node, tree : nx.DiGraph) -> tuple[ Dict[Any, int], int]:
+
     if isRoot(node, tree):
-        treeSize, topoSorts =  sizeAndNumberOfTopoSorts(node, tree)
+        treeSize, topoSorts =  sizeAndNumberOfTopoSortsTree(node, tree)
         nodesAfter = treeSize - 1
         return {0: PositionInfo(topoSorts, nodesAfter) }
 
@@ -22,7 +23,7 @@ def positionsInToposortsAndNodesBelow(node, tree : nx.DiGraph) -> tuple[ Dict[An
     tree.remove_edge(parent, node)
 
     parentPositions = positionsInToposortsAndNodesBelow(parent, tree)
-    nodeSize, nodeTopos = sizeAndNumberOfTopoSorts(node, tree)
+    nodeSize, nodeTopos = sizeAndNumberOfTopoSortsTree(node, tree)
     nodesBelow = nodeSize - 1 
     
     nodePositions = {}

@@ -4,7 +4,7 @@ from pgmpy.inference import VariableElimination
 from bayesianNetworks.bayesianNetwork import *
 from datasetManipulation import *
 from classesSizes.recursiveFormula import *
-from asvFormula.topoSorts.topoSorts import allTopoSorts
+from asvFormula.topoSorts.utils import allTopoSorts
 from functools import lru_cache
 import shap
 import time
