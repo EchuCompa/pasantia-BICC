@@ -4,7 +4,7 @@ from pgmpy.inference import VariableElimination
 from bayesianNetworks.bayesianNetwork import *
 from datasetManipulation import *
 from classesSizes.recursiveFormula import *
-from classesSizes.topoSorts import allTopoSorts
+from asvFormula.topoSorts.topoSorts import allTopoSorts
 from functools import lru_cache
 import shap
 import time
@@ -40,7 +40,7 @@ class ASV:
         assert totalTopologicalOrders == allTopologicalOrders, f"The total number of topological orders for the equivalence classes is {totalTopologicalOrders} and the total number of topological orders for the graph is {allTopologicalOrders}"
         return asvValue/allTopologicalOrders #This is the normalization for the ASV value
 
-    def meanPredictionForEquivalenceClass(self, classFeaturesOrder : List[str], feature : str, instance : pd.Series, featureFixed : bool) -> float:
+    def meanPredictionForEquivalenceClass(self, classFeaturesOrder : List[str], feature : str, instance : pd.Series, featureFixed : bool) -> list[float]:
         fixedFeaturesFrom = classFeaturesOrder.index(feature) + (1 if featureFixed else 0)
         fixedFeatures = classFeaturesOrder[:fixedFeaturesFrom]
 
@@ -67,7 +67,7 @@ class ASV:
         )
         #print(self.cached_prob_of_instance.cache_info())
         meanPrediction = np.dot(predictions, probabilities)
-        return meanPrediction
+        return [1-meanPrediction, meanPrediction] #Esto es cualca, es para que corra nada más
 
     def consistentInstances(self, instance: pd.Series, fixedFeatures: list[str], variableFeatures: list[str]) -> pd.DataFrame:
         fixed_values = {feature: instance[feature] for feature in fixedFeatures}
@@ -111,6 +111,22 @@ class ASV:
                 decodedInstance[feature] = self.valuesPerFeature[feature][instance[feature]]
         return decodedInstance
     
+    #TODO: Finish this so that I can compare the mean predictions of the two approaches. I need to adapt the old mean prediction output to the new one
+
+    def assertAllMeanPredictionsAreSimilar(self, instance : pd.Series, showProgress = False) -> list[float]: 
+
+        features = [feature for feature in self.valuesPerFeature.keys() if feature in self.dag.nodes]
+        for feature in features:
+            for equivalenceClass in equivalenceClassesFor(self.dag, feature):
+                classFeaturesOrder = equivalenceClass[0]
+                self.assertMeanPredictionsAreSimilar(classFeaturesOrder, feature, instance, True)
+
+    def assertMeanPredictionsAreSimilar(self, classFeaturesOrder : List[str], feature : str, instance : pd.Series, featureFixed : bool):
+        
+        meanPredAlgorithm = self.meanPredictionForEquivalenceClass(classFeaturesOrder, feature, instance, featureFixed)
+        oldMeanPredAlgorithm = self.oldMeanPredictionForEquivalenceClass(classFeaturesOrder, feature, instance, featureFixed)
+        assert np.allclose(meanPredAlgorithm, oldMeanPredAlgorithm, atol=1.e-2), f"The mean prediction for the new algorithm is {meanPredAlgorithm} and the mean prediction for the old algorithm is {oldMeanPredAlgorithm}"
+
 
 def showASVandShapleyFor(first_instance : pd.Series, features : list[str], dtTreeClassifier : DecisionTreeClassifier, asv : ASV , progress = False):
     sumOfAsv = 0   

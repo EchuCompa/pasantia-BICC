@@ -7,7 +7,7 @@ from sklearn.tree import DecisionTreeClassifier
 import pandas as pd
 from pgmpy.inference import VariableElimination
 import shap
-from classesSizes.digraph import *
+from asvFormula.digraph import *
 from pgmpy.models import BayesianNetwork
 from pathCondition import PathCondition
 import math

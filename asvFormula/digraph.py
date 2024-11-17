@@ -50,6 +50,9 @@ def isLeaf(node, dag : nx.DiGraph):
 def isRoot(node, dag : nx.DiGraph):
     return dag.in_degree(node) == 0
 
+def hasMultipleParents(node, dag : nx.DiGraph):
+    return dag.in_degree(node) > 1
+
 def drawGraph(dag : nx.DiGraph):
     pos = nx.nx_agraph.graphviz_layout(dag, prog="dot") #To have a tree layout
     nx.draw(dag, pos, with_labels=True)

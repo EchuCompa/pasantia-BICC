@@ -1,8 +1,12 @@
 from typing import List, Dict, Any
-from equivalenceClass import EquivalenceClass
-from digraph import NodeState, isRoot, isLeaf, nx
+from asvFormula.digraph import NodeState, isRoot, isLeaf, hasMultipleParents, nx
 from scipy.special import comb
 import math
+from typing import NamedTuple
+from classesSizes.equivalenceClass import EquivalenceClass
+from toposPositions import naivePositionsInToposorts, positionsInToposorts
+
+#TODO: Organize this file into multiple files
 
 #Returns a hash that is the binary number which has 0 or 1 in the i-th position if the i-th unrelated node is before or after x_i
 
@@ -27,16 +31,42 @@ class TopoSortHasher:
 
 #Returns the size of the tree and the number of topological sorts
 
-def sizeAndNumberOfTopoSorts(node, dag : nx.DiGraph):
-    if isLeaf(node, dag):
+def sizeAndNumberOfTopoSorts(node, tree : nx.DiGraph):
+    if isLeaf(node, tree):
         return 1,1
     
     childrenSubtreeSizes = []
     children_topoSorts = []
 
     
-    for child in dag.successors(node):
-        child_size, child_topos =  sizeAndNumberOfTopoSorts(child,dag)
+    for child in tree.successors(node):
+        recursionNode = child
+
+        # I want to check if the child has more than one parent
+        if hasMultipleParents(child, tree):
+            parents = list(tree.predecessors(child))
+            tree.remove_edge(node, child)
+            anotherParent = next((parent for parent in parents if parent!=node), None)
+            recursionNode = anotherParent
+            
+        child_size, child_topos =  sizeAndNumberOfTopoSorts(recursionNode,tree)
+        children_topoSorts.append(child_topos)
+        childrenSubtreeSizes.append(child_size)
+        
+
+    topos = multinomial_coefficient(childrenSubtreeSizes) * math.prod(children_topoSorts)
+    return sum(childrenSubtreeSizes)+1, topos
+
+def oldSizeAndNumberOfTopoSorts(node, tree : nx.DiGraph):
+    if isLeaf(node, tree):
+        return 1,1
+    
+    childrenSubtreeSizes = []
+    children_topoSorts = []
+
+    
+    for child in tree.successors(node):
+        child_size, child_topos =  sizeAndNumberOfTopoSorts(child,tree)
         children_topoSorts.append(child_topos)
         childrenSubtreeSizes.append(child_size)
         
@@ -51,22 +81,22 @@ def topoSortsFrom(node, dag : nx.DiGraph):
 
 #TODO : Add dynamic programming so that each node knows its result.
 
-def allTopoSorts(dag : nx.DiGraph):
+def allTopoSorts(tree : nx.DiGraph):
     #Add a root node to the graph that is connected to all the roots of the graph.
-    roots = [node for node in dag.nodes() if isRoot(node, dag)]
+    roots = [node for node in tree.nodes() if isRoot(node, tree)]
     
 
     if len(roots) == 1:
         root = roots[0]
-        res = topoSortsFrom(root, dag)
+        res = topoSortsFrom(root, tree)
     else:
         newRoot = 'Root'
-        dag.add_node(newRoot)
+        tree.add_node(newRoot)
 
         for root in roots:
-            dag.add_edge(newRoot, root)
-        res = topoSortsFrom(newRoot, dag)
-        dag.remove_node(newRoot)    
+            tree.add_edge(newRoot, root)
+        res = topoSortsFrom(newRoot, tree)
+        tree.remove_node(newRoot)    
     
     return res
 

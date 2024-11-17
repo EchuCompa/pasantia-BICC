@@ -1,6 +1,6 @@
 from typing import Any, Dict, List
-from digraph import nx, classifyNodes, orderedNodes, NodeState
-from topoSorts import allTopoSorts, TopoSortHasher, topoSortsFrom
+from asvFormula.digraph import nx, classifyNodes, orderedNodes, NodeState
+from asvFormula.topoSorts.topoSorts import allTopoSorts, TopoSortHasher, topoSortsFrom
 from equivalenceClass import EquivalenceClass, numberOfEquivalenceClasses
 from recursiveFormula import unrelatedEquivalenceClassesSizes, lastUnionOf, uniteClassesWithSameParent, hashEquivClasses
 import time

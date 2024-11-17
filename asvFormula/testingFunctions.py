@@ -1,10 +1,12 @@
 import time
-from digraph import *
-from equivalenceClass import numberOfEquivalenceClasses
-from  topoSorts import TopoSortHasher, allTopoSorts
-from algorithmTime import assertTopoSortsAndEquivalenceClasses
-from  recursiveFormula import *
-from  naiveFormula import *
+from asvFormula.digraph import *
+from classesSizes.equivalenceClass import numberOfEquivalenceClasses
+from asvFormula.topoSorts.topoSorts import TopoSortHasher, allTopoSorts, nx, naivePositionsInToposorts, positionsInToposorts
+from classesSizes.algorithmTime import assertTopoSortsAndEquivalenceClasses
+from classesSizes.recursiveFormula import *
+from classesSizes.naiveFormula import *
+
+#TODO: Create tests for this class and use them instead of this functions in a collab notebook.
 
 def assertEquivalenceClassesForNode(dag: nx.DiGraph, feature_node, all_topo_sorts: List[List[Any]], timing_dict: Dict[str, Dict[str, float]]):
     
@@ -69,4 +71,12 @@ def assertEquivClassesForDag(dag: nx.DiGraph, nodesToEvaluate = None, allSorts =
 def test_allTopos(graph):
     all_topos = allTopoSorts(graph)
     all_topo_sorts = list(nx.all_topological_sorts(graph))
-    assert all_topos == len(all_topo_sorts), "allTopos and all_topological_sorts have different lengths"
+    assert all_topos == len(all_topo_sorts), f"allTopos: {all_topos} and all_topological_sorts: {len(all_topo_sorts)} have different lengths"
+
+def test_allToposPositions(node, graph : nx.DiGraph, allTopos : list[list[Any]]):    
+    allToposPositionsNaive = naivePositionsInToposorts(node, graph, allTopos)
+    allToposPositions = positionsInToposorts(node, graph)
+    assert allToposPositionsNaive.keys() == allToposPositions.keys(), f"Naive: {allToposPositionsNaive.keys()} and Recursive: {allToposPositions.keys()} positions are different"
+    for pos in allToposPositionsNaive.keys():
+        assert allToposPositionsNaive[pos] == allToposPositions[pos], f"Naive: {allToposPositionsNaive[pos]} and Recursive: {allToposPositions[pos]} have different values for position {pos} in node {node}"
+    

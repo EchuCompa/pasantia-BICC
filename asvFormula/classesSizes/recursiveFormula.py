@@ -1,6 +1,6 @@
 from typing import List, Dict, Any, Tuple
-from digraph import nx, orderedNodes, NodeState, isLeaf, isRoot, classifyNodes
-from topoSorts import TopoSortHasher, topoSortsFrom, hashEquivClasses, multinomial_coefficient
+from asvFormula.digraph import nx, orderedNodes, NodeState, isLeaf, isRoot, classifyNodes
+from asvFormula.topoSorts.topoSorts import TopoSortHasher, topoSortsFrom, hashEquivClasses, multinomial_coefficient
 from equivalenceClass import EquivalenceClass, NodePosition
 import itertools
 import math
@@ -108,7 +108,7 @@ def unionOf(equivalence_classes : List[EquivalenceClass], addLeftToposOrder : bo
     right_size = multinomial_coefficient(nodes_after) * math.prod(right_topos)
     return EquivalenceClass(positions, left_size, right_size)
 
-# TODO: Make some of the variables global, so that I don't need to pass them as arguments
+# TODO: Make some of the variables global or create a class for this method, so that I don't need to pass them as arguments
 
 def lastUnionOf(unr_classes : List[List[EquivalenceClass]], ancestors : List[Any], descendants : List[Any], descendantsTopoSorts : int, dag : nx.DiGraph, classification : Dict[Any, NodeState]) -> List[EquivalenceClass]:
     classes_combinations = list(itertools.product(*unr_classes)) #Generate al the possible combinations for each eqClass of each child with the eqClass of the other children. 
@@ -218,6 +218,6 @@ def possibleLeftOrders(actualPosition : int, leftElementsOfClasses : List[int], 
     memo[state] = totalOrders
     return totalOrders
 
-# TODO: Make some of the variables global, so that I don't need to pass them as arguments
+# TODO: Make some of the variables global or create a class for this method, so that I don't need to pass them as arguments
 
 #TODO : Improve the memoization data structure. Look if there is a structure that is useful for this kind of problem. ¿Maybe use lru_cache or other structure?
