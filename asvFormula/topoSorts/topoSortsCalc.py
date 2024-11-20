@@ -7,6 +7,7 @@ from typing import Any
 from asvFormula.classesSizes.recursiveFormula import getPossibleCombinations
 from itertools import product, permutations
 from typing import NamedTuple
+from functools import lru_cache
 
 #Returns a dict with the nodes with multiple parents and their parents
 def removeMultipleParents(polyTree : nx.DiGraph) -> dict[Any, list[Any]]:
@@ -69,16 +70,17 @@ class NodeInfo(NamedTuple):
     position: int
     node : Any
     treeSize : int
+    positionTopos : int
 
     def __str__(self) -> str:
         return str(self.node)
     
     def __repr__(self) -> str:
-        return str(self.node)
+        return f'Node: {str(self.node)} Position: {self.position}'
 
-def allToposOfOrder(order : list[NodeInfo], nodesSizesAndTopos : dict[Any, tuple[int, int]], polyTree : nx.DiGraph) -> int:
+def allToposOfOrder(order : list[NodeInfo]) -> int:
     
-    return math.prod([nodesSizesAndTopos[nodeInfo.node][1] for nodeInfo in order])
+    return math.prod([nodeInfo.positionTopos for nodeInfo in order])
 
 def removeUsedElements(usedElements : list[int], nodesBefore : list[int], nodesAfter : list[int], nodeIndex : int):
     for i, used in enumerate(usedElements):
@@ -97,10 +99,12 @@ def addUsedElements(usedElements : list[int], nodesBefore : list[int], nodesAfte
             nodesAfter[actualIndex - len(nodesBefore)] += used
 
 #Very similar to the leftPossibleOrders function in recursiveFormula.py
-def allPossibleOrders(order : list[NodeInfo], nodesBefore : list[int] , nodesAfter : list[int], nodeIndex : int) -> int:
+@lru_cache(maxsize=None)
+def allPossibleOrders(nodeIndex : int, nodesBefore : list[int] , nodesAfter : list[int], lastNode : int) -> int:
+    nodesBefore = list(nodesBefore)
+    nodesAfter = list(nodesAfter)
 
-
-    if nodeIndex == len(order): #You have no more nodes to place
+    if nodeIndex == lastNode: #You have no more nodes to place
         return multinomial_coefficient(nodesAfter)
 
     mustUse = nodesBefore[nodeIndex] #We need to use all of the nodes before the actual node
@@ -112,7 +116,7 @@ def allPossibleOrders(order : list[NodeInfo], nodesBefore : list[int] , nodesAft
     for positionsToFill in range(0, canUse + 1):
         for comb in getPossibleCombinations(usableNodes, positionsToFill):
             removeUsedElements(comb, nodesBefore, nodesAfter, nodeIndex)
-            totalOrders +=  allPossibleOrders(order, nodesBefore, nodesAfter, nodeIndex + 1) * multinomial_coefficient(comb + [mustUse])
+            totalOrders +=  allPossibleOrders(nodeIndex + 1 , tuple(nodesBefore), tuple(nodesAfter), lastNode) * multinomial_coefficient(comb + [mustUse])
             addUsedElements(comb, nodesBefore, nodesAfter, nodeIndex)
 
     return totalOrders
@@ -124,8 +128,8 @@ def mergeConnectedTrees(trees : dict[Any, tuple[int, int]], disconnectedNode : A
     nodesSizesAndTopos = {parent : trees[rootInfo(parent, polyTree)] for parent in parents + [disconnectedNode]}
     nodesPositions = {parent : positionsInToposorts(parent, polyTree) for parent in parents + [disconnectedNode]}
     
-    parentsPositions = [[NodeInfo(position, parent, nodesSizesAndTopos[parent][0]) for position in nodesPositions[parent].keys()] for parent in parents]
-    disconnectedPositions = [NodeInfo(position, disconnectedNode, nodesSizesAndTopos[disconnectedNode][0]) for position in nodesPositions[disconnectedNode].keys()]
+    parentsPositions = [[NodeInfo(position, parent, nodesSizesAndTopos[parent][0], toposPosition) for position, toposPosition in nodesPositions[parent].items()] for parent in parents]
+    disconnectedPositions = [NodeInfo(position, disconnectedNode, nodesSizesAndTopos[disconnectedNode][0], toposPosition) for position, toposPosition in nodesPositions[disconnectedNode].items()] 
 
     allOrders = [list(perm) for combination in product(*parentsPositions) for perm in permutations(combination)]
     allOrders = [order + [disconnectedPosition] for order in allOrders for disconnectedPosition in disconnectedPositions]
@@ -135,7 +139,7 @@ def mergeConnectedTrees(trees : dict[Any, tuple[int, int]], disconnectedNode : A
     for order in allOrders:
         nodesBefore = [nodeInfo.position for nodeInfo in order]
         nodesAfter =  [nodeInfo.treeSize - 1 - nodeInfo.position for nodeInfo in order]
-        totalTopos += allPossibleOrders(order, nodesBefore, nodesAfter, 0) * allToposOfOrder(order, nodesSizesAndTopos, polyTree)
+        totalTopos += allPossibleOrders(0, tuple(nodesBefore), tuple(nodesAfter), len(order)) * allToposOfOrder(order)
     
     totalSize = sum([size for size, _ in nodesSizesAndTopos.values()])
     return (totalSize, totalTopos)
