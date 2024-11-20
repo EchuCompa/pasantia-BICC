@@ -54,8 +54,6 @@ def unrelatedEquivalenceClassesSizes(node, dag : nx.DiGraph) -> List[Equivalence
         classes.append(allRight)
         # If the parent is to the right, then all of the children should be after the feature node
 
-        # TODO: I think that this kind of union (all in the right part) will always be the last element of classes_combinations, so we can just take the 
-        # first element of classes_combination to do this, I need to review this.
     return classes
 
 #TODO : Add dynamic programming so that it stores the result of the run for each node, or it stores some results so that it can reconstruct the solution.
@@ -125,10 +123,9 @@ def lastUnionOf(unr_classes : List[List[EquivalenceClass]], ancestors : List[Any
 
     else:
         memorization = {}
-        #TODO : Check if there is a better way to create the states so that more calls can be the same and the memoization can be more effective.
         for unr_class in classes_combinations:
             leftElements = getLeftElementsOfClasses(ancestors, dag, unr_class)
-            ascendantsCombinationsWithUnrelated = possibleLeftOrders(0, leftElements, 0 , list(ancestors), dag, classification, memorization)
+            ascendantsCombinationsWithUnrelated = possibleLeftOrders(0, leftElements, 0 , list(ancestors), memorization)
 
             eqClass = unionOf(unr_class, False)
 
@@ -156,14 +153,14 @@ def getLeftElementsOfClasses(ancestors : List[Any], dag : nx.DiGraph, unrClasses
 
 # The idea would be that it has the left elements of each unrelated class, ordered by the ascendant node that is their parent. 
 
-def getPossibleCombinations(leftElementsOfClasses: List[int], elementsToSelect: int) -> List[List[int]]:
+def getPossibleCombinations(leftElementsOfClasses: List[int], sumToObtain: int) -> List[List[int]]:
     def backtrack(index, current_combination, current_sum, maximumAmount):
         # If the current sum equals the required elementsToSelect, add the combination to the result
-        if current_sum == elementsToSelect:
+        if current_sum == sumToObtain:
             result.append(list(current_combination))
             return
         
-        if current_sum > elementsToSelect or index == len(leftElementsOfClasses) or current_sum + maximumAmount < elementsToSelect:
+        if current_sum > sumToObtain or index == len(leftElementsOfClasses) or current_sum + maximumAmount < sumToObtain:
             return
         
         for value in range(leftElementsOfClasses[index] + 1):
@@ -175,8 +172,6 @@ def getPossibleCombinations(leftElementsOfClasses: List[int], elementsToSelect: 
     backtrack(0, [], 0, sum(leftElementsOfClasses))
     return result
 
-# TODO: Add more pruning techniques. 
-
 def removePutElements(putElements, leftElementsOfClasses : List[int]):
     for i, put in enumerate(putElements):
         leftElementsOfClasses[i] -= put
@@ -185,7 +180,7 @@ def addPutElements(putElements, leftElementsOfClasses : List[int]):
     for i, put in enumerate(putElements):
         leftElementsOfClasses[i] += put
 
-def possibleLeftOrders(actualPosition : int, leftElementsOfClasses : List[int], ancestorIndex : int, ancestors : List[Any], dag : nx.DiGraph, classification : Dict[Any, NodeState], memo: Dict[Tuple[int, Tuple[int], int, int], int]) -> int:
+def possibleLeftOrders(actualPosition : int, leftElementsOfClasses : List[int], ancestorIndex : int, ancestors : List[Any], memo: Dict[Tuple[int, Tuple[int], int, int], int]) -> int:
     global memoHits
     state = (actualPosition, tuple(leftElementsOfClasses), ancestorIndex)
 
@@ -199,10 +194,7 @@ def possibleLeftOrders(actualPosition : int, leftElementsOfClasses : List[int], 
     totalOrders = 0
     #I just need to select all of the elements of the classes.
     if (ancestorIndex == len(ancestors)): #I have already selected all the ancestors
-        
-        for comb in getPossibleCombinations(leftElementsOfClasses, sum(leftElementsOfClasses)):
-            totalOrders += multinomial_coefficient(comb)
-        
+        totalOrders =  multinomial_coefficient(leftElementsOfClasses)
         memo[state] = totalOrders
         return totalOrders
 
@@ -212,12 +204,11 @@ def possibleLeftOrders(actualPosition : int, leftElementsOfClasses : List[int], 
         positionsToFill = ancestorPosition - actualPosition
         for comb in getPossibleCombinations(usableElements, positionsToFill):
             removePutElements(comb, leftElementsOfClasses)
-            totalOrders += multinomial_coefficient(comb) * possibleLeftOrders(ancestorPosition+1, leftElementsOfClasses, ancestorIndex + 1, ancestors, dag, classification, memo)
+            totalOrders += multinomial_coefficient(comb) * possibleLeftOrders(ancestorPosition+1, leftElementsOfClasses, ancestorIndex + 1, ancestors, memo)
             addPutElements(comb, leftElementsOfClasses)
     
     memo[state] = totalOrders
     return totalOrders
 
 # TODO: Make some of the variables global or create a class for this method, so that I don't need to pass them as arguments
-
-#TODO : Improve the memoization data structure. Look if there is a structure that is useful for this kind of problem. ¿Maybe use lru_cache or other structure?
+# Improve the memoization data structure. Look if there is a structure that is useful for this kind of problem. ¿Maybe use lru_cache or other structure?

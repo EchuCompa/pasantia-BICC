@@ -20,7 +20,7 @@ class DecisionTreeDigraph(nx.DiGraph):
         super().__init__(*args, **kwargs)
 
     def nodeAttribute(self , node, attribute : str):
-        return self.nodes[node].get(attribute, str(node))
+        return self.nodes[node].get(attribute, str(node)) #TODO: Refactor this, remove the default case.
 
     def nodeLabel(self , node):
         return self.nodeAttribute(node, 'label')

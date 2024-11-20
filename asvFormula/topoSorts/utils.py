@@ -27,7 +27,7 @@ class TopoSortHasher:
 
 #Returns the size of the tree and the number of topological sorts
 
-def sizeAndNumberOfTopoSortsTree(node, tree : nx.DiGraph):
+def sizeAndNumberOfTopoSortsTree(node, tree : nx.DiGraph) -> tuple[int, int]:
     if isLeaf(node, tree):
         return 1,1
     
@@ -49,8 +49,6 @@ def sizeAndNumberOfTopoSortsTree(node, tree : nx.DiGraph):
 def topoSortsFrom(node, dag : nx.DiGraph):
    _, topos = sizeAndNumberOfTopoSortsTree(node, dag)
    return topos
-
-#TODO : Add dynamic programming so that each node knows its result.
 
 def allTopoSorts(tree : nx.DiGraph):
     #Add a root node to the graph that is connected to all the roots of the graph.

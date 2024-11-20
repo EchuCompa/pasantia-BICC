@@ -2,12 +2,14 @@ import time
 from asvFormula.digraph import *
 from classesSizes.equivalenceClass import numberOfEquivalenceClasses
 from asvFormula.topoSorts.utils import TopoSortHasher, allTopoSorts, nx
-from asvFormula.topoSorts.toposPositions import naivePositionsInToposorts, positionsInToposorts
+from asvFormula.topoSorts.topoSortsCalc import allPolyTopoSorts
+from asvFormula.topoSorts.toposPositions import naivePositionsInToposorts, ToposortPosition, positionsInToposorts
 from classesSizes.algorithmTime import assertTopoSortsAndEquivalenceClasses
 from classesSizes.recursiveFormula import *
 from classesSizes.naiveFormula import *
 
 #TODO: Create tests for this class and use them instead of this functions in a collab notebook.
+# Also add test cases for the differents functions (use Refactor -> Generatate tests using Copilot )
 
 def assertEquivalenceClassesForNode(dag: nx.DiGraph, feature_node, all_topo_sorts: List[List[Any]], timing_dict: Dict[str, Dict[str, float]]):
     
@@ -74,10 +76,17 @@ def test_allTopos(graph):
     all_topo_sorts = list(nx.all_topological_sorts(graph))
     assert all_topos == len(all_topo_sorts), f"allTopos: {all_topos} and all_topological_sorts: {len(all_topo_sorts)} have different lengths"
 
-def test_allToposPositions(node, graph : nx.DiGraph, allTopos : list[list[Any]]):    
-    allToposPositionsNaive = naivePositionsInToposorts(node, graph, allTopos)
-    allToposPositions = positionsInToposorts(node, graph)
-    assert allToposPositionsNaive.keys() == allToposPositions.keys(), f"Naive: {allToposPositionsNaive.keys()} and Recursive: {allToposPositions.keys()} positions are different"
-    for pos in allToposPositionsNaive.keys():
-        assert allToposPositionsNaive[pos] == allToposPositions[pos], f"Naive: {allToposPositionsNaive[pos]} and Recursive: {allToposPositions[pos]} have different values for position {pos} in node {node}"
-    
+def test_allToposPositions(nodes : list[Any], graph : nx.DiGraph, allTopos : list[list[Any]]):    
+    toposPosi = ToposortPosition()
+    for node in nodes:    
+        print(node)
+        allToposPositionsNaive = naivePositionsInToposorts(node, graph, allTopos)
+        allToposPositions = positionsInToposorts(node, graph, toposPosi)
+        assert allToposPositionsNaive.keys() == allToposPositions.keys(), f"Naive: {allToposPositionsNaive.keys()} and Recursive: {allToposPositions.keys()} positions are different"
+        for pos in allToposPositionsNaive.keys():
+            assert allToposPositionsNaive[pos] == allToposPositions[pos], f"Naive: {allToposPositionsNaive[pos]} and Recursive: {allToposPositions[pos]} have different values for position {pos} in node {node}"
+
+def test_allPolyTopos(graph):
+    all_topos = allPolyTopoSorts(graph)
+    all_topo_sorts = list(nx.all_topological_sorts(graph))
+    assert all_topos == len(all_topo_sorts), f"allPolyTopos: {all_topos} and all_topological_sorts: {len(all_topo_sorts)} have different lengths"
