@@ -86,7 +86,7 @@ def test_allToposPositions(nodes : list[Any], graph : nx.DiGraph, allTopos : lis
         for pos in allToposPositionsNaive.keys():
             assert allToposPositionsNaive[pos] == allToposPositions[pos], f"Naive: {allToposPositionsNaive[pos]} and Recursive: {allToposPositions[pos]} have different values for position {pos} in node {node}"
 
-def test_allPolyTopos(graph):
+def test_allPolyTopos(graph: nx.DiGraph):
     all_topos = allPolyTopoSorts(graph)
     all_topo_sorts = list(nx.all_topological_sorts(graph))
     assert all_topos == len(all_topo_sorts), f"allPolyTopos: {all_topos} and all_topological_sorts: {len(all_topo_sorts)} have different lengths"

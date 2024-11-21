@@ -20,51 +20,15 @@ def removeMultipleParents(polyTree : nx.DiGraph) -> dict[Any, list[Any]]:
                 polyTree.remove_edge(parent, node)
     return disconnectedNodesAndParents
 
-def rootInfo(node, polyTree : nx.DiGraph):
-    if isRoot(node, polyTree):
-        return node
-    parent = next(polyTree.predecessors(node))
-    return polyTree.nodes[parent]['root']
+def rootTreeID(node, polyTree : nx.DiGraph):
 
-def addRootInfo(node, polyTree : nx.DiGraph):
+    return polyTree.nodes[node]['treeID']
 
-    polyTree.nodes[node]['root'] = rootInfo(node, polyTree)
+def addTreeID(node, polyTree : nx.DiGraph, treeId : Any):
+
+    polyTree.nodes[node]['treeID'] = treeId
     for child in polyTree.successors(node):
-        addRootInfo(child, polyTree)
-
-
-
-"""
-Another possible approach
-orders = [[rootInfo(parent, polyTree), parent] for parent in parents]
-possibleOrders = interleave_lists(orders)
-for order in possibleOrders:
-    order.append(disconnectedNode) #The disconnected node is always the last one
-totalOrders = sum([allPosibleOrders(order, polyTree, trees) for order in possibleOrders])
-
-
-def interleave_lists(lists):
-    if all(not lst for lst in lists):
-        return [[]]
-    
-    result = []
-    # Iterate over each list
-    for i, lst in enumerate(lists):
-        if lst:
-            # Take the first element from the current list
-            first_elem = lst[0]
-            # Remaining elements in the current list
-            rest_list = lst[1:]
-            # Remaining lists
-            rest_lists = lists[:i] + [rest_list] + lists[i+1:]
-            # Recursively compute interleavings of the remaining lists
-            for suffix in interleave_lists(rest_lists):
-                result.append([first_elem] + suffix)
-    return result
-
-#The I should do a similar implementation to leftPossibleOrders
-
-"""
+        addTreeID(child, polyTree, treeId)
 
 class NodeInfo(NamedTuple):
     position: int
@@ -121,11 +85,10 @@ def allPossibleOrders(nodeIndex : int, nodesBefore : list[int] , nodesAfter : li
 
     return totalOrders
 
-
 #Returns the results of merging the trees with the disconnected nodes and their parents
 def mergeConnectedTrees(trees : dict[Any, tuple[int, int]], disconnectedNode : Any, parents : list[Any], polyTree : nx.DiGraph) -> tuple[int, int]:
  
-    nodesSizesAndTopos = {parent : trees[rootInfo(parent, polyTree)] for parent in parents + [disconnectedNode]}
+    nodesSizesAndTopos = {parent : trees[rootTreeID(parent, polyTree)] for parent in parents + [disconnectedNode]}
     nodesPositions = {parent : positionsInToposorts(parent, polyTree) for parent in parents + [disconnectedNode]}
     
     parentsPositions = [[NodeInfo(position, parent, nodesSizesAndTopos[parent][0], toposPosition) for position, toposPosition in nodesPositions[parent].items()] for parent in parents]
@@ -156,14 +119,16 @@ def allPolyTopoSorts(polyTree : nx.DiGraph):
     rootsSizesAndTopos = {root: sizeAndNumberOfTopoSortsTree(root, copyPolyTree) for root in roots}
 
     for root in roots: #This is to identify each node with it's tree
-        addRootInfo(root, copyPolyTree)
+        addTreeID(root, copyPolyTree, root)
+
 
     # Merge the results of the trees with intersections and calculate the toposorts and sizes for the new trees.
     for disconnectedNode, parents in disconnectedNodesAndParents.items():
         mergedResult = mergeConnectedTrees(rootsSizesAndTopos, disconnectedNode, parents, copyPolyTree)
         rootsSizesAndTopos[disconnectedNode] = mergedResult
         for parent in parents:
-            del rootsSizesAndTopos[rootInfo(parent, copyPolyTree)]
+            addTreeID(parent, copyPolyTree, disconnectedNode)
+            del rootsSizesAndTopos[rootTreeID(parent, copyPolyTree)]
 
     # Merge all of the trees and calculate the final toposort
     treesSizes, treesTopos = zip(*[tree for tree in rootsSizesAndTopos.values()])
