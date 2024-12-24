@@ -1,8 +1,7 @@
 
-from asvFormula.digraph import  isLeaf, hasMultipleParents, nx, isRoot
+from asvFormula.digraph import  nx
 import math
-from utils import sizeAndNumberOfTopoSortsTree, multinomial_coefficient
-from toposPositions import positionsInToposorts
+from utils import multinomial_coefficient
 from typing import Any
 from asvFormula.classesSizes.recursiveFormula import getPossibleCombinations
 from itertools import product, permutations
@@ -22,6 +21,7 @@ def allPolyTopoSorts(polyTree : nx.DiGraph, firstNode = None) -> int:
     subtreesTopoSorts = [result[0] for result in subTreeResults.values()]
 
     topos = subtreesTopoSorts[0] if len(subtreesTopoSorts) == 1 else multinomial_coefficient(subtreeSizes) * math.prod(subtreesTopoSorts)
+    print(f'This would take {topos/60000} seconds in the naive way') 
     return topos
 
 def allPolyTopoSortsAndSizeFromNode(node, polyTree : nx.DiGraph, visited : dict[Any, bool]) -> int:
@@ -66,7 +66,7 @@ def addUsedElements(usedElements : list[int], nodesBefore : list[int], nodesAfte
 
 #Very similar to the leftPossibleOrders function in recursiveFormula.py
 @lru_cache(maxsize=None)
-def allPossibleOrders(nodeIndex : int, nodesBefore : list[int] , nodesAfter : list[int], lastNode : int, nodesToPutBefore : int, placedNodeIndex: int) -> int:
+def allPossibleOrdersOld(nodeIndex : int, nodesBefore : list[int] , nodesAfter : list[int], lastNode : int, nodesToPutBefore : int, placedNodeIndex: int) -> int:
     
     if nodesToPutBefore < 0 and nodeIndex <= placedNodeIndex: #I still haven't placed the node and I have already passed that position
         return 0
@@ -92,7 +92,7 @@ def allPossibleOrders(nodeIndex : int, nodesBefore : list[int] , nodesAfter : li
             placedNodes = positionsToFill + mustUse + 1 #The actual node
             removeUsedElements(comb, nodesBefore, nodesAfter, nodeIndex)
             newNodesToPut = 0 if nodeIndex > placedNodeIndex else nodesToPutBefore - placedNodes
-            totalOrders +=  allPossibleOrders(nodeIndex + 1 , tuple(nodesBefore), tuple(nodesAfter), lastNode, newNodesToPut, placedNodeIndex) * multinomial_coefficient(comb + [mustUse])
+            totalOrders +=  allPossibleOrdersOld(nodeIndex + 1 , tuple(nodesBefore), tuple(nodesAfter), lastNode, newNodesToPut, placedNodeIndex) * multinomial_coefficient(comb + [mustUse])
             addUsedElements(comb, nodesBefore, nodesAfter, nodeIndex)
 
     return totalOrders
@@ -128,15 +128,18 @@ def allPolyTopoSortsAndPositions(node, polyTree : nx.DiGraph, visited : dict[Any
     numChildren = len(notVisitedChildren)
 
     for order in allOrders:
-        nodesBefore = [nodeInfo.position for nodeInfo in order]
-        nodesAfter =  [nodeInfo.treeSize - 1 - nodeInfo.position for nodeInfo in order]
-        nodesMustBeBefore = sum(nodesBefore[:numParents]) + numParents #These nodes must be put before the actual node
-        nodesMustBeAfter = sum(nodesAfter[numParents:]) + numChildren #These nodes must be put after the actual node
-        for actualNodePosition in range(nodesMustBeBefore , totalSize - nodesMustBeAfter  + 1):
-            toposWithPosition = allPossibleOrders(0, tuple(nodesBefore), tuple(nodesAfter), len(order), actualNodePosition, numParents) * allToposOfOrder(order)
-            if toposWithPosition != 0:
-                toposPerPosition[actualNodePosition] = toposPerPosition.get(actualNodePosition, 0) + toposWithPosition
+        addToposortsOfOrder(order, toposPerPosition, totalSize, numParents, numChildren)
             
     results  = [NodeInfo(position, node, totalSize, positionTopos) for position, positionTopos in toposPerPosition.items()]
 
     return results
+
+def addToposortsOfOrder(order, toposPerPosition : dict[Any, ], totalSize, numParents, numChildren):
+    nodesBefore = [nodeInfo.position for nodeInfo in order]
+    nodesAfter =  [nodeInfo.treeSize - 1 - nodeInfo.position for nodeInfo in order]
+    nodesMustBeBefore = sum(nodesBefore[:numParents]) + numParents #These nodes must be put before the actual node
+    nodesMustBeAfter = sum(nodesAfter[numParents:]) + numChildren #These nodes must be put after the actual node
+    for actualNodePosition in range(nodesMustBeBefore , totalSize - nodesMustBeAfter  + 1):
+        toposWithPosition = allPossibleOrdersOld(0, tuple(nodesBefore), tuple(nodesAfter), len(order), actualNodePosition, numParents) * allToposOfOrder(order)
+        if toposWithPosition != 0:
+            toposPerPosition[actualNodePosition] = toposPerPosition.get(actualNodePosition, 0) + toposWithPosition

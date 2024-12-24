@@ -1,7 +1,7 @@
 import time
 from asvFormula.digraph import *
 from classesSizes.equivalenceClass import numberOfEquivalenceClasses
-from asvFormula.topoSorts.utils import TopoSortHasher, allTopoSorts, nx
+from asvFormula.topoSorts.utils import TopoSortHasher, allTreeTopoSorts, nx
 from asvFormula.topoSorts.topoSortsCalc import allPolyTopoSorts
 from asvFormula.topoSorts.toposPositions import naivePositionsInToposorts, ToposortPosition, positionsInToposorts
 from classesSizes.algorithmTime import assertTopoSortsAndEquivalenceClasses
@@ -59,7 +59,7 @@ def assertEquivClassesForDag(dag: nx.DiGraph, nodesToEvaluate = None, allSorts =
     # Measure time for all topological sorts
     start_time = time.time()
     all_topo_sorts = allSorts if allSorts != None else list(nx.all_topological_sorts(dag))
-    assert len(all_topo_sorts) == allTopoSorts(dag)
+    assert len(all_topo_sorts) == allTreeTopoSorts(dag)
     end_time = time.time()
     timing_dict['Time Of Topological Sorts'] = end_time - start_time
     timing_dict['Number of Topological Sorts'] = len(all_topo_sorts)
@@ -70,13 +70,6 @@ def assertEquivClassesForDag(dag: nx.DiGraph, nodesToEvaluate = None, allSorts =
             assertEquivalenceClassesForNode(dag, node, all_topo_sorts, timing_dict)
     
     return timing_dict
-
-def test_allTopos(graph):
-    all_topos = allTopoSorts(graph)
+    all_topos = allTreeTopoSorts(graph)
     all_topo_sorts = list(nx.all_topological_sorts(graph))
     assert all_topos == len(all_topo_sorts), f"allTopos: {all_topos} and all_topological_sorts: {len(all_topo_sorts)} have different lengths"
-
-def test_allPolyTopos(graph: nx.DiGraph, firstNode = None, allTopos : list[list[Any]] = None):
-    all_topo_sorts = list(nx.all_topological_sorts(graph)) if allTopos == None else allTopos
-    all_topos = allPolyTopoSorts(graph, firstNode)
-    assert all_topos == len(all_topo_sorts), f"allPolyTopos: {all_topos} and all_topological_sorts: {len(all_topo_sorts)} have different lengths"

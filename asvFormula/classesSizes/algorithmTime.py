@@ -1,13 +1,13 @@
 from typing import Any, Dict, List
 from asvFormula.digraph import nx, classifyNodes, orderedNodes, NodeState
-from asvFormula.topoSorts.utils import allTopoSorts, TopoSortHasher, topoSortsFrom
+from asvFormula.topoSorts.utils import allTreeTopoSorts, TopoSortHasher, topoSortsFrom
 from equivalenceClass import EquivalenceClass, numberOfEquivalenceClasses
 from recursiveFormula import unrelatedEquivalenceClassesSizes, lastUnionOf, uniteClassesWithSameParent, hashEquivClasses
 import time
 
 def assertTopoSortsAndEquivalenceClasses(dag, feature_node, recursiveClassesSizes):
     sumOfAllClasses = sum(map(lambda eqClass : eqClass[1],recursiveClassesSizes.values()))
-    assert (sumOfAllClasses == allTopoSorts(dag)), f"Number of topological sorts is different than the sum of all equivalence classes. \n Topological Sorts: {allTopoSorts(dag)}, Sum of all classes: {sumOfAllClasses}"
+    assert (sumOfAllClasses == allTreeTopoSorts(dag)), f"Number of topological sorts is different than the sum of all equivalence classes. \n Topological Sorts: {allTreeTopoSorts(dag)}, Sum of all classes: {sumOfAllClasses}"
     assert (len(recursiveClassesSizes) == numberOfEquivalenceClasses(dag, feature_node)), f"Number of equivalence classes is different than the expected. \n Expected: {numberOfEquivalenceClasses(dag, feature_node)}, Actual: {len(recursiveClassesSizes)}"
 
 def measureGraphTime(dag: nx.DiGraph, nodesToEvaluate : List[Any]) -> Dict[str, Any]:
@@ -35,7 +35,7 @@ def measureGraphTime(dag: nx.DiGraph, nodesToEvaluate : List[Any]) -> Dict[str, 
     biggest_equiv_classes, smallest_equiv_classes, average_equiv_classes = obtainMaxMinAvg(equiv_classes_per_node)
 
     return {
-        "allTopoSortsNumber": allTopoSorts(dag),
+        "allTopoSortsNumber": allTreeTopoSorts(dag),
         "recursiveLongestTime": longest_time,
         "recursiveShortestTime": shortest_time,
         "recursiveAverageTime": average_time,
@@ -119,7 +119,7 @@ def measureGraphInfo(dag: nx.DiGraph, nodesToEvaluate : List[Any]) -> Dict[str, 
     biggest_equiv_classes, smallest_equiv_classes, average_equiv_classes = obtainMaxMinAvg(equiv_classes_per_node)
 
     return {
-        "allTopoSortsNumber": allTopoSorts(dag),
+        "allTopoSortsNumber": allTreeTopoSorts(dag),
         "biggestEquivClasses": biggest_equiv_classes,
         "smallestEquivClasses": smallest_equiv_classes,
         "averageEquivClasses": average_equiv_classes,

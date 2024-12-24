@@ -4,7 +4,7 @@ from pgmpy.inference import VariableElimination
 from bayesianNetworks.bayesianNetwork import *
 from datasetManipulation import *
 from classesSizes.recursiveFormula import *
-from asvFormula.topoSorts.utils import allTopoSorts
+from asvFormula.topoSorts.utils import allTreeTopoSorts
 from functools import lru_cache
 import shap
 import time
@@ -27,7 +27,7 @@ class ASV:
         equivalenceClasses = equivalenceClassesFor(self.dag, feature)
         asvValue = 0
         totalTopologicalOrders = 0
-        allTopologicalOrders = allTopoSorts(self.dag)
+        allTopologicalOrders = allTreeTopoSorts(self.dag)
 
         for i, equivalenceClass in enumerate(equivalenceClasses):
             classFeaturesOrder = equivalenceClass[0]

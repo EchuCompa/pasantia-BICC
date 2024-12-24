@@ -3,6 +3,7 @@ from asvFormula.digraph import NodeState, isRoot, isLeaf, nx
 from scipy.special import comb
 import math
 from classesSizes.equivalenceClass import EquivalenceClass
+from functools import lru_cache
 
 #Returns a hash that is the binary number which has 0 or 1 in the i-th position if the i-th unrelated node is before or after x_i
 
@@ -50,7 +51,7 @@ def topoSortsFrom(node, dag : nx.DiGraph):
    _, topos = sizeAndNumberOfTopoSortsTree(node, dag)
    return topos
 
-def allTopoSorts(tree : nx.DiGraph):
+def allTreeTopoSorts(tree : nx.DiGraph):
     #Add a root node to the graph that is connected to all the roots of the graph.
     roots = [node for node in tree.nodes() if isRoot(node, tree)]
     
@@ -89,10 +90,16 @@ def hashEquivClasses(equivClasses : List[EquivalenceClass], hasher : TopoSortHas
     
     return hashedClasses
 
-def multinomial_coefficient(args) -> int:
+@lru_cache(maxsize=None)
+def multinomial_coefficient_cached(args) -> int:
     n = sum(args)
     coeff = 1
     for k in args:
         coeff *= comb(n, k, exact=True)
         n -= k
     return int(coeff)
+
+def multinomial_coefficient(args) -> int:
+    tupledArgs = tuple(args)
+    return multinomial_coefficient_cached(tupledArgs)
+
