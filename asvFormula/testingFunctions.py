@@ -76,17 +76,7 @@ def test_allTopos(graph):
     all_topo_sorts = list(nx.all_topological_sorts(graph))
     assert all_topos == len(all_topo_sorts), f"allTopos: {all_topos} and all_topological_sorts: {len(all_topo_sorts)} have different lengths"
 
-def test_allToposPositions(nodes : list[Any], graph : nx.DiGraph, allTopos : list[list[Any]]):    
-    toposPosi = ToposortPosition()
-    for node in nodes:    
-        print(node)
-        allToposPositionsNaive = naivePositionsInToposorts(node, graph, allTopos)
-        allToposPositions = positionsInToposorts(node, graph, toposPosi)
-        assert allToposPositionsNaive.keys() == allToposPositions.keys(), f"Naive: {allToposPositionsNaive.keys()} and Recursive: {allToposPositions.keys()} positions are different"
-        for pos in allToposPositionsNaive.keys():
-            assert allToposPositionsNaive[pos] == allToposPositions[pos], f"Naive: {allToposPositionsNaive[pos]} and Recursive: {allToposPositions[pos]} have different values for position {pos} in node {node}"
-
-def test_allPolyTopos(graph: nx.DiGraph):
-    all_topos = allPolyTopoSorts(graph)
-    all_topo_sorts = list(nx.all_topological_sorts(graph))
+def test_allPolyTopos(graph: nx.DiGraph, firstNode = None, allTopos : list[list[Any]] = None):
+    all_topo_sorts = list(nx.all_topological_sorts(graph)) if allTopos == None else allTopos
+    all_topos = allPolyTopoSorts(graph, firstNode)
     assert all_topos == len(all_topo_sorts), f"allPolyTopos: {all_topos} and all_topological_sorts: {len(all_topo_sorts)} have different lengths"

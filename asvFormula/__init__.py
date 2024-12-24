@@ -6,6 +6,5 @@ if module_path not in sys.path:
 
 #There must be a better way to do this, but this is good for now
 
-
 #global networkSamplesPath 
-asvRunResultsPath = "asvRunResults"
+asvRunResultsPath = "/results/asvRunResults"

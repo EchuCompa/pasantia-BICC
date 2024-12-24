@@ -126,3 +126,8 @@ def hasUnderlyingTree(G : nx.DiGraph) -> bool:
         return False
 
     return True
+
+def isPolyforest(G : nx.DiGraph) -> bool:
+    undirected_G = G.to_undirected()
+    
+    return len(nx.cycle_basis(undirected_G)) == 0

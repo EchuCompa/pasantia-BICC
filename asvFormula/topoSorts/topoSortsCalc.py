@@ -9,26 +9,28 @@ from itertools import product, permutations
 from typing import NamedTuple
 from functools import lru_cache
 
-#Returns a dict with the nodes with multiple parents and their parents
-def removeMultipleParents(polyTree : nx.DiGraph) -> dict[Any, list[Any]]:
-    disconnectedNodesAndParents = {}
+def allPolyTopoSorts(polyTree : nx.DiGraph, firstNode = None) -> int:
+    
+    visited = {node : False for node in polyTree.nodes()}
+    
+    subTreeResults = {}
     for node in polyTree.nodes():
-        if hasMultipleParents(node, polyTree):
-            parents = list(polyTree.predecessors(node))
-            disconnectedNodesAndParents[node] = parents
-            for parent in parents:
-                polyTree.remove_edge(parent, node)
-    return disconnectedNodesAndParents
+        if not visited[node]:
+            subTreeResults[node] = allPolyTopoSortsAndSizeFromNode(node, polyTree, visited)
 
-def rootTreeID(node, polyTree : nx.DiGraph):
+    subtreeSizes = [result[1] for result in subTreeResults.values()]
+    subtreesTopoSorts = [result[0] for result in subTreeResults.values()]
 
-    return polyTree.nodes[node]['treeID']
+    topos = subtreesTopoSorts[0] if len(subtreesTopoSorts) == 1 else multinomial_coefficient(subtreeSizes) * math.prod(subtreesTopoSorts)
+    return topos
 
-def addTreeID(node, polyTree : nx.DiGraph, treeId : Any):
+def allPolyTopoSortsAndSizeFromNode(node, polyTree : nx.DiGraph, visited : dict[Any, bool]) -> int:
+    
+    positionsAndTopos = allPolyTopoSortsAndPositions(node, polyTree, visited)
+    topos = sum([nodeInfo.positionTopos for nodeInfo in positionsAndTopos])
+    size = positionsAndTopos[0].treeSize
 
-    polyTree.nodes[node]['treeID'] = treeId
-    for child in polyTree.successors(node):
-        addTreeID(child, polyTree, treeId)
+    return topos,size
 
 class NodeInfo(NamedTuple):
     position: int
@@ -40,7 +42,7 @@ class NodeInfo(NamedTuple):
         return str(self.node)
     
     def __repr__(self) -> str:
-        return f'Node: {str(self.node)} Position: {self.position}'
+        return f'Node: {str(self.node)} Position: {self.position}, PositionTopos: {self.positionTopos}'
 
 def allToposOfOrder(order : list[NodeInfo]) -> int:
     
@@ -64,12 +66,19 @@ def addUsedElements(usedElements : list[int], nodesBefore : list[int], nodesAfte
 
 #Very similar to the leftPossibleOrders function in recursiveFormula.py
 @lru_cache(maxsize=None)
-def allPossibleOrders(nodeIndex : int, nodesBefore : list[int] , nodesAfter : list[int], lastNode : int) -> int:
+def allPossibleOrders(nodeIndex : int, nodesBefore : list[int] , nodesAfter : list[int], lastNode : int, nodesToPutBefore : int, placedNodeIndex: int) -> int:
+    
+    if nodesToPutBefore < 0 and nodeIndex <= placedNodeIndex: #I still haven't placed the node and I have already passed that position
+        return 0
+    
     nodesBefore = list(nodesBefore)
     nodesAfter = list(nodesAfter)
 
-    if nodeIndex == lastNode: #You have no more nodes to place
-        return multinomial_coefficient(nodesAfter)
+    if nodeIndex == lastNode: #You have no more nodes to place 
+        totalOrders = 0
+        for comb in getPossibleCombinations(nodesAfter, sum(nodesAfter)): #You must put all of the remaining nodes
+            totalOrders +=  multinomial_coefficient(comb) #There are no more nodes to place
+        return totalOrders
 
     mustUse = nodesBefore[nodeIndex] #We need to use all of the nodes before the actual node
 
@@ -77,61 +86,57 @@ def allPossibleOrders(nodeIndex : int, nodesBefore : list[int] , nodesAfter : li
     canUse = sum(usableNodes)
 
     totalOrders = 0
-    for positionsToFill in range(0, canUse + 1):
+    possibleNodesToUse = range(0, canUse + 1) if nodeIndex != placedNodeIndex else [nodesToPutBefore] #If the actual node is the one that we need to place, we must use exactly nodesToPutBefore nodes
+    for positionsToFill in possibleNodesToUse:
         for comb in getPossibleCombinations(usableNodes, positionsToFill):
+            placedNodes = positionsToFill + mustUse + 1 #The actual node
             removeUsedElements(comb, nodesBefore, nodesAfter, nodeIndex)
-            totalOrders +=  allPossibleOrders(nodeIndex + 1 , tuple(nodesBefore), tuple(nodesAfter), lastNode) * multinomial_coefficient(comb + [mustUse])
+            newNodesToPut = 0 if nodeIndex > placedNodeIndex else nodesToPutBefore - placedNodes
+            totalOrders +=  allPossibleOrders(nodeIndex + 1 , tuple(nodesBefore), tuple(nodesAfter), lastNode, newNodesToPut, placedNodeIndex) * multinomial_coefficient(comb + [mustUse])
             addUsedElements(comb, nodesBefore, nodesAfter, nodeIndex)
 
     return totalOrders
 
-#Returns the results of merging the trees with the disconnected nodes and their parents
-def mergeConnectedTrees(trees : dict[Any, tuple[int, int]], disconnectedNode : Any, parents : list[Any], polyTree : nx.DiGraph) -> tuple[int, int]:
- 
-    nodesSizesAndTopos = {parent : trees[rootTreeID(parent, polyTree)] for parent in parents + [disconnectedNode]}
-    nodesPositions = {parent : positionsInToposorts(parent, polyTree) for parent in parents + [disconnectedNode]}
+def allPolyTopoSortsAndPositions(node, polyTree : nx.DiGraph, visited : dict[Any, bool]) -> list[NodeInfo]:
     
-    parentsPositions = [[NodeInfo(position, parent, nodesSizesAndTopos[parent][0], toposPosition) for position, toposPosition in nodesPositions[parent].items()] for parent in parents]
-    disconnectedPositions = [NodeInfo(position, disconnectedNode, nodesSizesAndTopos[disconnectedNode][0], toposPosition) for position, toposPosition in nodesPositions[disconnectedNode].items()] 
+    visited[node] = True
 
-    allOrders = [list(perm) for combination in product(*parentsPositions) for perm in permutations(combination)]
-    allOrders = [order + [disconnectedPosition] for order in allOrders for disconnectedPosition in disconnectedPositions]
+    notVisitedChildren = [child for child in polyTree.successors(node) if not visited[child]]
+    notVisitedParents = [parent for parent in polyTree.predecessors(node) if not visited[parent]]
 
-    totalTopos = 0
+    for neighbour in notVisitedChildren + notVisitedParents:
+        visited[neighbour] = True
+
+    if len(notVisitedChildren + notVisitedParents) == 0: #Leaf node
+        return [NodeInfo(0, node, 1, 1)]
+    
+    notVisitedChildrenPositions = [allPolyTopoSortsAndPositions(child, polyTree, visited) for child in notVisitedChildren]
+    notVisitedParentsPositions = [allPolyTopoSortsAndPositions(parent, polyTree, visited) for parent in notVisitedParents]
+    
+    actualNodeInfo = NodeInfo(0, node, 1, 1) 
+    allChildOrders = [list(perm) for combination in product(*notVisitedChildrenPositions) for perm in permutations(combination)]
+    
+    allParentOrders = [list(perm) for combination in product(*notVisitedParentsPositions) for perm in permutations(combination)]
+
+    # The actual node will be after it's children and before it's parents
+    allOrders = [parentOrder + [actualNodeInfo] + childOrder  for childOrder in allChildOrders for parentOrder in allParentOrders]
+    #TODO: Maybe do this with itertools if it's faster
+
+    toposPerPosition = {}
+    totalSize = sum([nodeInfo.treeSize for nodeInfo in allOrders[0]])
+    numParents = len(notVisitedParents)
+    numChildren = len(notVisitedChildren)
 
     for order in allOrders:
         nodesBefore = [nodeInfo.position for nodeInfo in order]
         nodesAfter =  [nodeInfo.treeSize - 1 - nodeInfo.position for nodeInfo in order]
-        totalTopos += allPossibleOrders(0, tuple(nodesBefore), tuple(nodesAfter), len(order)) * allToposOfOrder(order)
-    
-    totalSize = sum([size for size, _ in nodesSizesAndTopos.values()])
-    return (totalSize, totalTopos)
+        nodesMustBeBefore = sum(nodesBefore[:numParents]) + numParents #These nodes must be put before the actual node
+        nodesMustBeAfter = sum(nodesAfter[numParents:]) + numChildren #These nodes must be put after the actual node
+        for actualNodePosition in range(nodesMustBeBefore , totalSize - nodesMustBeAfter  + 1):
+            toposWithPosition = allPossibleOrders(0, tuple(nodesBefore), tuple(nodesAfter), len(order), actualNodePosition, numParents) * allToposOfOrder(order)
+            if toposWithPosition != 0:
+                toposPerPosition[actualNodePosition] = toposPerPosition.get(actualNodePosition, 0) + toposWithPosition
+            
+    results  = [NodeInfo(position, node, totalSize, positionTopos) for position, positionTopos in toposPerPosition.items()]
 
-def allPolyTopoSorts(polyTree : nx.DiGraph):
-    
-    #Identify the nodes with more than one parent and disconnect them from the graph. Saving the nodes and the parents. 
-    copyPolyTree = polyTree.copy()
-    disconnectedNodesAndParents  = removeMultipleParents(copyPolyTree)
-
-    
-    #Calculate and save the toposorts and sizes for each tree
-    roots = [node for node in copyPolyTree.nodes() if isRoot(node, copyPolyTree)]
-    rootsSizesAndTopos = {root: sizeAndNumberOfTopoSortsTree(root, copyPolyTree) for root in roots}
-
-    for root in roots: #This is to identify each node with it's tree
-        addTreeID(root, copyPolyTree, root)
-
-
-    # Merge the results of the trees with intersections and calculate the toposorts and sizes for the new trees.
-    for disconnectedNode, parents in disconnectedNodesAndParents.items():
-        mergedResult = mergeConnectedTrees(rootsSizesAndTopos, disconnectedNode, parents, copyPolyTree)
-        rootsSizesAndTopos[disconnectedNode] = mergedResult
-        for parent in parents:
-            addTreeID(parent, copyPolyTree, disconnectedNode)
-            del rootsSizesAndTopos[rootTreeID(parent, copyPolyTree)]
-
-    # Merge all of the trees and calculate the final toposort
-    treesSizes, treesTopos = zip(*[tree for tree in rootsSizesAndTopos.values()])
-    topos = multinomial_coefficient(list(treesSizes)) * math.prod(list(treesTopos))
-    
-    return topos
+    return results
