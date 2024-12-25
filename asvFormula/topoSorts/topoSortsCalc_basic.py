@@ -7,7 +7,7 @@ from toposPositions import positionsInToposorts
 from topoSortsCalc import *
 
 #Returns a dict with the nodes with multiple parents and their parents
-def removeMultipleParents(polyTree : nx.DiGraph) -> dict[Any, list[Any]]:
+def removeMultipleParents(polyTree : nx.DiGraph) -> dict[Node, list[Node]]:
     disconnectedNodesAndParents = {}
     for node in polyTree.nodes():
         if hasMultipleParents(node, polyTree):
@@ -36,7 +36,7 @@ def allPossibleOrdersOld(nodeIndex : int, nodesBefore : list[int] , nodesAfter :
     nodesAfter = list(nodesAfter)
 
     if nodeIndex == lastNode: #You have no more nodes to place
-        return multinomial_coefficient(nodesAfter)
+        return uti.multinomial_coefficient(nodesAfter)
 
     mustUse = nodesBefore[nodeIndex] #We need to use all of the nodes before the actual node
 
@@ -47,14 +47,14 @@ def allPossibleOrdersOld(nodeIndex : int, nodesBefore : list[int] , nodesAfter :
     for positionsToFill in range(0, canUse + 1):
         for comb in getPossibleCombinations(usableNodes, positionsToFill):
             removeUsedElements(comb, nodesBefore, nodesAfter, nodeIndex)
-            totalOrders +=  allPossibleOrdersOld(nodeIndex + 1 , tuple(nodesBefore), tuple(nodesAfter), lastNode) * multinomial_coefficient(comb + [mustUse])
+            totalOrders +=  allPossibleOrdersOld(nodeIndex + 1 , tuple(nodesBefore), tuple(nodesAfter), lastNode) * uti.multinomial_coefficient(comb + [mustUse])
             addUsedElements(comb, nodesBefore, nodesAfter, nodeIndex)
 
     return totalOrders
 
 
 #Returns the results of merging the trees with the disconnected nodes and their parents
-def mergeConnectedTrees(trees : dict[Any, tuple[int, int]], disconnectedNode : Any, parents : list[Any], polyTree : nx.DiGraph) -> tuple[int, int]:
+def mergeConnectedTrees(trees : dict[Node, tuple[int, int]], disconnectedNode : Node, parents : list[Node], polyTree : nx.DiGraph) -> tuple[int, int]:
 
     nodesSizesAndTopos = {parent : trees[rootInfo(parent, polyTree)] for parent in parents + [disconnectedNode]}
     nodesPositions = {parent : positionsInToposorts(parent, polyTree) for parent in parents + [disconnectedNode]}
@@ -100,6 +100,6 @@ def allPolyTopoSortsOld(polyTree : nx.DiGraph):
 
     # Merge all of the trees and calculate the final toposort
     treesSizes, treesTopos = zip(*[tree for tree in rootsSizesAndTopos.values()])
-    topos = multinomial_coefficient(list(treesSizes)) * math.prod(list(treesTopos))
+    topos = uti.multinomial_coefficient(list(treesSizes)) * math.prod(list(treesTopos))
     
     return topos

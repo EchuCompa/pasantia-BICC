@@ -1,7 +1,7 @@
 import time
 from asvFormula.digraph import *
 from classesSizes.equivalenceClass import numberOfEquivalenceClasses
-from asvFormula.topoSorts.utils import TopoSortHasher, allTreeTopoSorts, nx
+from asvFormula.topoSorts.utils import TopoSortHasher, allForestTopoSorts, nx
 from asvFormula.topoSorts.topoSortsCalc import allPolyTopoSorts
 from asvFormula.topoSorts.toposPositions import naivePositionsInToposorts, ToposortPosition, positionsInToposorts
 from classesSizes.algorithmTime import assertTopoSortsAndEquivalenceClasses
@@ -11,11 +11,11 @@ from classesSizes.naiveFormula import *
 #TODO: Create tests for this class and use them instead of this functions in a collab notebook.
 # Also add test cases for the differents functions (use Refactor -> Generatate tests using Copilot )
 
-def assertEquivalenceClassesForNode(dag: nx.DiGraph, feature_node, all_topo_sorts: List[List[Any]], timing_dict: Dict[str, Dict[str, float]]):
+def assertEquivalenceClassesForNode(dag: nx.DiGraph, feature_node, all_topo_sorts: List[List[Node]], timing_dict: Dict[str, Dict[str, float]]):
     
     nodes_classification = {}
     unr_roots = classifyNodes(dag, feature_node, nodes_classification)
-    hasher = TopoSortHasher(nodes_classification)
+    hasher = TopoSortHasher(dag, feature_node)
 
     # Naive approach
     start_time = time.time()
@@ -25,7 +25,7 @@ def assertEquivalenceClassesForNode(dag: nx.DiGraph, feature_node, all_topo_sort
 
     # Recursive approach
     start_time = time.time()
-    recursiveClassesSizes = recursiveEquivalenceClassesSizes(dag, unr_roots, hasher, feature_node, nodes_classification)
+    recursiveClassesSizes = recursiveEquivalenceClassesSizes(dag, unr_roots, hasher, feature_node)
     end_time = time.time()
     timing_dict[feature_node]['Recursive Formula'] = end_time - start_time
 
@@ -59,7 +59,7 @@ def assertEquivClassesForDag(dag: nx.DiGraph, nodesToEvaluate = None, allSorts =
     # Measure time for all topological sorts
     start_time = time.time()
     all_topo_sorts = allSorts if allSorts != None else list(nx.all_topological_sorts(dag))
-    assert len(all_topo_sorts) == allTreeTopoSorts(dag)
+    assert len(all_topo_sorts) == allForestTopoSorts(dag)
     end_time = time.time()
     timing_dict['Time Of Topological Sorts'] = end_time - start_time
     timing_dict['Number of Topological Sorts'] = len(all_topo_sorts)
@@ -70,6 +70,3 @@ def assertEquivClassesForDag(dag: nx.DiGraph, nodesToEvaluate = None, allSorts =
             assertEquivalenceClassesForNode(dag, node, all_topo_sorts, timing_dict)
     
     return timing_dict
-    all_topos = allTreeTopoSorts(graph)
-    all_topo_sorts = list(nx.all_topological_sorts(graph))
-    assert all_topos == len(all_topo_sorts), f"allTopos: {all_topos} and all_topological_sorts: {len(all_topo_sorts)} have different lengths"

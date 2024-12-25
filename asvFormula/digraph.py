@@ -1,7 +1,8 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 from enum import Enum
-from typing import Any, Dict, List
+from typing import Dict, List
+from asvFormula import Node
 
 class NodeState(Enum):
     ANCESTOR = 1
@@ -12,7 +13,7 @@ class NodeState(Enum):
 
 #Classify the nodes into the category descendants, ancestors and unrelated. 
 
-def classifyNodes(dag: nx.DiGraph, x_i : Any, nodes_classification : Dict[Any, NodeState]):
+def classifyNodes(dag: nx.DiGraph, x_i : Node, nodes_classification : Dict[Node, NodeState]):
     ancestors = nx.ancestors(dag, x_i)
     descendants = nx.descendants(dag, x_i)
     unrelated_roots = []
@@ -35,7 +36,7 @@ def classifyNodes(dag: nx.DiGraph, x_i : Any, nodes_classification : Dict[Any, N
 
 #They need to be ordered in the same way that the nodes are ordered in the graph, because in the possibleLeftOrders we are putting them assuming they have the same order as in the graph
 
-def orderedNodes(dag : nx.DiGraph, nodesToOrder : List[Any]) -> List[Any]:
+def orderedNodes(dag : nx.DiGraph, nodesToOrder : List[Node]) -> List[Node]:
     topo_sorted_nodes = list(nx.topological_sort(dag))
     ordered_ancestors = [n for n in topo_sorted_nodes if n in nodesToOrder]
     

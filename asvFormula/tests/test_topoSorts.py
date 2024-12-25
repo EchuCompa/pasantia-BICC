@@ -1,41 +1,34 @@
 import unittest
 from parameterized import parameterized
-import unittest
 import networkx as nx
-import sys
-import os
-
-# Add the root directory to sys.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 from asvFormula.digraph import *
 import topoSorts.topoSortsCalc as tp
 import topoSorts.topoSortsCalc_basic as tpBasic
 from asvFormula.topoSorts.toposPositions import naivePositionsInToposorts, positionsInToposorts
-from asvFormula.topoSorts.utils import allTreeTopoSorts
-
-#These tests take a lot of time, they are more regression tests than unit tests.
+from asvFormula.topoSorts.utils import allForestTopoSorts
 
 class TestTopoSorts(unittest.TestCase):
 
-    @parameterized.expand([
-        ("path_graph", multiplePaths(1,5)),
-        ('naive_bayes', naiveBayesWithPath(5, 4)),
-        ("simple_tree", balancedTree(2, 3)),
-        ("complex_tree", balancedTree(3, 2))
-    ])
+    @parameterized.expand(
+        [("empty_graph", emptyGraph(8)),
+        ('naive_bayes', naiveBayes(8))] + 
+        [(f"naive_bayes_path_{path_length}", naiveBayesWithPath(7, path_length)) for path_length in range(1,5)] + 
+        [(f"multiple_paths_{paths}", multiplePaths(paths, 4)) for paths in range(1,4)] + 
+        [(f"balanced_tree_{b}", balancedTree(2, b)) for b in range(2,9)]
+    )
     def test_treeToposPositionsAndTopoSorts(self, name, graph):
         nodes_to_test = self.pathToLeaf(graph, 0)
         allTopos = list(nx.all_topological_sorts(graph))
-
+        
         for node in nodes_to_test:    
             allToposPositionsNaive = naivePositionsInToposorts(node, graph, allTopos)
             allToposPositions = positionsInToposorts(node, graph)
-            self.assertEqual(allToposPositionsNaive.keys(), allToposPositions.keys())
+            self.assertEqual(allToposPositionsNaive.keys(), allToposPositions.keys(),  f"Naive: {allToposPositionsNaive.keys()} and Recursive: {allToposPositions.keys()} positions are different")
             for pos in allToposPositionsNaive.keys():
-                self.assertEqual(allToposPositionsNaive[pos], allToposPositions[pos])
+                self.assertEqual(allToposPositionsNaive[pos], allToposPositions[pos],  f"Naive: {allToposPositionsNaive[pos]} and Recursive: {allToposPositions[pos]} have different values for position {pos} in node {node}")
 
-        self.assertEqual(allTreeTopoSorts(graph), len(allTopos))
+        self.assertEqual(allForestTopoSorts(graph), len(allTopos))
     
     def pathToLeaf(self, tree : nx.DiGraph, start_node):
         path = [start_node]
@@ -55,7 +48,6 @@ class TestTopoSorts(unittest.TestCase):
         childTrees = [balancedTree(numLevels, branchingFactor) for _ in range(parentsAndChildren)]
         middleTree = multiplePaths(1, numLevels)
 
-        
         union = nx.union(nx.DiGraph(), middleTree)
         allTrees = parentTrees + childTrees
         for i in range(len(allTrees)):
@@ -91,7 +83,7 @@ class TestTopoSorts(unittest.TestCase):
 
     def assertToposorts(self, union):
         allTopos = list(nx.all_topological_sorts(union))
-        self.assertEqual(tp.allPolyTopoSorts(union), len(allTopos))
+        self.assertEqual(tp.allPolyTopoSorts(union), len(allTopos), 'The number of topological sorts is different than the expected')
 
     def test_polyTreeIntersectionLeafsToRoot(self):
         numLevels = 2

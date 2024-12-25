@@ -1,4 +1,5 @@
-from typing import Any, List
+from typing import List
+from asvFormula import Node
 from asvFormula.digraph import isLeaf, classifyNodes, nx
 import math
 
@@ -63,15 +64,15 @@ class EquivalenceClass:
         
         return f"Equivalence Class (TopoSort={self.topologicalSort()}, Size={self.classSize()})"
     
-    def addParent(self, parent : Any):
+    def addParent(self, parent : Node):
         self.before =  [parent] + self.before
         self.parent = parent
 
-    def addParentToRigth(self, parent : Any):
+    def addParentToRigth(self, parent : Node):
         self.after =  [parent] + self.after
         self.parent = parent
 
-    def addAncestors(self, nodes : List[Any]):
+    def addAncestors(self, nodes : List[Node]):
         self.before =  nodes + self.before
 
     def classParent(self):
@@ -82,9 +83,9 @@ class EquivalenceClass:
 
 #Number of equivalence classes
 
-def numberOfEquivalenceClasses(dag : nx.DiGraph, feature_nodes : Any):
+def numberOfEquivalenceClasses(dag : nx.DiGraph, feature_node : Node):
     nodes_classification = {}
-    unrelated_roots = classifyNodes(dag, feature_nodes, nodes_classification)
+    unrelated_roots = classifyNodes(dag, feature_node, nodes_classification)
     if unrelated_roots == []:
         return 1
 

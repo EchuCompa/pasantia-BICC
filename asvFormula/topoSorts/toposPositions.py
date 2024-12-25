@@ -1,5 +1,5 @@
-from typing import Dict, Any
-from asvFormula.digraph import isRoot, nx
+from typing import Dict
+from asvFormula.digraph import isRoot, nx, Node
 from typing import NamedTuple
 from asvFormula.topoSorts.utils import sizeAndNumberOfTopoSortsTree, multinomial_coefficient
 from functools import lru_cache
@@ -18,7 +18,7 @@ class ToposortPosition:
     # It is not safe to call it with the same node in different trees.
     #TODO: Experiment with the cache decorator to see if it improves the performance of this function.
     #@lru_cache 
-    def positionsInToposortsAndNodesBelow(self, node) -> tuple[ Dict[Any, int], int]:
+    def positionsInToposortsAndNodesBelow(self, node) -> tuple[ Dict[Node, int], int]:
 
         if isRoot(node, self.tree):
             treeSize, topoSorts =  sizeAndNumberOfTopoSortsTree(node, self.tree)
@@ -56,14 +56,21 @@ class PositionInfo(NamedTuple):
 #Returns a dict with the possible positions of a node in all the toposorts and who many exists. This works for trees.
 # {pos_x : number of toposorts with x in position pos_x}
 
-def positionsInToposorts(node, tree : nx.DiGraph, topoPosi : ToposortPosition = ToposortPosition() ) -> Dict[Any, int]:
+def positionsInToposorts(node, tree : nx.DiGraph, topoPosi : ToposortPosition = ToposortPosition() ) -> Dict[Node, int]:
     copiedTree = tree.copy()
-    topoPosi.setTree(copiedTree)
+    
+    roots = [node for node in tree.nodes() if isRoot(node, copiedTree)]
+    newRoot = 'Root'
+    copiedTree.add_node(newRoot)
+    for root in roots:
+        copiedTree.add_edge(newRoot, root)
+
+    topoPosi.setTree(copiedTree)    
     positions = topoPosi.positionsInToposortsAndNodesBelow(node)
-    positions = {pos: posInfo.topoSorts for pos, posInfo in positions.items()}
+    positions = {(pos-1): posInfo.topoSorts for pos, posInfo in positions.items()}
     return positions
 
-def naivePositionsInToposorts(node, dag : nx.DiGraph, allTopos : list[list[Any]] = None) -> Dict[Any, int]: 
+def naivePositionsInToposorts(node, dag : nx.DiGraph, allTopos : list[list[Node]] = None) -> Dict[Node, int]: 
     all_topo_sorts = allTopos if allTopos is None else list(nx.all_topological_sorts(dag))
     positions = {}
     for topoSort in all_topo_sorts:

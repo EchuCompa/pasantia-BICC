@@ -1,7 +1,8 @@
-from typing import List, Dict, Any, Tuple
-from asvFormula.digraph import nx, orderedNodes, NodeState, isLeaf, isRoot, classifyNodes
+from typing import List, Dict, Tuple
+from asvFormula.digraph import nx, orderedNodes, isLeaf, isRoot, classifyNodes
 from asvFormula.topoSorts.utils import TopoSortHasher, topoSortsFrom, hashEquivClasses, multinomial_coefficient
 from equivalenceClass import EquivalenceClass, NodePosition
+from asvFormula import Node, getPossibleCombinations
 import itertools
 import math
 memoHits = 0
@@ -12,23 +13,23 @@ def equivalenceClassesFor(dag, feature_node) -> List[EquivalenceClass]:
     return list(equivalanceClassesSizesWithHashes(dag, feature_node).values())
 
 
-def equivalanceClassesSizesWithHashes(dag, feature_node) -> Dict[int, Any]:
+def equivalanceClassesSizesWithHashes(dag, feature_node) -> Dict[int, tuple[List[Node], int]]:
     nodes_classification = {}
     unr_roots = classifyNodes(dag, feature_node, nodes_classification)
-    hasher = TopoSortHasher(nodes_classification)
-    equivClasses = recursiveEquivalenceClassesSizes(dag, unr_roots, hasher, feature_node, nodes_classification) 
+    hasher = TopoSortHasher(dag, feature_node)
+    equivClasses = recursiveEquivalenceClassesSizes(dag, unr_roots, hasher, feature_node)
 
     return equivClasses
 
 
-def recursiveEquivalenceClassesSizes(dag : nx.DiGraph, unr_roots : List[Any], hasher : TopoSortHasher, feature_node, nodes_classification : Dict[Any, NodeState]) -> Dict[int, Any]:
+def recursiveEquivalenceClassesSizes(dag : nx.DiGraph, unr_roots : List[Node], hasher : TopoSortHasher, feature_node) -> Dict[int, tuple[Node, int]]:
     unr_classes = list(map(lambda child : unrelatedEquivalenceClassesSizes(child,dag), unr_roots))
     unr_classes = uniteClassesWithSameParent(unr_classes, dag)
     ancestors = orderedNodes(dag, nx.ancestors(dag, feature_node))
     descendants = orderedNodes(dag, nx.descendants(dag, feature_node))
 
     descendantsTopoSorts = topoSortsFrom(feature_node, dag)
-    recursiveClassesSizes = lastUnionOf(unr_classes, ancestors, descendants, descendantsTopoSorts, dag, nodes_classification)
+    recursiveClassesSizes = lastUnionOf(unr_classes, ancestors, descendants, descendantsTopoSorts, dag)
 
     recursiveClassesSizes = hashEquivClasses(recursiveClassesSizes, hasher, feature_node, dag)
     return recursiveClassesSizes
@@ -108,7 +109,7 @@ def unionOf(equivalence_classes : List[EquivalenceClass], addLeftToposOrder : bo
 
 # TODO: Make some of the variables global or create a class for this method, so that I don't need to pass them as arguments
 
-def lastUnionOf(unr_classes : List[List[EquivalenceClass]], ancestors : List[Any], descendants : List[Any], descendantsTopoSorts : int, dag : nx.DiGraph, classification : Dict[Any, NodeState]) -> List[EquivalenceClass]:
+def lastUnionOf(unr_classes : List[List[EquivalenceClass]], ancestors : List[Node], descendants : List[Node], descendantsTopoSorts : int, dag : nx.DiGraph) -> List[EquivalenceClass]:
     classes_combinations = list(itertools.product(*unr_classes)) #Generate al the possible combinations for each eqClass of each child with the eqClass of the other children. 
     
     descendants_position = [NodePosition(des, True) for des in descendants]
@@ -139,7 +140,7 @@ def lastUnionOf(unr_classes : List[List[EquivalenceClass]], ancestors : List[Any
     
     return classes
 
-def getLeftElementsOfClasses(ancestors : List[Any], dag : nx.DiGraph, unrClasses : List[EquivalenceClass]):
+def getLeftElementsOfClasses(ancestors : List[Node], dag : nx.DiGraph, unrClasses : List[EquivalenceClass]):
     leftElements = [0]*(len(ancestors)+1)
 
     for unrClass in unrClasses: #These trees will always be available to use, because they are not related to any ancestor. They can go before the root of the ancestors even.
@@ -151,27 +152,6 @@ def getLeftElementsOfClasses(ancestors : List[Any], dag : nx.DiGraph, unrClasses
 
     return leftElements
 
-# The idea would be that it has the left elements of each unrelated class, ordered by the ascendant node that is their parent. 
-
-def getPossibleCombinations(leftElementsOfClasses: List[int], sumToObtain: int) -> List[List[int]]:
-    def backtrack(index, current_combination, current_sum, maximumAmount):
-        # If the current sum equals the required elementsToSelect, add the combination to the result
-        if current_sum == sumToObtain:
-            result.append(list(current_combination))
-            return
-        
-        if current_sum > sumToObtain or index == len(leftElementsOfClasses) or current_sum + maximumAmount < sumToObtain:
-            return
-        
-        for value in range(leftElementsOfClasses[index] + 1):
-            current_combination.append(value)
-            backtrack(index + 1, current_combination, current_sum + value, maximumAmount - leftElementsOfClasses[index])
-            current_combination.pop() 
-
-    result = []
-    backtrack(0, [], 0, sum(leftElementsOfClasses))
-    return result
-
 def removePutElements(putElements, leftElementsOfClasses : List[int]):
     for i, put in enumerate(putElements):
         leftElementsOfClasses[i] -= put
@@ -180,7 +160,7 @@ def addPutElements(putElements, leftElementsOfClasses : List[int]):
     for i, put in enumerate(putElements):
         leftElementsOfClasses[i] += put
 
-def possibleLeftOrders(actualPosition : int, leftElementsOfClasses : List[int], ancestorIndex : int, ancestors : List[Any], memo: Dict[Tuple[int, Tuple[int], int, int], int]) -> int:
+def possibleLeftOrders(actualPosition : int, leftElementsOfClasses : List[int], ancestorIndex : int, ancestors : List[Node], memo: Dict[Tuple[int, Tuple[int], int, int], int]) -> int:
     global memoHits
     state = (actualPosition, tuple(leftElementsOfClasses), ancestorIndex)
 

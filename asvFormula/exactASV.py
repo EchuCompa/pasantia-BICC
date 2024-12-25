@@ -4,10 +4,9 @@ from pgmpy.inference import VariableElimination
 from bayesianNetworks.bayesianNetwork import *
 from datasetManipulation import *
 from classesSizes.recursiveFormula import *
-from asvFormula.topoSorts.utils import allTreeTopoSorts
+from asvFormula.topoSorts.utils import allForestTopoSorts
 from functools import lru_cache
 import shap
-import time
 
 class ASV:
     def __init__(self, dag : nx.DiGraph, model, feature_distributions : VariableElimination, valuesPerFeature : dict[str, list], feature : str, predictionFunction : str = 'Exact'):
@@ -27,7 +26,7 @@ class ASV:
         equivalenceClasses = equivalenceClassesFor(self.dag, feature)
         asvValue = 0
         totalTopologicalOrders = 0
-        allTopologicalOrders = allTreeTopoSorts(self.dag)
+        allTopologicalOrders = allForestTopoSorts(self.dag)
 
         for i, equivalenceClass in enumerate(equivalenceClasses):
             classFeaturesOrder = equivalenceClass[0]

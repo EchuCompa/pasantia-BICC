@@ -1,14 +1,13 @@
 
 from asvFormula.digraph import  nx
-import math
-from utils import multinomial_coefficient
-from typing import Any
-from asvFormula.classesSizes.recursiveFormula import getPossibleCombinations
+import utils as uti
+from asvFormula import Node, getPossibleCombinations
 from itertools import product, permutations
 from typing import NamedTuple
+import math
 from functools import lru_cache
 
-def allPolyTopoSorts(polyTree : nx.DiGraph, firstNode = None) -> int:
+def allPolyTopoSorts(polyTree : nx.DiGraph) -> int:
     
     visited = {node : False for node in polyTree.nodes()}
     
@@ -20,11 +19,11 @@ def allPolyTopoSorts(polyTree : nx.DiGraph, firstNode = None) -> int:
     subtreeSizes = [result[1] for result in subTreeResults.values()]
     subtreesTopoSorts = [result[0] for result in subTreeResults.values()]
 
-    topos = subtreesTopoSorts[0] if len(subtreesTopoSorts) == 1 else multinomial_coefficient(subtreeSizes) * math.prod(subtreesTopoSorts)
+    topos = subtreesTopoSorts[0] if len(subtreesTopoSorts) == 1 else uti.multinomial_coefficient(subtreeSizes) * math.prod(subtreesTopoSorts)
     print(f'This would take {topos/60000} seconds in the naive way') 
     return topos
 
-def allPolyTopoSortsAndSizeFromNode(node, polyTree : nx.DiGraph, visited : dict[Any, bool]) -> int:
+def allPolyTopoSortsAndSizeFromNode(node, polyTree : nx.DiGraph, visited : dict[Node, bool]) -> int:
     
     positionsAndTopos = allPolyTopoSortsAndPositions(node, polyTree, visited)
     topos = sum([nodeInfo.positionTopos for nodeInfo in positionsAndTopos])
@@ -34,7 +33,7 @@ def allPolyTopoSortsAndSizeFromNode(node, polyTree : nx.DiGraph, visited : dict[
 
 class NodeInfo(NamedTuple):
     position: int
-    node : Any
+    node : Node
     treeSize : int
     positionTopos : int
 
@@ -77,7 +76,7 @@ def allPossibleOrdersOld(nodeIndex : int, nodesBefore : list[int] , nodesAfter :
     if nodeIndex == lastNode: #You have no more nodes to place 
         totalOrders = 0
         for comb in getPossibleCombinations(nodesAfter, sum(nodesAfter)): #You must put all of the remaining nodes
-            totalOrders +=  multinomial_coefficient(comb) #There are no more nodes to place
+            totalOrders +=  uti.multinomial_coefficient(comb) #There are no more nodes to place
         return totalOrders
 
     mustUse = nodesBefore[nodeIndex] #We need to use all of the nodes before the actual node
@@ -92,12 +91,12 @@ def allPossibleOrdersOld(nodeIndex : int, nodesBefore : list[int] , nodesAfter :
             placedNodes = positionsToFill + mustUse + 1 #The actual node
             removeUsedElements(comb, nodesBefore, nodesAfter, nodeIndex)
             newNodesToPut = 0 if nodeIndex > placedNodeIndex else nodesToPutBefore - placedNodes
-            totalOrders +=  allPossibleOrdersOld(nodeIndex + 1 , tuple(nodesBefore), tuple(nodesAfter), lastNode, newNodesToPut, placedNodeIndex) * multinomial_coefficient(comb + [mustUse])
+            totalOrders +=  allPossibleOrdersOld(nodeIndex + 1 , tuple(nodesBefore), tuple(nodesAfter), lastNode, newNodesToPut, placedNodeIndex) * uti.multinomial_coefficient(comb + [mustUse])
             addUsedElements(comb, nodesBefore, nodesAfter, nodeIndex)
 
     return totalOrders
 
-def allPolyTopoSortsAndPositions(node, polyTree : nx.DiGraph, visited : dict[Any, bool]) -> list[NodeInfo]:
+def allPolyTopoSortsAndPositions(node, polyTree : nx.DiGraph, visited : dict[Node, bool]) -> list[NodeInfo]:
     
     visited[node] = True
 
@@ -134,7 +133,7 @@ def allPolyTopoSortsAndPositions(node, polyTree : nx.DiGraph, visited : dict[Any
 
     return results
 
-def addToposortsOfOrder(order, toposPerPosition : dict[Any, ], totalSize, numParents, numChildren):
+def addToposortsOfOrder(order, toposPerPosition : dict[int, int], totalSize, numParents, numChildren):
     nodesBefore = [nodeInfo.position for nodeInfo in order]
     nodesAfter =  [nodeInfo.treeSize - 1 - nodeInfo.position for nodeInfo in order]
     nodesMustBeBefore = sum(nodesBefore[:numParents]) + numParents #These nodes must be put before the actual node

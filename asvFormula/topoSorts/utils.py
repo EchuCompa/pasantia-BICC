@@ -1,15 +1,16 @@
 from typing import List, Dict, Any
-from asvFormula.digraph import NodeState, isRoot, isLeaf, nx
+from asvFormula.digraph import NodeState, isRoot, isLeaf, nx, classifyNodes
 from scipy.special import comb
 import math
-from classesSizes.equivalenceClass import EquivalenceClass
 from functools import lru_cache
 
 #Returns a hash that is the binary number which has 0 or 1 in the i-th position if the i-th unrelated node is before or after x_i
 
 class TopoSortHasher:
-    def __init__(self, nodes_classification: Dict[Any, NodeState]):
-        self._unrelated_nodes_ids = self._get_unrelated_nodes(nodes_classification)
+    def __init__(self, dag : nx.DiGraph, feature_node : Any):
+        nodesClassification = {}
+        classifyNodes(dag, feature_node, nodesClassification)
+        self._unrelated_nodes_ids = self._get_unrelated_nodes(nodesClassification)
 
     def _get_unrelated_nodes(self, nodes_classification: Dict[Any, NodeState]):
         unrelated_nodes = list(filter(lambda node: nodes_classification[node] == NodeState.UNRELATED, nodes_classification.keys()))
@@ -51,7 +52,7 @@ def topoSortsFrom(node, dag : nx.DiGraph):
    _, topos = sizeAndNumberOfTopoSortsTree(node, dag)
    return topos
 
-def allTreeTopoSorts(tree : nx.DiGraph):
+def allForestTopoSorts(tree : nx.DiGraph):
     #Add a root node to the graph that is connected to all the roots of the graph.
     roots = [node for node in tree.nodes() if isRoot(node, tree)]
     
@@ -79,7 +80,7 @@ def isTopologicalSort(G, ordering):
             return False
     return True
 
-def hashEquivClasses(equivClasses : List[EquivalenceClass], hasher : TopoSortHasher , feature_node, dag : nx.DiGraph):
+def hashEquivClasses(equivClasses : List[Any], hasher : TopoSortHasher , feature_node, dag : nx.DiGraph) -> Dict[int, tuple[Any, int]]:
     hashedClasses = {}
     for eqClass in equivClasses:
         topoSortForClass = eqClass.topologicalSort(feature_node)

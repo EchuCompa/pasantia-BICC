@@ -5,3 +5,6 @@ if module_path not in sys.path:
     sys.path.append(module_path)
 
 #There must be a better way to do this, but this is good for now
+
+from topoSortsCalc import allPolyTopoSorts
+from utils import allForestTopoSorts, TopoSortHasher
