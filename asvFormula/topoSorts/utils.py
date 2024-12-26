@@ -84,8 +84,8 @@ def hashEquivClasses(equivClasses : List[Any], hasher : TopoSortHasher , feature
     hashedClasses = {}
     for eqClass in equivClasses:
         topoSortForClass = eqClass.topologicalSort(feature_node)
-        if not isTopologicalSort(dag, topoSortForClass):
-            raise AssertionError(f"The topological sort {topoSortForClass} is not a valid topological sort for the graph, for the feature node {feature_node}")
+        #if not isTopologicalSort(dag, topoSortForClass):
+        #    raise AssertionError(f"The topological sort {topoSortForClass} is not a valid topological sort for the graph, for the feature node {feature_node}")
         hash = hasher.hashTopoSort(topoSortForClass, feature_node)
         hashedClasses[hash] = [topoSortForClass,  eqClass.classSize()]
     

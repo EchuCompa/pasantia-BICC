@@ -5,6 +5,7 @@ import networkx as nx
 from asvFormula.digraph import *
 from asvFormula.topoSorts import allPolyTopoSorts, allForestTopoSorts, TopoSortHasher
 from asvFormula.classesSizes import equivalanceClassesSizesWithHashes, naiveEquivalenceClassesSizes
+from asvFormula.topoSorts.utils import isTopologicalSort
 
 #These tests take a lot of time, they are more regression tests than unit tests.
 
@@ -28,16 +29,20 @@ class TestEquivalenceClasses(unittest.TestCase):
         equivalenceClasses = equivalanceClassesSizesWithHashes(dag, feature_node)
         naiveEquivalenceClasses = naiveEquivalenceClassesSizes(all_topo_sorts, feature_node, TopoSortHasher(dag, feature_node))
 
-        self.assertEquals(len(equivalenceClasses), len(naiveEquivalenceClasses), f"The number of equivalence classes is different than expected")
+        self.assertEqual(len(equivalenceClasses), len(naiveEquivalenceClasses), f"The number of equivalence classes is different than expected")
 
-        for eqClassHash, classInfo in naiveEquivalenceClasses.items():
+        for eqClassHash, classInfo in naiveEquivalenceClasses.items():            
             self.assertTrue(eqClassHash in equivalenceClasses, f"The equivalence class {eqClassHash} is not present in the recursive approach")
-            self.assertEquals(classInfo[1], equivalenceClasses[eqClassHash][1], f"The sizes of the equivalence classes are not equal")
+            recurClassinfo = equivalenceClasses[eqClassHash]
+
+            self.assertEqual(classInfo[1], recurClassinfo[1], f"The sizes of the equivalence classes are not equal")
+            self.assertTrue(all(map(lambda order: isTopologicalSort(dag, order), [classInfo[0], recurClassinfo[0]])), 'The equivalence class does not contain a topological sort')
+
 
 
     def assertTopos(self, graph, allTopos):
-        self.assertEquals(allForestTopoSorts(graph), len(allTopos))
-        self.assertEquals(allPolyTopoSorts(graph), len(allTopos))
+        self.assertEqual(allForestTopoSorts(graph), len(allTopos))
+        self.assertEqual(allPolyTopoSorts(graph), len(allTopos))
 
 if __name__ == '__main__':
     unittest.main()

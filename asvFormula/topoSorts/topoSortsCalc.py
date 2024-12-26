@@ -20,7 +20,7 @@ def allPolyTopoSorts(polyTree : nx.DiGraph) -> int:
     subtreesTopoSorts = [result[0] for result in subTreeResults.values()]
 
     topos = subtreesTopoSorts[0] if len(subtreesTopoSorts) == 1 else uti.multinomial_coefficient(subtreeSizes) * math.prod(subtreesTopoSorts)
-    print(f'This would take {topos/60000} seconds in the naive way') 
+    #print(f'This would take {topos/60000} seconds in the naive way') 
     return topos
 
 def allPolyTopoSortsAndSizeFromNode(node, polyTree : nx.DiGraph, visited : dict[Node, bool]) -> int:
@@ -65,10 +65,13 @@ def addUsedElements(usedElements : list[int], nodesBefore : list[int], nodesAfte
 
 #Very similar to the leftPossibleOrders function in recursiveFormula.py
 @lru_cache(maxsize=None)
-def allPossibleOrdersOld(nodeIndex : int, nodesBefore : list[int] , nodesAfter : list[int], lastNode : int, nodesToPutBefore : int, placedNodeIndex: int) -> int:
+def allPossibleOrders(nodeIndex : int, nodesBefore : list[int] , nodesAfter : list[int], lastNode : int, nodesToPutBefore : int, placedNodeIndex: int) -> int:
     
     if nodesToPutBefore < 0 and nodeIndex <= placedNodeIndex: #I still haven't placed the node and I have already passed that position
         return 0
+
+    if sum(nodesBefore) == 0 and sum(nodesAfter) == 0 and (placedNodeIndex < nodeIndex): #There are no more nodes to place
+        return 1
     
     nodesBefore = list(nodesBefore)
     nodesAfter = list(nodesAfter)
@@ -76,7 +79,7 @@ def allPossibleOrdersOld(nodeIndex : int, nodesBefore : list[int] , nodesAfter :
     if nodeIndex == lastNode: #You have no more nodes to place 
         totalOrders = 0
         for comb in getPossibleCombinations(nodesAfter, sum(nodesAfter)): #You must put all of the remaining nodes
-            totalOrders +=  uti.multinomial_coefficient(comb) #There are no more nodes to place
+            totalOrders +=  uti.multinomial_coefficient(comb)
         return totalOrders
 
     mustUse = nodesBefore[nodeIndex] #We need to use all of the nodes before the actual node
@@ -91,11 +94,12 @@ def allPossibleOrdersOld(nodeIndex : int, nodesBefore : list[int] , nodesAfter :
             placedNodes = positionsToFill + mustUse + 1 #The actual node
             removeUsedElements(comb, nodesBefore, nodesAfter, nodeIndex)
             newNodesToPut = 0 if nodeIndex > placedNodeIndex else nodesToPutBefore - placedNodes
-            totalOrders +=  allPossibleOrdersOld(nodeIndex + 1 , tuple(nodesBefore), tuple(nodesAfter), lastNode, newNodesToPut, placedNodeIndex) * uti.multinomial_coefficient(comb + [mustUse])
+            totalOrders +=  allPossibleOrders(nodeIndex + 1 , tuple(nodesBefore), tuple(nodesAfter), lastNode, newNodesToPut, placedNodeIndex) * uti.multinomial_coefficient(comb + [mustUse])
             addUsedElements(comb, nodesBefore, nodesAfter, nodeIndex)
 
     return totalOrders
 
+import time
 def allPolyTopoSortsAndPositions(node, polyTree : nx.DiGraph, visited : dict[Node, bool]) -> list[NodeInfo]:
     
     visited[node] = True
@@ -103,15 +107,18 @@ def allPolyTopoSortsAndPositions(node, polyTree : nx.DiGraph, visited : dict[Nod
     notVisitedChildren = [child for child in polyTree.successors(node) if not visited[child]]
     notVisitedParents = [parent for parent in polyTree.predecessors(node) if not visited[parent]]
 
+
     for neighbour in notVisitedChildren + notVisitedParents:
         visited[neighbour] = True
 
     if len(notVisitedChildren + notVisitedParents) == 0: #Leaf node
         return [NodeInfo(0, node, 1, 1)]
     
+    timedChilds = time.time()
     notVisitedChildrenPositions = [allPolyTopoSortsAndPositions(child, polyTree, visited) for child in notVisitedChildren]
     notVisitedParentsPositions = [allPolyTopoSortsAndPositions(parent, polyTree, visited) for parent in notVisitedParents]
-    
+    timedChilds = time.time() - timedChilds
+
     actualNodeInfo = NodeInfo(0, node, 1, 1) 
     allChildOrders = [list(perm) for combination in product(*notVisitedChildrenPositions) for perm in permutations(combination)]
     
@@ -126,8 +133,10 @@ def allPolyTopoSortsAndPositions(node, polyTree : nx.DiGraph, visited : dict[Nod
     numParents = len(notVisitedParents)
     numChildren = len(notVisitedChildren)
 
+    timedOrders = time.time()
     for order in allOrders:
         addToposortsOfOrder(order, toposPerPosition, totalSize, numParents, numChildren)
+    timedOrders = time.time() - timedOrders
             
     results  = [NodeInfo(position, node, totalSize, positionTopos) for position, positionTopos in toposPerPosition.items()]
 
@@ -139,6 +148,6 @@ def addToposortsOfOrder(order, toposPerPosition : dict[int, int], totalSize, num
     nodesMustBeBefore = sum(nodesBefore[:numParents]) + numParents #These nodes must be put before the actual node
     nodesMustBeAfter = sum(nodesAfter[numParents:]) + numChildren #These nodes must be put after the actual node
     for actualNodePosition in range(nodesMustBeBefore , totalSize - nodesMustBeAfter  + 1):
-        toposWithPosition = allPossibleOrdersOld(0, tuple(nodesBefore), tuple(nodesAfter), len(order), actualNodePosition, numParents) * allToposOfOrder(order)
+        toposWithPosition = allPossibleOrders(0, tuple(nodesBefore), tuple(nodesAfter), len(order), actualNodePosition, numParents) * allToposOfOrder(order)
         if toposWithPosition != 0:
             toposPerPosition[actualNodePosition] = toposPerPosition.get(actualNodePosition, 0) + toposWithPosition

@@ -19,7 +19,7 @@ def getPossibleCombinations(leftElementsOfClasses: List[int], sumToObtain: int) 
     def backtrack(index, current_combination, current_sum, maximumAmount):
         # If the current sum equals the required elementsToSelect, add the combination to the result
         if current_sum == sumToObtain:
-            result.append(list(current_combination))
+            result.append(current_combination.copy())
             return
         
         if current_sum > sumToObtain or index == len(leftElementsOfClasses) or current_sum + maximumAmount < sumToObtain:

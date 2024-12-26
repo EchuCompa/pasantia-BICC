@@ -6,9 +6,12 @@ from asvFormula.digraph import *
 import topoSorts.topoSortsCalc as tp
 import topoSorts.topoSortsCalc_basic as tpBasic
 from asvFormula.topoSorts.toposPositions import naivePositionsInToposorts, positionsInToposorts
-from asvFormula.topoSorts.utils import allForestTopoSorts
+from asvFormula.topoSorts.utils import allForestTopoSorts, isTopologicalSort
+from asvFormula.topoSorts.randomTopoSorts import randomTopoSorts
 
 class TestTopoSorts(unittest.TestCase):
+
+    seed = 42
 
     @parameterized.expand(
         [("empty_graph", emptyGraph(8)),
@@ -127,11 +130,40 @@ class TestTopoSorts(unittest.TestCase):
 
     # Horrible test, but just to check some random cases
     def testRandomPolyForests(self):
+        random.seed(self.seed)
         for nodes in range(1,15):
             for degree in range(1, 12):
                 polyforest = createRandomPolyforest(num_nodes=nodes, max_out_degree=degree)
                 if tp.allPolyTopoSorts(polyforest) < 60000: # This is to avoid taking too much time
                     self.assertToposorts(polyforest)
+
+    @parameterized.expand([
+    ("empty_graph", emptyGraph(2)),
+    ('naive_bayes', naiveBayes(9)),
+    ("naive_bayes_path", naiveBayesWithPath(6, 3)),
+    ("multiple_paths", multiplePaths(4, 2)),
+    ("balanced_tree", balancedTree(3, 2))]
+    )
+    def testRandomTopoSortsGeneration(self, name, graph):
+        random.seed(self.seed)
+        nSamples = tp.allPolyTopoSorts(graph)
+        randomOrders = randomTopoSorts(graph, nSamples)
+        uniqueRandomOrders = set()
+        for order in randomOrders:
+            self.assertTrue(isTopologicalSort(graph, order))
+            uniqueRandomOrders.add(tuple(order))
+        
+        allTopoSorts = list(nx.all_topological_sorts(graph))
+        sampledToposorts = random.choices(allTopoSorts, k=nSamples)
+
+        uniqueElements = set([tuple(order) for order in randomOrders])
+        uniqueElementsSampled = set([tuple(order) for order in sampledToposorts])
+
+        generatedElementsRatio = len(uniqueElements)/nSamples
+        sampledElementsRatio = len(uniqueElementsSampled)/nSamples
+
+        #The idea is that the generated elements are uniformly distributed
+        self.assertAlmostEqual(generatedElementsRatio, sampledElementsRatio, 2, f"The {nSamples} topological sorts generated are not uniformly distributed")
                 
 
 import random
