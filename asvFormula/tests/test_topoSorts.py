@@ -138,11 +138,11 @@ class TestTopoSorts(unittest.TestCase):
                     self.assertToposorts(polyforest)
 
     @parameterized.expand([
-    ("empty_graph", emptyGraph(2)),
+    ("empty_graph", emptyGraph(7)),
     ('naive_bayes', naiveBayes(9)),
-    ("naive_bayes_path", naiveBayesWithPath(6, 3)),
+    ("naive_bayes_path", naiveBayesWithPath(6, 6)),
     ("multiple_paths", multiplePaths(4, 2)),
-    ("balanced_tree", balancedTree(3, 2))]
+    ("balanced_tree", balancedTree(2, 2))]
     )
     def testRandomTopoSortsGeneration(self, name, graph):
         random.seed(self.seed)

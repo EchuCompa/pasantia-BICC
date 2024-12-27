@@ -11,6 +11,9 @@ def allPolyTopoSorts(polyTree : nx.DiGraph) -> int:
     
     visited = {node : False for node in polyTree.nodes()}
     
+    return allPolyTopoSortsWithVisited(polyTree, visited)
+
+def allPolyTopoSortsWithVisited(polyTree, visited):
     subTreeResults = {}
     for node in polyTree.nodes():
         if not visited[node]:
