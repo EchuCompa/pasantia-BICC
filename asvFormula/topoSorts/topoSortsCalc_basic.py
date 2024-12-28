@@ -36,7 +36,7 @@ def allPossibleOrdersOld(nodeIndex : int, nodesBefore : list[int] , nodesAfter :
     nodesAfter = list(nodesAfter)
 
     if nodeIndex == lastNode: #You have no more nodes to place
-        return uti.multinomial_coefficient(nodesAfter)
+        return multinomial_coefficient(nodesAfter)
 
     mustUse = nodesBefore[nodeIndex] #We need to use all of the nodes before the actual node
 
@@ -47,7 +47,7 @@ def allPossibleOrdersOld(nodeIndex : int, nodesBefore : list[int] , nodesAfter :
     for positionsToFill in range(0, canUse + 1):
         for comb in getPossibleCombinations(usableNodes, positionsToFill):
             removeUsedElements(comb, nodesBefore, nodesAfter, nodeIndex)
-            totalOrders +=  allPossibleOrdersOld(nodeIndex + 1 , tuple(nodesBefore), tuple(nodesAfter), lastNode) * uti.multinomial_coefficient(comb + [mustUse])
+            totalOrders +=  allPossibleOrdersOld(nodeIndex + 1 , tuple(nodesBefore), tuple(nodesAfter), lastNode) * multinomial_coefficient(comb + [mustUse])
             addUsedElements(comb, nodesBefore, nodesAfter, nodeIndex)
 
     return totalOrders
@@ -100,6 +100,6 @@ def allPolyTopoSortsOld(polyTree : nx.DiGraph):
 
     # Merge all of the trees and calculate the final toposort
     treesSizes, treesTopos = zip(*[tree for tree in rootsSizesAndTopos.values()])
-    topos = uti.multinomial_coefficient(list(treesSizes)) * math.prod(list(treesTopos))
+    topos = multinomial_coefficient(list(treesSizes)) * math.prod(list(treesTopos))
     
     return topos

@@ -1,9 +1,9 @@
 
 from asvFormula.digraph import  nx
-import utils as uti
+from utils import multinomial_coefficient
 from asvFormula import Node, getPossibleCombinations
 from itertools import product, permutations
-from typing import NamedTuple
+from typing import NamedTuple, List
 import math
 from functools import lru_cache
 
@@ -15,15 +15,16 @@ def allPolyTopoSorts(polyTree : nx.DiGraph) -> int:
 
 def allPolyTopoSortsWithVisited(polyTree, visited):
     subTreeResults = {}
-    for node in polyTree.nodes():
+
+    nodesByDegree = sorted(polyTree.nodes(), key = lambda node : polyTree.in_degree(node) + polyTree.out_degree(node))
+    for node in nodesByDegree:
         if not visited[node]:
             subTreeResults[node] = allPolyTopoSortsAndSizeFromNode(node, polyTree, visited)
 
     subtreeSizes = [result[1] for result in subTreeResults.values()]
     subtreesTopoSorts = [result[0] for result in subTreeResults.values()]
 
-    topos = subtreesTopoSorts[0] if len(subtreesTopoSorts) == 1 else uti.multinomial_coefficient(subtreeSizes) * math.prod(subtreesTopoSorts)
-    #print(f'This would take {topos/60000} seconds in the naive way') 
+    topos = subtreesTopoSorts[0] if len(subtreesTopoSorts) == 1 else multinomial_coefficient(subtreeSizes) * math.prod(subtreesTopoSorts)
     return topos
 
 def allPolyTopoSortsAndSizeFromNode(node, polyTree : nx.DiGraph, visited : dict[Node, bool]) -> int:
@@ -82,7 +83,7 @@ def allPossibleOrders(nodeIndex : int, nodesBefore : list[int] , nodesAfter : li
     if nodeIndex == lastNode: #You have no more nodes to place 
         totalOrders = 0
         for comb in getPossibleCombinations(nodesAfter, sum(nodesAfter)): #You must put all of the remaining nodes
-            totalOrders +=  uti.multinomial_coefficient(comb)
+            totalOrders +=  multinomial_coefficient(comb)
         return totalOrders
 
     mustUse = nodesBefore[nodeIndex] #We need to use all of the nodes before the actual node
@@ -97,12 +98,11 @@ def allPossibleOrders(nodeIndex : int, nodesBefore : list[int] , nodesAfter : li
             placedNodes = positionsToFill + mustUse + 1 #The actual node
             removeUsedElements(comb, nodesBefore, nodesAfter, nodeIndex)
             newNodesToPut = 0 if nodeIndex > placedNodeIndex else nodesToPutBefore - placedNodes
-            totalOrders +=  allPossibleOrders(nodeIndex + 1 , tuple(nodesBefore), tuple(nodesAfter), lastNode, newNodesToPut, placedNodeIndex) * uti.multinomial_coefficient(comb + [mustUse])
+            totalOrders +=  allPossibleOrders(nodeIndex + 1 , tuple(nodesBefore), tuple(nodesAfter), lastNode, newNodesToPut, placedNodeIndex) * multinomial_coefficient(comb + [mustUse])
             addUsedElements(comb, nodesBefore, nodesAfter, nodeIndex)
 
     return totalOrders
 
-import time
 def allPolyTopoSortsAndPositions(node, polyTree : nx.DiGraph, visited : dict[Node, bool]) -> list[NodeInfo]:
     
     visited[node] = True
@@ -117,10 +117,8 @@ def allPolyTopoSortsAndPositions(node, polyTree : nx.DiGraph, visited : dict[Nod
     if len(notVisitedChildren + notVisitedParents) == 0: #Leaf node
         return [NodeInfo(0, node, 1, 1)]
     
-    timedChilds = time.time()
     notVisitedChildrenPositions = [allPolyTopoSortsAndPositions(child, polyTree, visited) for child in notVisitedChildren]
     notVisitedParentsPositions = [allPolyTopoSortsAndPositions(parent, polyTree, visited) for parent in notVisitedParents]
-    timedChilds = time.time() - timedChilds
 
     actualNodeInfo = NodeInfo(0, node, 1, 1) 
     allChildOrders = [list(perm) for combination in product(*notVisitedChildrenPositions) for perm in permutations(combination)]
@@ -136,16 +134,14 @@ def allPolyTopoSortsAndPositions(node, polyTree : nx.DiGraph, visited : dict[Nod
     numParents = len(notVisitedParents)
     numChildren = len(notVisitedChildren)
 
-    timedOrders = time.time()
     for order in allOrders:
         addToposortsOfOrder(order, toposPerPosition, totalSize, numParents, numChildren)
-    timedOrders = time.time() - timedOrders
             
     results  = [NodeInfo(position, node, totalSize, positionTopos) for position, positionTopos in toposPerPosition.items()]
 
     return results
 
-def addToposortsOfOrder(order, toposPerPosition : dict[int, int], totalSize, numParents, numChildren):
+def addToposortsOfOrder(order : List[NodeInfo], toposPerPosition : dict[int, int], totalSize : int, numParents : int, numChildren : int):
     nodesBefore = [nodeInfo.position for nodeInfo in order]
     nodesAfter =  [nodeInfo.treeSize - 1 - nodeInfo.position for nodeInfo in order]
     nodesMustBeBefore = sum(nodesBefore[:numParents]) + numParents #These nodes must be put before the actual node

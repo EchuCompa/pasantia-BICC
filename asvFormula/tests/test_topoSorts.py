@@ -7,7 +7,7 @@ import topoSorts.topoSortsCalc as tp
 import topoSorts.topoSortsCalc_basic as tpBasic
 from asvFormula.topoSorts.toposPositions import naivePositionsInToposorts, positionsInToposorts
 from asvFormula.topoSorts.utils import allForestTopoSorts, isTopologicalSort
-from asvFormula.topoSorts.randomTopoSorts import randomTopoSorts
+from asvFormula.topoSorts.randomTopoSortsGeneration import randomTopoSorts
 
 class TestTopoSorts(unittest.TestCase):
 
@@ -161,6 +161,8 @@ class TestTopoSorts(unittest.TestCase):
 
         generatedElementsRatio = len(uniqueElements)/nSamples
         sampledElementsRatio = len(uniqueElementsSampled)/nSamples
+
+        self.assertEqual(len(sampledToposorts), nSamples, f"The number of sampled topological sorts is different than the expected")
 
         #The idea is that the generated elements are uniformly distributed
         self.assertAlmostEqual(generatedElementsRatio, sampledElementsRatio, 2, f"The {nSamples} topological sorts generated are not uniformly distributed")

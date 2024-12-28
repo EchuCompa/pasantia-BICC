@@ -52,7 +52,7 @@ def isRoot(node, dag : nx.DiGraph):
     return dag.in_degree(node) == 0
 
 def isRootWithVisited(node, dag : nx.DiGraph, visited : Dict[Node, bool]):
-    return len([prede for prede in dag.predecessors(node) if not visited[prede]]) == 0
+    return all(visited[parent] for parent in dag.predecessors(node))
 
 def hasMultipleParents(node, dag : nx.DiGraph):
     return dag.in_degree(node) > 1
