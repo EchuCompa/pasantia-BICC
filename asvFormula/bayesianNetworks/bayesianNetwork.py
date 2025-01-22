@@ -41,7 +41,7 @@ class DecisionTreeDigraph(nx.DiGraph):
     def nodeFeature(self , node):
         return self.nodeAttribute(node, 'feature')
 
-def obtainDecisionTreeDigraph(decisionTree : tree.DecisionTreeClassifier, featureNames : list[str]) -> DecisionTreeDigraph:
+def obtainDecisionTreeDigraph(decisionTree : tree.DecisionTreeClassifier, featureNames : list[str], meanPrediction = False) -> DecisionTreeDigraph:
     # Extract the necessary details from the tree
     G = DecisionTreeDigraph()
     children_left = decisionTree.tree_.children_left
@@ -71,9 +71,8 @@ def obtainDecisionTreeDigraph(decisionTree : tree.DecisionTreeClassifier, featur
             stack.append((children_left[node_id], depth + 1))
             stack.append((children_right[node_id], depth + 1))
         else:
-            #G.add_node(node_id, label=f"Leaf {node_id}: {np.around(values[node_id], 3)}")
-            # Obtains the prediction of the node instead of the probabilities
-            prediction = np.argmax(classesValues)
+            # Obtains the exact prediction of the node instead of the probabilities
+            prediction = np.around(values[node_id], 3) if meanPrediction else np.argmax(classesValues)
             G.add_node(node_id, label=f"{node_id}: {prediction}")
     return G
 
@@ -119,7 +118,7 @@ def meanPredictionForDTinBN(dtClassifer : DecisionTreeClassifier, bayesianNetwor
 
 def meanPredictionForDTinBNWithEvidence(decisionTreeGraph : DecisionTreeDigraph, node, bayesianNetwork : VariableElimination, pathCondition : PathCondition, priorEvidence : dict[str, list] = None, nodePrediction : Callable = lambda n, tree : tree.nodeMeanPrediction(n)) -> list[float]:
     
-    if pathCondition.doesNotMatchEvidence(priorEvidence):
+    if pathCondition.doesNotMatchEvidence(priorEvidence): #It would be more efficient to only do this check when you add the variable to the path condition, but it's more legible this way and the performance is not much better
         possibleOutputs = len(nodePrediction(node, decisionTreeGraph))
         return np.zeros(possibleOutputs)
 
@@ -156,6 +155,12 @@ def meanPredictionForDTinBNWithEvidence(decisionTreeGraph : DecisionTreeDigraph,
     pathCondition.setVariableLowerLimit(feature, previousLowerLimit)
 
     return leftMean + rightMean
+
+def meanPredictionForDTinBNWithEvidenceExact(decisionTreeGraph : DecisionTreeDigraph, bayesianNetwork : VariableElimination, valuesPerFeature : dict[str, list], priorEvidence : dict[str, list] = None) -> list[float]:
+    rootNodes = [node for node in decisionTreeGraph.nodes if isRoot(node, decisionTreeGraph)] 
+    root = rootNodes[0]
+
+    return meanPredictionForDTinBNWithEvidence(decisionTreeGraph, root, bayesianNetwork, PathCondition(valuesPerFeature), priorEvidence, (lambda n,tree: tree.nodePrediction(n)) )
 
 def showMeanPredictionOfModel(variableToPredict : str, completeBNInference : VariableElimination, valuesPerFeature : dict[str,list], dtTreeClassifier : DecisionTreeClassifier):
 

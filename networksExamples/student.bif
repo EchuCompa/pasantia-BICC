@@ -1,0 +1,55 @@
+network unknown {
+}
+
+variable Difficulty {
+  type discrete [ 2 ] { d0, d1 };
+}
+variable Intelligence {
+  type discrete [ 2 ] { i0, i1 };
+}
+variable SAT {
+  type discrete [ 2 ] { s0, s1 };
+}
+variable Grade {
+  type discrete [ 3 ] { g1, g2, g3 };
+}
+variable Letter {
+  type discrete [ 2 ] { l0, l1 };
+}
+
+variable Acceptance {
+  type discrete [ 2 ] { denied, accepted };
+}
+
+probability ( Difficulty ) {
+  table 0.6, 0.4;
+}
+
+probability ( Intelligence ) {
+  table 0.7, 0.3;
+}
+
+probability ( SAT | Intelligence ) {
+  (i0) 0.95, 0.05;
+  (i1) 0.2, 0.8;
+}
+
+probability ( Grade | Intelligence, Difficulty ) {
+  (i0, d0) 0.3, 0.4, 0.3;
+  (i0, d1) 0.05, 0.25, 0.7;
+  (i1, d0) 0.9, 0.08, 0.02;
+  (i1, d1) 0.5, 0.3, 0.2;
+}
+
+probability ( Letter | Grade ) {
+  (g1) 0.1, 0.9;
+  (g2) 0.4, 0.6;
+  (g3) 0.99, 0.01;
+}
+
+probability ( Acceptance | Letter, SAT ) { //If you have a recomendation letter and a good Sat Score then you are more likely to get accepted. 
+  (l0 s0)  0.9, 0.1;
+  (l0 s1)  0.8, 0.2;
+  (l1 s0)  0.7, 0.3;
+  (l1 s1)  0.1, 0.9;
+}
