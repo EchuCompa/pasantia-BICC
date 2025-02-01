@@ -1,6 +1,6 @@
 from typing import List, Dict, Any
 from asvFormula.digraph import NodeState, isRoot, isLeaf, nx, classifyNodes
-from scipy.special import comb
+from scipy.special import factorial
 import math
 from functools import lru_cache
 
@@ -94,11 +94,11 @@ def hashEquivClasses(equivClasses : List[Any], hasher : TopoSortHasher , feature
 @lru_cache(maxsize=None)
 def multinomial_coefficient_cached(args) -> int:
     n = sum(args)
-    coeff = 1
+    numerator = factorial(n)
+    denominator = 1
     for k in args:
-        coeff *= comb(n, k, exact=True)
-        n -= k
-    return int(coeff)
+        denominator *= factorial(k)
+    return int(numerator / denominator)
 
 def multinomial_coefficient(args) -> int:
     tupledArgs = tuple(args)
