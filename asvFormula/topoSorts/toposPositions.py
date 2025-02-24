@@ -53,7 +53,7 @@ class PositionInfo(NamedTuple):
     topoSorts : int
     nodesAfter : int
 
-#Returns a dict with the possible positions of a node in all the toposorts and who many exists. This works for trees.
+#Returns a dict with the possible positions of a node in all the toposorts and who many exists. This only works for trees.
 # {pos_x : number of toposorts with x in position pos_x}
 
 def positionsInToposorts(node, tree : nx.DiGraph, topoPosi : ToposortPosition = ToposortPosition() ) -> Dict[Node, int]:

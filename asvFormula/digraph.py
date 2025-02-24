@@ -57,6 +57,10 @@ def isRootWithVisited(node, dag : nx.DiGraph, visited : Dict[Node, bool]):
 def hasMultipleParents(node, dag : nx.DiGraph):
     return dag.in_degree(node) > 1
 
+def rootNode(tree : nx.DiGraph):
+    rootNodes = [node for node in tree if isRoot(node, tree)] 
+    return rootNodes[0]
+
 def drawGraph(dag : nx.DiGraph):
     pos = nx.nx_agraph.graphviz_layout(dag, prog="dot") #To have a tree layout
     nx.draw(dag, pos, with_labels=True)

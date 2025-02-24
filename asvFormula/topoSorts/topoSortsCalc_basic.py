@@ -29,7 +29,7 @@ def addRootInfo(node, polyTree : nx.DiGraph):
     for child in polyTree.successors(node):
         addRootInfo(child, polyTree)
 
-#Very similar to the leftPossibleOrders function in recursiveFormula.py
+#Very similar to the possibleLeftOrders function in recursiveFormula.py
 @lru_cache(maxsize=None)
 def allPossibleOrdersOld(nodeIndex : int, nodesBefore : list[int] , nodesAfter : list[int], lastNode : int) -> int:
     nodesBefore = list(nodesBefore)

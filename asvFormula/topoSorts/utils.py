@@ -103,4 +103,3 @@ def multinomial_coefficient_cached(args) -> int:
 def multinomial_coefficient(args) -> int:
     tupledArgs = tuple(args)
     return multinomial_coefficient_cached(tupledArgs)
-

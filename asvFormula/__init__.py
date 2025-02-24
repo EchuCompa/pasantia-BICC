@@ -8,7 +8,7 @@ if module_path not in sys.path:
 #There must be a better way to do this, but this is good for now
 
 #global networkSamplesPath 
-asvRunResultsPath = "/results/asvRunResults"
+asvRunResultsPath = "results/asvRuns"
 
 from typing import NewType, Any
 Node = NewType('Node', Any)

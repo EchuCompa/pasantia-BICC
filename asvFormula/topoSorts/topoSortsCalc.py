@@ -25,7 +25,7 @@ def allPolyTopoSorts(polyTree : nx.DiGraph) -> int:
     
     return allPolyTopoSortsWithVisited(polyTree, visited)
 
-def allPolyTopoSortsWithVisited(polyTree, visited):
+def allPolyTopoSortsWithVisited(polyTree : nx.DiGraph, visited : dict[Node, bool]):
     subTreeResults = {}
 
     nodesByDegree = sorted(polyTree.nodes(), key = lambda node : polyTree.in_degree(node) + polyTree.out_degree(node)) 
@@ -53,7 +53,6 @@ def allPolyTopoSortsAndPositions(node, polyTree : nx.DiGraph, visited : dict[Nod
 
     notVisitedChildren = [child for child in polyTree.successors(node) if not visited[child]]
     notVisitedParents = [parent for parent in polyTree.predecessors(node) if not visited[parent]]
-
 
     for neighbour in notVisitedChildren + notVisitedParents:
         visited[neighbour] = True
@@ -115,7 +114,7 @@ def addUsedElements(usedElements : list[int], nodesBefore : list[int], nodesAfte
         else:
             nodesAfter[actualIndex - len(nodesBefore)] += used
 
-#Very similar to the leftPossibleOrders function in recursiveFormula.py
+#Very similar to the possibleLeftOrders function in recursiveFormula.py
 @lru_cache(maxsize=None)
 def allPossibleOrders(nodeIndex : int, nodesBefore : list[int] , nodesAfter : list[int], lastNode : int, nodesToPutBefore : int, placedNodeIndex: int) -> int:
     
@@ -129,10 +128,7 @@ def allPossibleOrders(nodeIndex : int, nodesBefore : list[int] , nodesAfter : li
     nodesAfter = list(nodesAfter)
 
     if nodeIndex == lastNode: #You have no more nodes to place 
-        totalOrders = 0
-        for comb in getPossibleCombinations(nodesAfter, sum(nodesAfter)): #You must put all of the remaining nodes
-            totalOrders +=  multinomial_coefficient(comb)
-        return totalOrders
+        return multinomial_coefficient(nodesAfter)
 
     mustUse = nodesBefore[nodeIndex] #We need to use all of the nodes before the actual node
 
