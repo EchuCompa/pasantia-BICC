@@ -7,6 +7,9 @@ import time
 
 def assertTopoSortsAndEquivalenceClasses(dag, feature_node, recursiveClassesSizes):
     sumOfAllClasses = sum(map(lambda eqClass : eqClass[1],recursiveClassesSizes.values()))
+
+    if (sumOfAllClasses != allForestTopoSorts(dag)):
+        print('Its wrong')
     assert (sumOfAllClasses == allForestTopoSorts(dag)), f"Number of topological sorts is different than the sum of all equivalence classes. \n Topological Sorts: {allForestTopoSorts(dag)}, Sum of all classes: {sumOfAllClasses}"
     assert (len(recursiveClassesSizes) == numberOfEquivalenceClasses(dag, feature_node)), f"Number of equivalence classes is different than the expected. \n Expected: {numberOfEquivalenceClasses(dag, feature_node)}, Actual: {len(recursiveClassesSizes)}"
 

@@ -98,7 +98,7 @@ def multinomial_coefficient_cached(args) -> int:
     denominator = 1
     for k in args:
         denominator *= factorial(k)
-    return int(numerator / denominator)
+    return math.ceil(numerator / denominator) #This is in case the numbers are too big
 
 def multinomial_coefficient(args) -> int:
     tupledArgs = tuple(args)

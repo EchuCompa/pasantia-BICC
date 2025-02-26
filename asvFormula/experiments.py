@@ -15,21 +15,22 @@ def showMeanPredictionOfModel(variableToPredict : str, completeBNInference : Var
     print(f"Mean prediction of model for the variable {variableToPredict}")
     
     def meanPredictionForDT():
-        global meanPredictions
+        global meanPredictions, meanProbsPredictions
         meanPredictions = meanPredictionForDTinBN(dtTreeClassifier, completeBNInference, valuesPerFeature, variableToPredict, asv.instance, fixedFeatures)
+        meanProbsPredictions = meanProbabilityPredictionForDTinBN(dtTreeClassifier, completeBNInference, valuesPerFeature, variableToPredict, asv.instance, fixedFeatures)
 
     meanPredDTTime = timeit.timeit(meanPredictionForDT, number=1)
     
-    print(f"Mean prediction value for the decision tree: {meanPredictions}, it took {meanPredDTTime} seconds")
+    print(f"Mean prediction value for the decision tree: {meanPredictions}, it took {meanPredDTTime/2} seconds")
+    print(f"Mean prediction value for the probabilities of the decision tree: {meanProbsPredictions}, it took {meanPredDTTime/2} seconds")
 
     def meanPredictionForData():
         global meanPredictions
-        
-        
         meanPredictions = asv.naiveMeanPredictionForEquivalenceClass(fixedFeatures, variableFeatures)
 
     meanPredDataTime = timeit.timeit(meanPredictionForData, number=1)
     print(f"Mean prediction value for possible values of the dataset: {meanPredictions}, it took {meanPredDataTime} seconds")
+
 
     explainer = shap.TreeExplainer(dtTreeClassifier)
     print(f"Estimated value for shap explainer: {explainer.expected_value}")

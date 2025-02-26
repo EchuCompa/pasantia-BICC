@@ -44,5 +44,13 @@ class TestEquivalenceClasses(unittest.TestCase):
         self.assertEqual(allForestTopoSorts(graph), len(allTopos))
         self.assertEqual(allPolyTopoSorts(graph), len(allTopos))
 
+    def test_hugeNumberOfTopoSorts(self):
+        graph = naiveBayesWithPath(11, 15)
+        equivalenceClasses = equivalanceClassesSizesWithHashes(graph, 2)
+
+        sumOfAllClasses = sum(map(lambda eqClass : eqClass[1],equivalenceClasses.values()))
+
+        self.assertEqual(sumOfAllClasses, allForestTopoSorts(graph))
+
 if __name__ == '__main__':
     unittest.main()

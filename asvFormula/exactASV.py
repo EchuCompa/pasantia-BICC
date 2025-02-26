@@ -44,10 +44,7 @@ class ASV:
 
     def meanPredictionForEquivalenceClass(self, fixedFeatures : List[str]) -> list[float]:
 
-        priorEvidence = {featureEvidence : self.instance[featureEvidence] for featureEvidence in fixedFeatures}
-        root = rootNode(self.modelAsTree)
-
-        return meanPredictionForDTinBNWithEvidence(self.modelAsTree, root, self.featureDistributions, PathCondition(self.valuesPerFeature), priorEvidence, nodePrediction=self.predictionFunction)
+        return meanPredictionForDTinBNWithEvidence(self.modelAsTree, rootNode(self.modelAsTree), self.featureDistributions, PathCondition(self.valuesPerFeature), priorEvidenceFrom(self.instance, fixedFeatures), nodePrediction=self.predictionFunction)
     
     def naiveMeanPredictionForEquivalenceClass(self, fixedFeatures : List[str], variableFeatures: List[str]) -> list[float]:
         

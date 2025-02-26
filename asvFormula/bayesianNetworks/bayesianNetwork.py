@@ -26,8 +26,8 @@ class DecisionTreeDigraph(nx.DiGraph):
     def nodeThreshold(self , node):
         return self.nodeAttribute(node, 'threshold')
 
-    #It asumes that is a binary classifier, so it returns the probability for each class
-    def nodeMeanPrediction(self , node):
+    #It returns the probability for each class to be correct one
+    def nodeProbabilityPrediction(self , node):
         return self.nodeAttribute(node, 'classesProbabilities') 
     
     #It asumes that is a binary classifier, so it returns 0 or 1 for each class. It will return 1 for the class with the highest probability
@@ -105,13 +105,27 @@ def datasetFromBayesianNetwork(model, n):
 def meanPredictionForDTinBN(dtClassifer : DecisionTreeClassifier, bayesianNetwork : VariableElimination, valuesPerFeature : dict[str, list], variableToPredict : str, instance : pd.Series, fixedFeatures : list[str]) -> list[float]:
     assert variableToPredict in valuesPerFeature.keys(), "The variable to predict must be in the valuesPerFeature dictionary"
 
+    dtAsNetwork = convertDecisionTreeToGraph(dtClassifer, valuesPerFeature, variableToPredict)
+    
+    return meanPredictionForDTinBNWithEvidence(dtAsNetwork, rootNode(dtAsNetwork), bayesianNetwork, PathCondition(valuesPerFeature), priorEvidence=priorEvidenceFrom(instance, fixedFeatures))
+
+def meanProbabilityPredictionForDTinBN(dtClassifer : DecisionTreeClassifier, bayesianNetwork : VariableElimination, valuesPerFeature : dict[str, list], variableToPredict : str, instance : pd.Series, fixedFeatures : list[str]) -> list[float]:
+    assert variableToPredict in valuesPerFeature.keys(), "The variable to predict must be in the valuesPerFeature dictionary"
+
+    dtAsNetwork = convertDecisionTreeToGraph(dtClassifer, valuesPerFeature, variableToPredict)
+    
+    return meanPredictionForDTinBNWithEvidence(dtAsNetwork, rootNode(dtAsNetwork), bayesianNetwork, PathCondition(valuesPerFeature), priorEvidenceFrom(instance, fixedFeatures), lambda n, tree : tree.nodeProbabilityPrediction(n))
+
+def priorEvidenceFrom(instance, fixedFeatures):
+    return {featureEvidence : instance[featureEvidence] for featureEvidence in fixedFeatures}
+
+def convertDecisionTreeToGraph(dtClassifer, valuesPerFeature, variableToPredict):
     featureNames = list(valuesPerFeature.keys())
     featureNames.remove(variableToPredict) # The variable to predict is not a feature, it was not present in the original dataset
     dtAsNetwork = obtainDecisionTreeDigraph(dtClassifer, featureNames)
-    
-    return meanPredictionForDTinBNWithEvidence(dtAsNetwork, rootNode(dtAsNetwork), bayesianNetwork, PathCondition(valuesPerFeature), priorEvidence=None)
+    return dtAsNetwork
 
-def meanPredictionForDTinBNWithEvidence(decisionTreeGraph : DecisionTreeDigraph, node, bayesianNetwork : VariableElimination, pathCondition : PathCondition, priorEvidence : dict[str, list] = None, nodePrediction : Callable = lambda n, tree : tree.nodeMeanPrediction(n)) -> list[float]:
+def meanPredictionForDTinBNWithEvidence(decisionTreeGraph : DecisionTreeDigraph, node, bayesianNetwork : VariableElimination, pathCondition : PathCondition, priorEvidence : dict[str, list] = None, nodePrediction : Callable = lambda n, tree : tree.nodePrediction(n)) -> list[float]:
     
     if pathCondition.doesNotMatchEvidence(priorEvidence): #It would be more efficient to only do this check when you add the variable to the path condition, but it's more legible this way (and the perfomance loss is not significant)
         possibleOutputs = len(nodePrediction(node, decisionTreeGraph))
@@ -154,10 +168,6 @@ def leafNodePrediction(decisionTreeGraph, node, bayesianNetwork, pathCondition, 
         
     nodePred = nodePrediction(node, decisionTreeGraph) * probOfAllEvents
     return nodePred
-
-def meanPredictionForDTinBNWithEvidenceExact(decisionTreeGraph : DecisionTreeDigraph, bayesianNetwork : VariableElimination, valuesPerFeature : dict[str, list], priorEvidence : dict[str, list] = None) -> list[float]:
-   
-    return meanPredictionForDTinBNWithEvidence(decisionTreeGraph, rootNode(decisionTreeGraph), bayesianNetwork, PathCondition(valuesPerFeature), priorEvidence, (lambda n,tree: tree.nodePrediction(n)) )
 
 def removeEdgeAndMarginalizeCPD(treeBNChild : BayesianNetwork, tail, head):
     treeBNChild.remove_edge(tail, head)
