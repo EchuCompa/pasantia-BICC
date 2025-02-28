@@ -44,8 +44,11 @@ class TestEquivalenceClasses(unittest.TestCase):
         self.assertEqual(allForestTopoSorts(graph), len(allTopos))
         self.assertEqual(allPolyTopoSorts(graph), len(allTopos))
 
-    def test_hugeNumberOfTopoSorts(self):
-        graph = naiveBayesWithPath(11, 15)
+    @parameterized.expand(
+        [(f"naive_bayes_path_{path_length}", naiveBayesWithPath(x, path_length)) for x, path_length in [(11,15), (10,17), (10,15)]]
+    )
+    def test_hugeNumberOfTopoSorts(self, name, graph):
+        #We have these tests for the possible errors in the multinomial calculation for big numbers
         equivalenceClasses = equivalanceClassesSizesWithHashes(graph, 2)
 
         sumOfAllClasses = sum(map(lambda eqClass : eqClass[1],equivalenceClasses.values()))

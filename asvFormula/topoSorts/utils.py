@@ -1,7 +1,7 @@
 from typing import List, Dict, Any
 from asvFormula.digraph import NodeState, isRoot, isLeaf, nx, classifyNodes
-from scipy.special import factorial
 import math
+from scipy.special import comb
 from functools import lru_cache
 
 #Returns a hash that is the binary number which has 0 or 1 in the i-th position if the i-th unrelated node is before or after x_i
@@ -94,11 +94,11 @@ def hashEquivClasses(equivClasses : List[Any], hasher : TopoSortHasher , feature
 @lru_cache(maxsize=None)
 def multinomial_coefficient_cached(args) -> int:
     n = sum(args)
-    numerator = factorial(n)
     denominator = 1
     for k in args:
-        denominator *= factorial(k)
-    return math.ceil(numerator / denominator) #This is in case the numbers are too big
+        denominator *= comb(n, k, exact=True)
+        n -= k
+    return denominator
 
 def multinomial_coefficient(args) -> int:
     tupledArgs = tuple(args)
