@@ -6,8 +6,8 @@ from asvFormula.topoSorts.utils import allForestTopoSorts
 from functools import lru_cache
 
 class ASV:
-    def __init__(self, dag : nx.DiGraph, model, featureDistributions : VariableElimination, valuesPerFeature : dict[str, list], featureToPredict : str, predictionFunction : str = 'Exact', instance : pd.Series = None):
-        self.dag = dag
+    def __init__(self, bayesianNetwork : BayesianNetwork, model : DecisionTreeClassifier, featureDistributions : VariableElimination, valuesPerFeature : dict[str, list], featureToPredict : str, predictionFunction : str = 'Exact', instance : pd.Series = None):
+        self.dag = bayesianNetworkToDigraph(bayesianNetwork)
         self.model = model
         self.featureDistributions = featureDistributions
         self.valuesPerFeature = valuesPerFeature

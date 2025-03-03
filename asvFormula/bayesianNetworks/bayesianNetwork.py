@@ -55,7 +55,8 @@ def obtainDecisionTreeDigraph(decisionTree : tree.DecisionTreeClassifier, featur
         node_id, depth = stack.pop()
         classesValues = values[node_id][0]
         # Modify the label to show the actual feature name, we asume that feature names has the same order as the original dataset
-        G.add_node(node_id, label=f"{featureNames[feature[node_id]]}, node: {node_id}", threshold = thresholds[node_id], classesProbabilities = classesValues, feature = featureNames[feature[node_id]])
+        label = f"{featureNames[feature[node_id]]}" #Other option: f"{featureNames[feature[node_id]]}, node: {node_id}"
+        G.add_node(node_id, label=label, threshold = thresholds[node_id], classesProbabilities = classesValues, feature = featureNames[feature[node_id]])
 
         # Check if it's a split node (non-leaf)
         is_split_node = children_left[node_id] != children_right[node_id]
@@ -71,18 +72,29 @@ def obtainDecisionTreeDigraph(decisionTree : tree.DecisionTreeClassifier, featur
         else:
             # Obtains the exact prediction of the node instead of the probabilities
             prediction = np.around(values[node_id], 3) if meanPrediction else np.argmax(classesValues)
-            G.add_node(node_id, label=f"{node_id}: {prediction}")
+            G.add_node(node_id, label=f"Pred: {prediction}") #Other option: {node_id}: {prediction}
     return G
 
-def drawDecisionTree(decisionTree : nx.DiGraph):
+def drawDecisionTree(decisionTree: nx.DiGraph, filePath : str = None):
     num_nodes = len(decisionTree.nodes())
-    dynamic_size = max(8, min(num_nodes * 0.5, 20))  # Scale factor can be adjusted
+    dynamic_size = max(8, min(num_nodes * 0.5, 20))
 
-    plt.figure(figsize=(dynamic_size, dynamic_size * 0.9)) 
-    pos = nx.nx_agraph.graphviz_layout(decisionTree, prog="dot") #To have a tree layout
-    labelForNode = lambda node : decisionTree.nodes[node].get('label', str(node))
-    nx.draw(decisionTree, pos, with_labels=True, labels={n: labelForNode(n) for n in decisionTree.nodes()})
+    plt.figure(figsize=(dynamic_size, dynamic_size * 0.9))
+    
+    pos = nx.nx_agraph.graphviz_layout(decisionTree, prog="dot")
+
+    label_offset = 10
+    adjusted_pos = {node: (x, y + label_offset) for node, (x, y) in pos.items()}
+
+    node_labels = {n: decisionTree.nodes[n].get('label', str(n)) for n in decisionTree.nodes()}
+
+    nx.draw(decisionTree, pos, with_labels=False, node_color="lightblue", edge_color="gray", node_size=800)
+    nx.draw_networkx_labels(decisionTree, adjusted_pos, labels=node_labels, font_size=12, font_color="black")
     nx.draw_networkx_edge_labels(decisionTree, pos, edge_labels=nx.get_edge_attributes(decisionTree, 'label'))
+
+    if filePath:
+        plt.savefig(filePath) 
+
     plt.show()
 
 def decisionTreeFromDataset(dataset : pd.DataFrame, target_feature, maximum_depth, rand_state=42):
@@ -169,6 +181,24 @@ def leafNodePrediction(decisionTreeGraph, node, bayesianNetwork, pathCondition, 
     nodePred = nodePrediction(node, decisionTreeGraph) * probOfAllEvents
     return nodePred
 
+def bayesianNetworkToDigraph(bayesianNetwork : BayesianNetwork) -> nx.DiGraph:
+    G = nx.DiGraph()
+    G.add_nodes_from(bayesianNetwork.nodes())
+    G.add_edges_from(bayesianNetwork.edges())
+    return G
+
 def removeEdgeAndMarginalizeCPD(treeBNChild : BayesianNetwork, tail, head):
     treeBNChild.remove_edge(tail, head)
     treeBNChild.get_cpds(head).marginalize([tail], inplace=True)
+
+def childBNAsTree(treeBNChild):
+    #I remove this edges so that it is a tree and we can work with it
+    removeEdgeAndMarginalizeCPD(treeBNChild, 'LungParench', 'Grunting')
+    removeEdgeAndMarginalizeCPD(treeBNChild, 'LungParench', 'HypoxiaInO2')
+    removeEdgeAndMarginalizeCPD(treeBNChild, 'HypoxiaInO2', 'LowerBodyO2')
+    removeEdgeAndMarginalizeCPD(treeBNChild, 'CardiacMixing', 'HypDistrib')
+    removeEdgeAndMarginalizeCPD(treeBNChild, 'Sick', 'Age')
+    removeEdgeAndMarginalizeCPD(treeBNChild, 'LungFlow', 'ChestXray')
+
+    assert hasUnderlyingTree(treeBNChild)
+    return treeBNChild
