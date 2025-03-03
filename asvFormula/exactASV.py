@@ -11,7 +11,7 @@ class ASV:
         self.model = model
         self.featureDistributions = featureDistributions
         self.valuesPerFeature = valuesPerFeature
-        self.predictionFunction = (lambda n, tree : tree.nodeMeanPrediction(n)) if predictionFunction == 'Mean' else lambda n, tree : tree.nodePrediction(n)
+        self.predictionFunction = (lambda n, tree : tree.nodeProbabilityPrediction(n)) if predictionFunction == 'Mean' else lambda n, tree : tree.nodePrediction(n)
         self.instance = instance
         self.featureToPredict = featureToPredict
 

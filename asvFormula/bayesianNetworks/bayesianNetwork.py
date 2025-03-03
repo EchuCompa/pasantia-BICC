@@ -26,7 +26,7 @@ class DecisionTreeDigraph(nx.DiGraph):
     def nodeThreshold(self , node):
         return self.nodeAttribute(node, 'threshold')
 
-    #It returns the probability for each class to be correct one
+    #It returns the probability for each class
     def nodeProbabilityPrediction(self , node):
         return self.nodeAttribute(node, 'classesProbabilities') 
     
