@@ -18,8 +18,8 @@ def showMeanPredictionOfModel(variableToPredict : str, completeBNInference : Var
     
     def meanPredictionForDT():
         global meanPredictions, meanProbsPredictions
-        meanPredictions = meanPredictionForDTinBN(dtTreeClassifier, completeBNInference, valuesPerFeature, variableToPredict, asv.instance, fixedFeatures)
-        meanProbsPredictions = meanProbabilityPredictionForDTinBN(dtTreeClassifier, completeBNInference, valuesPerFeature, variableToPredict, asv.instance, fixedFeatures)
+        meanPredictions = meanPredictionForDTinBN(dtTreeClassifier, asv.featureDistributions, valuesPerFeature, variableToPredict, asv.instance, fixedFeatures)
+        meanProbsPredictions = meanProbabilityPredictionForDTinBN(dtTreeClassifier, asv.featureDistributions, valuesPerFeature, variableToPredict, asv.instance, fixedFeatures)
 
     meanPredDTTime = timeit.timeit(meanPredictionForDT, number=1)
     

@@ -97,21 +97,21 @@ def drawDecisionTree(decisionTree: nx.DiGraph, filePath : str = None):
 
     plt.show()
 
-def decisionTreeFromDataset(dataset : pd.DataFrame, target_feature, maximum_depth, rand_state=42):
+def decisionTreeFromDataset(dataset : pd.DataFrame, target_feature, maximum_depth, seed) -> tree.DecisionTreeClassifier:
     X = dataset.drop(target_feature, axis=1)
     y = dataset[target_feature]
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=rand_state)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=seed)
 
-    rf_model = tree.DecisionTreeClassifier(max_depth=maximum_depth, random_state=rand_state)
+    rf_model = tree.DecisionTreeClassifier(max_depth=maximum_depth, random_state=seed)
     # These trees will always be binary ones, that's the implementation is sklearn.
     rf_model.fit(X_train, y_train)
     print(f'The model accuracy is : {rf_model.score(X_test, y_test)}')
     
     return rf_model
 
-def datasetFromBayesianNetwork(model, n):
-    return model.simulate(n_samples=n)
+def datasetFromBayesianNetwork(model : BayesianNetwork, n, seed : int):
+    return model.simulate(n_samples=n, seed = seed)
 
 #It returns the mean value for each possible value of the feature. 
 def meanPredictionForDTinBN(dtClassifer : DecisionTreeClassifier, bayesianNetwork : VariableElimination, valuesPerFeature : dict[str, list], variableToPredict : str, instance : pd.Series, fixedFeatures : list[str]) -> list[float]:

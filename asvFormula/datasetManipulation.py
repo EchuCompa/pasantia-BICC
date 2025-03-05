@@ -1,6 +1,7 @@
 from sklearn.preprocessing import LabelEncoder
 from pgmpy.models import BayesianNetwork
 from asvFormula.bayesianNetworks.bayesianNetwork import *
+import random
 
 def encodeCategoricalColumns(dataset):
     encodingDict = {}
@@ -13,15 +14,17 @@ def encodeCategoricalColumns(dataset):
     return encodingDict, encodedDataset
 
 
-def initializeDataAndRemoveVariable(BNmodel : BayesianNetwork, variableToPredict : str, numberOfSamples : int, treeMaxDepth : int):
+def initializeDataAndRemoveVariable(BNmodel : BayesianNetwork, variableToPredict : str, numberOfSamples : int, treeMaxDepth : int, seed = None):
     # Create a BNDatabaseGenerator object from the model
-    dataFromBN = datasetFromBayesianNetwork(BNmodel, numberOfSamples)
+    np.random.seed(seed)
+    random.seed(seed)
+    dataFromBN = datasetFromBayesianNetwork(BNmodel, numberOfSamples, seed)
 
     BNmodel.remove_node(variableToPredict) # We remove the variable to predict from the BN model so that we won't have this information when we are going to predict it
     BNInference = VariableElimination(BNmodel)
 
     valuesPerFeature, encodedDataset = encodeCategoricalColumns(dataFromBN)
-    dtTreeClassifier = decisionTreeFromDataset(encodedDataset, variableToPredict , treeMaxDepth)
+    dtTreeClassifier = decisionTreeFromDataset(encodedDataset, variableToPredict , treeMaxDepth, seed)
 
     featureColumns = list(dataFromBN.columns)
     featureColumns.remove(variableToPredict)  
