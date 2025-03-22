@@ -4,6 +4,7 @@ import timeit
 from asvFormula.bayesianNetworks.bayesianNetwork import *
 from pgmpy.readwrite import BIFReader
 from asvFormula.bayesianNetworks import networkSamplesPath
+import os
 
 def showMeanPredictionOfModel(variableToPredict : str, completeBNInference : VariableElimination, valuesPerFeature : dict[str,list], dtTreeClassifier : DecisionTreeClassifier, asv : ASV, numberOfVariableFeatures : int):
 
@@ -46,22 +47,34 @@ def showMeanPredictionOfModel(variableToPredict : str, completeBNInference : Var
 
 #I want to the same as the previous function but saving the results in a file
 
-def writeASVAndShapleyIntoFile(first_instance : pd.Series, dataSet : pd.DataFrame, dtTreeClassifier : DecisionTreeClassifier, asv : ASV, file : str, valuesPerFeature : dict[str,list], variableToPredict : str, progress = False):
-    # I want it in a CSV format as a table. With the features as the columns and the values as the rows
+def writeASVAndShapleyIntoFile(
+    first_instance: pd.Series,
+    dataSet: pd.DataFrame,
+    dtTreeClassifier: DecisionTreeClassifier,
+    asv,
+    file: str,
+    valuesPerFeature: dict[str, list],
+    variableToPredict: str,
+    seed: int,
+    progress=False
+):
     features = list(dataSet.columns)
     explainer = shap.TreeExplainer(dtTreeClassifier, dataSet)
     shap_values = explainer.shap_values(first_instance)
     predictionValues = valuesPerFeature[variableToPredict]
-    with open(file, 'w') as f:
-        f.write(f"Feature,{variableToPredict} value,ASV,Shapley\n")
-        sumOfAsv = np.zeros(dtTreeClassifier.n_classes_)
+
+    # Check if the file exists to decide whether to write the header
+    file_exists = os.path.isfile(file)
+
+    with open(file, 'a') as f:
+        if not file_exists:
+            f.write(f"Feature,{variableToPredict} value,ASV,Shapley,Seed\n")
+
         for i, feature in enumerate(features):
             asvValue = asv.asvForFeature(feature, first_instance, showProgress=progress)
-            sumOfAsv += asvValue
             shapleyValue = shap_values[i]
-            for i in range(len(shapleyValue)):
-                f.write(f"{feature},{predictionValues[i]},{asvValue[i]},{shapleyValue[i]}\n")
-        f.write(f"Sum,{sumOfAsv},{sum(shap_values)}\n")
+            for j in range(len(shapleyValue)):
+                f.write(f"{feature},{predictionValues[j]},{asvValue[j]},{shapleyValue[j]},{seed}\n")
 
 def cancerNetworkConfig():
     cancerNetworkPath = networkSamplesPath + "/cancer.bif"
