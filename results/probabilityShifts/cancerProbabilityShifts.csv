@@ -1,0 +1,17 @@
+,Variable,Variable value,Smoker,phi(Smoker),Probability Shift
+0,Pollution,low,True,0.3,0.0
+1,Pollution,low,False,0.7,0.0
+2,Pollution,high,True,0.3,0.0
+3,Pollution,high,False,0.7,0.0
+4,Cancer,True,True,0.8255,0.5255
+5,Cancer,True,False,0.1745,0.5255
+6,Cancer,False,True,0.2938,0.0062
+7,Cancer,False,False,0.7062,0.0062
+8,Xray,positive,True,0.3206,0.0206
+9,Xray,positive,False,0.6794,0.0206
+10,Xray,negative,True,0.2946,0.0054
+11,Xray,negative,False,0.7054,0.0054
+12,Dyspnoea,True,True,0.307,0.007
+13,Dyspnoea,True,False,0.693,0.007
+14,Dyspnoea,False,True,0.2969,0.0031
+15,Dyspnoea,False,False,0.7031,0.0031
