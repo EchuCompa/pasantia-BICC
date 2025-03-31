@@ -143,8 +143,8 @@ def lastUnionOf(unr_classes : List[List[EquivalenceClass]], ancestors : List[Nod
 def getLeftElementsOfClasses(ancestors : List[Node], dag : nx.DiGraph, unrClasses : List[EquivalenceClass]):
     leftElements = [0]*(len(ancestors)+1)
 
-    for unrClass in unrClasses: #These trees will always be available to use, because they are not related to any ancestor. They can go before the root of the ancestors even.
-            if isRoot(unrClass.classParent(), dag):
+    for unrClass in unrClasses:
+            if isRoot(unrClass.classParent(), dag): #These trees will always be available to use, because they are not related to any ancestor. They can go before the root of the ancestors even.
                 leftElements[0] = unrClass.num_nodes_before()
             else:
                 parent = list(dag.predecessors(unrClass.classParent()))[0]

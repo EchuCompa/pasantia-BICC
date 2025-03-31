@@ -1,10 +1,12 @@
 import shap
-from exactASV import ASV
+from asvFormula.ASV import ASV
 import timeit
 from asvFormula.bayesianNetworks.bayesianNetwork import *
 from pgmpy.readwrite import BIFReader
 from asvFormula.bayesianNetworks import networkSamplesPath
 import os
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 def showMeanPredictionOfModel(variableToPredict : str, completeBNInference : VariableElimination, valuesPerFeature : dict[str,list], dtTreeClassifier : DecisionTreeClassifier, asv : ASV, numberOfVariableFeatures : int):
 
@@ -92,3 +94,43 @@ def childNetworkConfig():
     numberOfSamples = 10000
     treeMaxDepth = 9
     return treeBNChild,variableToPredict,numberOfSamples,treeMaxDepth
+
+def dataframeFromCsv(path, seed=None):
+    df = pd.read_csv(path)
+    for column in ['ASV', 'Shapley']:
+        df[column] = pd.to_numeric(df[column], errors='coerce')
+    
+    df = df[df['Seed'] == seed]
+    df.name = path.split('/')[-1][:-4]
+    return df
+
+def multipleSeedsDataframes(dataPath, seeds) -> dict[int, pd.DataFrame]:
+    dataframesDict = {}
+    for seed in seeds:
+        dataframesDict[seed] = dataframeFromCsv(dataPath, seed=seed)
+    return dataframesDict
+
+childFeatureOrder = ["Disease", "CardiacMixing", "CO2Report", "LungParench", "DuctFlow", "Grunting", "LungFlow", "LVHreport", "ChestXray", "BirthAsphyxia", "RUQO2", "Sick", "XrayReport", "LowerBodyO2", "HypoxiaInO2", "HypDistrib", "CO2", "GruntingReport", "LVH"]
+
+def plotValuesFromDF(ax, df, valueToPlot, hueValue, seed, paletteValue='Set2'):
+    bayesianNetwork = 'Cancer' if 'cancer' in df.name.lower() else 'Child'
+
+    desired_order = ["Xray", "Pollution", "Dyspnoea", "Cancer"] if bayesianNetwork == 'Cancer' else childFeatureOrder
+    sns.barplot(x="Feature", y=valueToPlot, hue=hueValue, data=df, palette=paletteValue, ax=ax, order=desired_order)
+    ax.axhline(0, color="black", linewidth=1)
+    ax.set_title(f"{valueToPlot} Values, with seed: {seed} in {bayesianNetwork} Network")
+    ax.set_ylabel(valueToPlot)
+    ax.set_xlabel("Feature")
+    if bayesianNetwork == 'Child':
+        ax.tick_params(axis='x', rotation=45)
+    ax.legend(title=hueValue)
+
+def plotASVandShapFromDF(df, hueValue, seed, figPath=None, axes=None):
+    if axes is None:
+        _, axes = plt.subplots(1, 2, figsize=(15, 6))
+    plotValuesFromDF(axes[0], df, 'ASV', hueValue, seed)
+    plotValuesFromDF(axes[1], df, 'Shapley', hueValue, seed)
+    if figPath:
+        plt.tight_layout()  # Adjust layout to prevent overlap
+        plt.savefig(figPath)
+        plt.show()

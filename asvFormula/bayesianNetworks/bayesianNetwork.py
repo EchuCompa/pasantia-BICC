@@ -175,6 +175,7 @@ def leafNodePrediction(decisionTreeGraph, node, bayesianNetwork, pathCondition, 
         for event in pathCondition.allPossibleEvents():
             query = {pathVariables[i] : event[i] for i in range(len(pathVariables))}
             probOfAllEvents += inferenceWithEvidence.get_value(**query)
+            #TODO: I could add a cache to this function to avoid recalculating the same querys for the same evidence, it would be a cache per function call
     else:
         probOfAllEvents = 1 #The evidence is the same as the path condition, so the probability is 1
         
