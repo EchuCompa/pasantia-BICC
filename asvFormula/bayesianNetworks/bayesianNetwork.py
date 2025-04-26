@@ -31,10 +31,16 @@ class DecisionTreeDigraph(nx.DiGraph):
         return self.nodeAttribute(node, 'classesProbabilities') 
     
     #It asumes that is a binary classifier, so it returns 0 or 1 for each class. It will return 1 for the class with the highest probability
-    def nodePrediction(self , node):
+    def nodePrediction(self, node):
         probs = self.nodeAttribute(node, 'classesProbabilities')
-        maxValues = probs == max(probs)
-        return maxValues.astype(int)
+        max_prob = max(probs)
+        candidates = [i for i, p in enumerate(probs) if p == max_prob]
+        selected = min(candidates)  # pick the smallest label among ties, this is the same behaviour as the sklearn classifier
+        
+        result = np.zeros_like(probs, dtype=int)  # array of zeros, same shape
+        result[selected] = 1
+        return result
+
 
     def nodeFeature(self , node):
         return self.nodeAttribute(node, 'feature')
