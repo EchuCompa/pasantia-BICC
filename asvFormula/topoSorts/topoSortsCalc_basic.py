@@ -54,14 +54,14 @@ def allPossibleOrdersOld(nodeIndex : int, nodesBefore : list[int] , nodesAfter :
 
 
 #Returns the results of merging the trees with the disconnected nodes and their parents
-def mergeConnectedTrees(trees : dict[Node, tuple[int, int]], disconnectedNode : Node, parents : list[Node], polyTree : nx.DiGraph) -> tuple[int, int]:
+def ordersFromIntersection(trees : dict[Node, tuple[int, int]], intersectionNode : Node, parents : list[Node], polyTree : nx.DiGraph) -> tuple[int, int]:
 
-    nodesSizesAndTopos = {parent : trees[rootInfo(parent, polyTree)] for parent in parents + [disconnectedNode]}
-    nodesPositions = {parent : positionsInToposorts(parent, polyTree) for parent in parents + [disconnectedNode]}
+    nodesSizesAndTopos = {parent : trees[rootInfo(parent, polyTree)] for parent in parents + [intersectionNode]}
+    nodesPositions = {parent : positionsInToposorts(parent, polyTree) for parent in parents + [intersectionNode]}
 
     
     parentsPositions = [[NodeInfo(position, parent, nodesSizesAndTopos[parent][0], toposPosition) for position, toposPosition in nodesPositions[parent].items()] for parent in parents]
-    disconnectedPositions = [NodeInfo(position, disconnectedNode, nodesSizesAndTopos[disconnectedNode][0], toposPosition) for position, toposPosition in nodesPositions[disconnectedNode].items()] 
+    disconnectedPositions = [NodeInfo(position, intersectionNode, nodesSizesAndTopos[intersectionNode][0], toposPosition) for position, toposPosition in nodesPositions[intersectionNode].items()] 
 
     allOrders = [list(perm) for combination in product(*parentsPositions) for perm in permutations(combination)]
     allOrders = [order + [disconnectedPosition] for order in allOrders for disconnectedPosition in disconnectedPositions]
@@ -81,7 +81,7 @@ def allPolyTopoSortsOld(polyTree : nx.DiGraph):
 
     #Identify the nodes with more than one parent and disconnect them from the graph. Saving the nodes and the parents. 
     copyPolyTree = polyTree.copy()
-    disconnectedNodesAndParents  = removeMultipleParents(copyPolyTree)
+    intersectionNodesAndParents  = removeMultipleParents(copyPolyTree)
 
 
     #Calculate and save the toposorts and sizes for each tree
@@ -92,9 +92,9 @@ def allPolyTopoSortsOld(polyTree : nx.DiGraph):
         addRootInfo(root, copyPolyTree)
 
     # Merge the results of the trees with intersections and calculate the toposorts and sizes for the new trees.
-    for disconnectedNode, parents in disconnectedNodesAndParents.items():
-        mergedResult = mergeConnectedTrees(rootsSizesAndTopos, disconnectedNode, parents, copyPolyTree)
-        rootsSizesAndTopos[disconnectedNode] = mergedResult
+    for intersectionNode, parents in intersectionNodesAndParents.items():
+        mergedResult = ordersFromIntersection(rootsSizesAndTopos, intersectionNode, parents, copyPolyTree)
+        rootsSizesAndTopos[intersectionNode] = mergedResult
         for parent in parents:
             del rootsSizesAndTopos[rootInfo(parent, copyPolyTree)]
 

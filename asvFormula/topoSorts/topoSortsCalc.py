@@ -91,8 +91,7 @@ def addToposortsOfOrder(order : List[NodeInfo], toposPerPosition : dict[int, int
     nodesMustBeAfter = sum(nodesAfter[numParents:]) + numChildren #These nodes must be put after the actual node
     for actualNodePosition in range(nodesMustBeBefore , totalSize - nodesMustBeAfter  + 1):
         toposWithPosition = allPossibleOrders(0, tuple(nodesBefore), tuple(nodesAfter), len(order), actualNodePosition, numParents) * allToposOfOrder(order)
-        if toposWithPosition != 0:
-            toposPerPosition[actualNodePosition] = toposPerPosition.get(actualNodePosition, 0) + toposWithPosition
+        toposPerPosition[actualNodePosition] = toposPerPosition.get(actualNodePosition, 0) + toposWithPosition
 
 def allToposOfOrder(order : list[NodeInfo]) -> int:
     
@@ -116,33 +115,33 @@ def addUsedElements(usedElements : list[int], nodesBefore : list[int], nodesAfte
 
 #Very similar to the possibleLeftOrders function in recursiveFormula.py
 @lru_cache(maxsize=None)
-def allPossibleOrders(nodeIndex : int, nodesBefore : list[int] , nodesAfter : list[int], lastNode : int, nodesToPutBefore : int, placedNodeIndex: int) -> int:
+def allPossibleOrders(actualNodeIndex : int, nodesBefore : list[int] , nodesAfter : list[int], lastNode : int, nodesToPutBefore : int, placedNodeIndex: int) -> int:
     
-    if nodesToPutBefore < 0 and nodeIndex <= placedNodeIndex: #I still haven't placed the node and I have already passed that position
+    if nodesToPutBefore < 0 and actualNodeIndex <= placedNodeIndex: #I still haven't placed the node and I have already passed that position
         return 0
 
-    if sum(nodesBefore) == 0 and sum(nodesAfter) == 0 and (placedNodeIndex < nodeIndex): #There are no more nodes to place
+    if sum(nodesBefore) == 0 and sum(nodesAfter) == 0 and (placedNodeIndex < actualNodeIndex): #There are no more nodes to place
         return 1
     
     nodesBefore = list(nodesBefore)
     nodesAfter = list(nodesAfter)
 
-    if nodeIndex == lastNode: #You have no more nodes to place 
+    if actualNodeIndex == lastNode: #You have no more nodes to place 
         return multinomial_coefficient(nodesAfter)
 
-    mustUse = nodesBefore[nodeIndex] #We need to use all of the nodes before the actual node
+    mustUse = nodesBefore[actualNodeIndex] #We need to use all of the nodes before the actual node
 
-    usableNodes = nodesBefore[nodeIndex+1:] + nodesAfter[:nodeIndex]
+    usableNodes = nodesBefore[actualNodeIndex+1:] + nodesAfter[:actualNodeIndex]
     canUse = sum(usableNodes)
 
     totalOrders = 0
-    possibleNodesToUse = range(0, canUse + 1) if nodeIndex != placedNodeIndex else [nodesToPutBefore] #If the actual node is the one that we need to place, we must use exactly nodesToPutBefore nodes
+    possibleNodesToUse = range(0, canUse + 1) if actualNodeIndex != placedNodeIndex else [nodesToPutBefore] #If the actual node is the one that we need to place, we must use exactly nodesToPutBefore nodes
     for positionsToFill in possibleNodesToUse:
         for comb in getPossibleCombinations(usableNodes, positionsToFill):
             placedNodes = positionsToFill + mustUse + 1 #The actual node
-            removeUsedElements(comb, nodesBefore, nodesAfter, nodeIndex)
-            newNodesToPut = 0 if nodeIndex > placedNodeIndex else nodesToPutBefore - placedNodes
-            totalOrders +=  allPossibleOrders(nodeIndex + 1 , tuple(nodesBefore), tuple(nodesAfter), lastNode, newNodesToPut, placedNodeIndex) * multinomial_coefficient(comb + [mustUse])
-            addUsedElements(comb, nodesBefore, nodesAfter, nodeIndex)
+            removeUsedElements(comb, nodesBefore, nodesAfter, actualNodeIndex)
+            newNodesToPut = 0 if actualNodeIndex > placedNodeIndex else nodesToPutBefore - placedNodes
+            totalOrders +=  allPossibleOrders(actualNodeIndex + 1 , tuple(nodesBefore), tuple(nodesAfter), lastNode, newNodesToPut, placedNodeIndex) * multinomial_coefficient(comb + [mustUse])
+            addUsedElements(comb, nodesBefore, nodesAfter, actualNodeIndex)
 
     return totalOrders
