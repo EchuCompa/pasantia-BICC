@@ -1,0 +1,77 @@
+\documentclass{article}
+\usepackage{dsfont, amsmath, amsthm}
+\usepackage{graphicx} % Required for inserting images
+\usepackage[hidelinks]{hyperref}  %To remove the red outline
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{decorations.pathmorphing}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{pgf} % For arithmetic operations in TikZ
+\usepackage{comment}
+
+
+\tikzset{
+    nodo/.style={
+        shape=circle,
+        draw=black,
+        line width=1,
+        minimum size=7mm
+    },
+    arista/.style={
+        line width=1,
+        -{Latex[length=3mm]}
+    }
+}
+
+
+\usepackage[a4paper, total={6in, 8in}]{geometry}
+
+\input{macros}
+\title{Un buen titulo} %
+\author{Andial}
+\date{May 2024}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+    Hacer un buen abstract es como pelar una naranja.
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction}
+
+\input{0_introduction}
+
+\input{1_equivalence_classes_and_topo_orders}
+
+\subsection{Bayesian Networks}
+
+%\input{2_bayesian_networks} 
+
+\section{Algorithm for equivalence classes with forests as causal digraphs}
+
+%\input{3_algorithm_for_equiv_class_in_trees}
+
+\section{ASV with equivalence classes}
+
+
+\section{Tareas}
+
+Falta escribir:
+
+\begin{itemize}
+    \item Sección 2.3.2 (Mean prediction in decomposable)
+    \item Sección 2.3.3 (Approximate mean prediction).
+\end{itemize}
+
+\bibliographystyle{plain}
+\bibliography{biblio}
+
+
+
+
+\end{document}

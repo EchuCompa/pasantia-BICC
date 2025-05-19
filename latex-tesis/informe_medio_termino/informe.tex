@@ -1,0 +1,68 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\usepackage{hyperref,color}
+\usepackage{graphicx}
+\newgeometry{left=2cm,bottom=0.1cm, top=0.1cm} 
+\usepackage[backend=biber, style=alphabetic, sorting=ynt]{biblatex}
+\addbibresource{biblio.bib}
+
+\hypersetup{
+    colorlinks=true,   % color instead of boxes
+    citecolor=blue,    % cite links in blue
+    linkcolor=blue,    % other internal links in gray
+%    linktocpage,         % in TOC, LOF and LOT, the link is on the page number
+}
+\usepackage[backgroundcolor=orange, textcolor=black, textsize=tiny]{todonotes}
+\newcommand{\santi}[1]{\todo[inline,caption={},color=blue!30]{{\bf Santi:} #1}}
+\newcommand{\echu}[1]{\todo[inline,caption={},color=blue!30]{{\bf Echu:} #1}}
+\newcommand{\sergio}[1]{\todo[inline,caption={},color=green!30, size=\footnotesize]{{\bf Sergio:} #1}} 
+\newcommand{\sidesergio}[1]{\todo[caption={},color=green!30, size=\footnotesize]{{\bf Sergio:} #1}}
+
+
+\title{\textbf{INFORME DE MEDIO TÉRMINO}}
+\author{\uppercase{XAI: Algoritmos eficientes para explicabilidad}}
+
+\date{Becas de Iniciación a la investigación en Ciencias de la Computación (llamado de febrero de 2024). DC, FCEN, UBA.}
+
+
+
+\begin{document}
+\pagenumbering{gobble}
+
+\maketitle
+\noindent
+\textbf{PASANTE:} \uppercase{Ezequiel Companeetz}
+\noindent \newline
+\textbf{DIRECTOR:} \uppercase{Sergio Abriola}
+\noindent \newline
+\textbf{MENTOR:} \uppercase{Santiago Cifuentes}
+\\
+
+En el presente informe se notifican las actividades desempeñadas por el pasante desde el mes de abril de 2024 hasta septiembre de 2024.\\
+Una parte del trabajo inicial del pasante fue familiarizarse con la bibliografía existente sobre los distintos enfoques respeto a la explicabilidad en IA, buscando conocer los últimos avances en el tema. El plan de trabajo proponía considerar tanto métodos ``formales'' basados en lógica como aquellos basados en teoría de juegos. Tras una primera revisión bibliográfica se decidió profundizar en la segunda familia de métodos, puntualmente en los algoritmos de feature attribution como \href{https://arxiv.org/pdf/1705.07874}{SHAP} \cite{lundberg2017unified}, y en especial en una variación del mismo, \href{https://arxiv.org/pdf/1910.06358}{ASV} \cite{frye2019asymmetric}.
+Terminado ese periodo inicial, el pasante inició la tarea de familiarizarse con estas propuestas de explicabilidad y con los distintos algoritmos y resultados asociados a los mismos. Puntualmente, se analizó la \href{https://arxiv.org/abs/2009.08634}{complejidad de SHAP} \cite{van2022tractability} para distintas familias de modelos (como árboles de decisión o circuitos) y se estudió la posibilidad de traducir estos algoritmos al contexto de ASV. El primer resultado encontrado fue que ASV se puede calcular en tiempo polinomial para una amplia familia de modelos cuando la distribución considerada es una red Naive Bayes, lo cual contrasta con SHAP, el cual no se puede calcular sobre este tipo redes. A partir de este resultado comenzó la búsqueda por un algoritmo polinomial para calcular ASV sobre redes bayesianas, una distribución más general que una Naive Bayes. En el camino se logró demostrar que para modelos más complejos como circuitos el problema es intratable. 
+
+ASV funciona recorriendo ciertas permutaciones de una ``red causal'', y evaluando la calidad de cada una de ellas. Estas permutaciones son los órdenes topológicos del digrafo causal del problema. Para encontrar un algoritmo polinomial se definió una noción de  clase de equivalencia sobre estos órdenes, que permitiría reducir las permutaciones a generar. Los resultados de este algoritmo están en un repositorio público y pueden encontrarse \href{https://github.com/EchuCompa/pasantia-BICC}{acá}. Este código incluye un algoritmo para calcular las distintas clases de equivalencias de un dígrafo causal y sus tamaños. %\sidesergio{Este párrafo se podría achicar ligeramente de ser necesario por el espacio total disponible.}
+%\echu{Por mi lo achico no hay drama, podría ser menos específico y más general}
+Además, se logró implementar este algoritmo en una complejidad polinomial respecto a las clases de equivalencia, encontrando una cota para el número de estas. Ahora se está trabajando en implementar un algoritmo para calcular ASV utilizando el algoritmo diseñado para generar las clases de equivalencias. Un trabajo similar al hecho en \href{https://github.com/nredell/shapFlex/tree/master}{este} repositorio. %, solo que el método propuesto en este proyecto es exacto. 
+
+Durante este trabajo también se descubrió un algoritmo polinomial para calcular la predicción promedio de un árbol de decisión que tiene a una red bayesiana cómo su distribución en tiempo polinomial, el cual no ha sido implementado todavía.  
+
+En los meses siguientes, el pasante realizará más investigaciones en lo que respecta al cálculo de ASV en tiempo polinomial para distintas distribuciones, explorando otros posibles algoritmos de feature attribution. Este proceso terminará con un nuevo conjunto de algoritmos, con sus respectivas complejidades, de XAI.
+
+\printbibliography
+%\hspace{250cm}\\
+
+%\hspace{150cm}\\
+
+
+
+%% Para las firmas
+\includegraphics[scale=0.2]{firmas/Echu_firma.jpg} \hspace{2,7cm} \includegraphics[scale=0.2]{firmas/Firma_Sergiob.jpg} \hspace{2,3cm}  \includegraphics[scale=0.2]{firmas/Cifuentes_Firma.png} \hspace{2,3cm}%\includegraphics[scale=0.4]{firmas.jpg} 
+%\\
+%\line(1,0){120} \hfill \line(1,0){120} \hfill \line(1,0){120}
+
+\hspace{0.2cm}Ezequiel Companeetz \hspace{2,3cm} Sergio Abriola  \hspace{2,3cm} Santiago Cifuentes
+
+\end{document}

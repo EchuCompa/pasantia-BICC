@@ -1,0 +1,479 @@
+%TODO: Add labels the tikzpictures and enclose them in figures
+
+Let's remember the definition of the  ASV formula:
+
+\begin{align*}
+    \assym_{M,e,\Pr}(x_i) = \sum_{\pi \in \topo(G)} [\charactheristicFunction_{M,e,\Pr}(\pi_{<i} \cup \{x_i\}) - \charactheristicFunction_{M,e,\Pr}(\pi_{<i})] 
+\end{align*}
+
+
+To simplify the notation, let $M,e$ and $Pr$ be fixed, so that $\charactheristicFunction_{M,e,\Pr} = \charactheristicFunction$. Now the idea is to find a criterion to diminish the number of topological orders that we need to calculate and the amount of times that we will need to evaluate $\charactheristicFunction$. The main idea behind this heuristic is to identify the equivalence classes for the difference topological orders $\toOr^1, \toOr^2 \in \topo(G)$ such that $\toOr^1 \rel \ \toOr^2 \iff \charactheristicFunction(\toOr^1_{<i}) = \charactheristicFunction(\toOr^2_{<i}) $, that defines our relation \rel. \santi{Acá creo que solo hay que poner $\toOr^1_{<i} = \toOr^2_{<i}$, que denota que el conjunto de variables que quedan fijas es el mismo. Pedir esto con el $\charactheristicFunction$ es más laxo pero no sabemos controlarlo.}
+\echu{Pero la idea es justamente que no importe el orden de los elementos tampoco, osea sólo ver que los conjuntos son iguales}
+\santi{Pero vos no esta´s pidiendo que los conjuntos sean iguales, sino que pedís que la función evaluada en esos conjuntos lo sea. O sea, hay conjuntos que no son iguales pero a lo mejor si los evaluas te da igual. Ahora mismo escribiste esta última relación.}
+\santi{Quedamos en definir la relación ``ideal'' $R^*$ que captura que dos permutaciones son iguales si dan la misma evaluación. Como eso es difícil, solamente calculamos la relación $R$ que dice que dos permutaciones son iguales si tienen el mismo conjunto de nodos antes del nodo $x_i$.}
+
+Using our new formula, the permutations that we will be studying are the ones in $topo(G)$. Now we want to see the equivalence classes of $\topo(G)$ following the criteria defined before, taking into account that we are calculating $\phi_{i}^{assym}(\charactheristicFunction)$. For our DAG $G=(V,E)$, let $A$ be the ancestors of $x_i$ and $D$ his descendants.
+
+\begin{figure}
+\centering 
+ \begin{tikzpicture}[scale=.95, transform shape]
+        % ---- NODOS ----
+        \node[nodo] (a1) at (0, 0) {$a_1$};
+        \node[nodo] (a2) at (2.5, 2) {$a_2$};
+        \node[nodo] (a3) at (2.5, -2) {$a_3$};
+        \node[nodo] (xi) at (5, 0) {$x_i$};
+        \node[nodo] (d_1) at (7.5, 2) {$d_1$};
+        \node[nodo] (d_2) at (10, -2) {$d_2$};
+        \node[nodo] (d_3) at (10, 0) {$d_3$};
+        
+        \node[draw=none, fill=none] (hijo_a3) at (4.5, -4) {};
+        \node[draw=none, fill=none] (hijo_d2) at (8, -4) {};
+
+        % ---- ARISTAS ----
+        \path [->] (a1) edge[arista, decorate, decoration={snake, amplitude=.4mm, 
+        segment length=4mm, post length=1mm}]  (xi);
+        \path [->] (a2) edge[arista, decorate, decoration={snake, amplitude=.4mm, segment length=4mm, post length=1mm}]  (xi);
+        \path [->] (a3) edge[arista, decorate, decoration={snake, amplitude=.4mm, segment length=4mm, post length=1mm}]  (xi);
+         \path [->] (xi) edge[arista, decorate, decoration={snake, amplitude=.4mm, segment length=4mm, post length=1mm}]  (d_1);
+         \path [->] (xi) edge[arista, decorate, decoration={snake, amplitude=.4mm, segment length=4mm, post length=1mm}]  (d_2);
+         \path [->] (xi) edge[arista, decorate, decoration={snake, amplitude=.4mm, segment length=4mm, post length=1mm}]  (d_3);
+         \path [->] (a3) edge[arista, decorate, decoration={snake, amplitude=.4mm, segment length=4mm, post length=1mm}] node[above right] {$a_3$ descendants} (hijo_a3);
+         \path [->] (hijo_d2) edge[arista, decorate, decoration={snake, amplitude=.4mm, segment length=4mm, post length=1mm}] node[below right] {$d_2$ ancestors} (d_2);
+
+    \end{tikzpicture}
+    \caption{When fixing a node $x_i$ we can split the rest of the nodes in three groups: \textit{ancestors} (every node able to reach $x_i$), \textit{descendants} (every node reachable from $x_i$) and those \textit{unrelated} with $x_i$.}
+\end{figure}
+For every topological order $\toOr$ we know that every $a \in A$ appears before $x_i$, $\toOr(a) < \toOr(x_i)$, and that every $d \in D$ appears after,$\toOr(x_i) < \toOr(d)$. If they were the only nodes to take into account, then \numTopo($G$)= \#$A! \cdot \#D!$, that's the permutations of $A$ times the permutation of $D$. Also, all of them will  be in the same equivalence class, because the order of the attributes in each permutation $\toOr^1, \toOr^2$ won't affect the result of evaluating $\charactheristicFunction$ ($\charactheristicFunction(\toOr^1) = \charactheristicFunction(\toOr^2)$). They will have the same fixed attributes before $x_i$, $A$,  and the same after $x_i$, $D$. That gives us this formula,  $$\sum_{\toOr \in \topo(G)} [\charactheristicFunction(\toOr_{<i} \cup \{x_i\}) - \charactheristicFunction(\toOr_{<i})] = ( \charactheristicFunction(\toOr_{<i} \cup \{x_i\}) - \charactheristicFunction(\toOr_{<i}) ) * \#A! \cdot \#D!$$ (for any $\toOr \in \topo(G))$, because all the evaluations of $\charactheristicFunction$ give the same result for any $\toOr$. That means that we can reduce the number of times that we will evaluate $\charactheristicFunction$.
+
+But in the DAG $G$ we have nodes that aren't descendants or ancestors  of $x_i$,they will be $U$, the \emph{unrelated nodes}. There can be multiple equivalence classes, and we will need to discover all of them and their sizes. With that information, we can calculate the $ASV$: $$\assym_{M,e,\Pr}(x_i) = \sum_{\toOr \in \topo(G)} \charactheristicFunction(\toOr_{<i} \cup \{x_i\}) - \charactheristicFunction(\toOr_{<i}) = \heuristicASVFormula$$
+
+If we can calculate the number and size of the equivalence classes in an efficient manner then we can calculate the $ASV$ value. For the size of the equivalence classes, we want to calculate the number of topological orders of a certain DAG. 
+
+\subsubsection{Number of topological orders of a DAG} %¿Or polytree?
+\label{Number Of Toposorts}
+
+We are going to define a formula to calculate the number of topological orders of a DAG. Let's start with the most basic DAG $D$, a graph with $n+1$ nodes and no edges. 
+
+\begin{figure}[ht]
+\centering 
+ \begin{tikzpicture}[scale=.95, transform shape]
+
+        % ---- NODOS ----
+        \node[nodo] (r) at (0, 0) {$r$};
+        \node[nodo] (s1) at (-4, -2) {$s_1$};
+        \node[nodo] (s2) at (-2, -2) {$s_2$};
+        \node[nodo] (si) at (1, -2) {$s_i$};
+        \node[nodo] (sn-1) at (4, -2) {$s_{r}$};
+        
+        \node[draw=none, fill=none] (dots) at (-0.2, -2) {$\ldots$}; % Ellipsis
+        \node[draw=none, fill=none] (dots) at (2.2, -2) {$\ldots$}; % Ellipsis
+        
+        % \node[draw=none, fill=none] (hijo_a3) at (4.5, -4) {};
+        % \node[draw=none, fill=none] (hijo_d2) at (8, -4) {};
+        
+    \end{tikzpicture}
+\end{figure}
+
+In this case the number of topological orders of $D$ is $n!$, because the nodes don't have any edges between them, so there are no restrictions. Now let's add some edges to $D$ so that it becomes a tree and let's imagine that each node $s_j$ has it's own subtree. 
+
+\begin{figure}[ht]
+\centering 
+ \begin{tikzpicture}[scale=.95, transform shape]
+
+        % ---- NODOS ----
+        \node[nodo] (r) at (0, 0) {$r$};
+        \node[nodo] (s1) at (-4, -2) {$s_1$};
+        \node[nodo] (s2) at (-2, -2) {$s_2$};
+        \node[nodo] (si) at (1, -2) {$s_i$};
+        \node[nodo] (sn-1) at (4, -2) {$s_{r}$};
+        
+        \node[draw=none, fill=none] (dots) at (-0.2, -2) {$\ldots$}; % Ellipsis
+        \node[draw=none, fill=none] (dots) at (2.2, -2) {$\ldots$}; % Ellipsis
+        
+        \node[draw=none, fill=none] (h1) at (-4, -4) {};
+        \node[draw=none, fill=none] (h2) at (-2, -4) {};
+        \node[draw=none, fill=none] (hi) at (1, -4) {};
+        \node[draw=none, fill=none] (hn-1) at (4, -4) {};
+
+
+         \path [->] (r) edge[arista]  (s1);
+         \path [->] (r) edge[arista]  (s2);
+         \path [->] (r) edge[arista]  (si);
+         \path [->] (r) edge[arista]  (sn-1);
+
+        \path [->] (s1) edge[arista,  decorate, decoration={snake, amplitude=.4mm, segment length=4mm, post length=1mm}]  (h1);
+         \path [->] (s2) edge[arista,  decorate, decoration={snake, amplitude=.4mm, segment length=4mm, post length=1mm}]  (h2);
+         \path [->] (si) edge[arista,  decorate, decoration={snake, amplitude=.4mm, segment length=4mm, post length=1mm}]  (hi);
+         \path [->] (sn-1) edge[arista,  decorate, decoration={snake, amplitude=.4mm, segment length=4mm, post length=1mm}]  (hn-1);
+    \end{tikzpicture}
+\end{figure}
+
+% Misma idea que en https://cs.stackexchange.com/questions/12713/find-the-number-of-topological-sorts-in-a-tree
+Here the formula is recursive, and it depends on each of the subtrees of $D$. Now we have $n+1$ nodes, and the subtrees $t_1, \dots, t_r$ of the children $s_j$, have $k_1, \dots, k_r$ nodes respectively (with $n= k_1 + \dots + k_r$). Now let $\numTopo(r)$ be the number of topological orders of the tree $D$ with root $r$. Then the formula we have is: 
+
+$$\numTopo(t) =  \binom{n}{k_1, k_2, \ldots, k_r} \prod_{i=1}^{n} \numTopo(t_i)$$
+
+You can combine the topological orders of each child by selecting which position you are going to assign to each of them, the number of different assignments that you can do in $n$ positions with $r$ sets of $k_i$ elements each is: $ \binom{n}{k_1, k_2, \ldots, k_r}= \frac{n!}{k_1! k_2! \ldots, k_r!}$. Now for all of those assignments you can use any of the topological orders of each subtree, that's the $\prod_{i=1}^{n} \numTopo(t_i)$.
+
+We could try to add more edges to our graph $D$, for example an edge $(r,d)$ between $r$ and one of it's descendants $d$.
+
+\begin{figure}[ht]
+\centering 
+ \begin{tikzpicture}[scale=.5, transform shape]
+
+        % ---- NODOS ----
+        \node[nodo] (r) at (0, 0) {$r$};
+        \node[nodo] (s1) at (-4, -2) {$s_1$};
+       
+        \node[draw=none, fill=none] (h1) at (-4, -4) {};
+
+         \path [->] (r) edge[arista]  (s1);
+         \draw[->] (r) to[bend left] (h1);
+
+
+        \path [->] (s1) edge[arista,  decorate, decoration={snake, amplitude=.4mm, segment length=4mm, post length=1mm}]  (h1);
+
+    \end{tikzpicture}
+\end{figure}
+
+But it would stop being a polytree, because it would introduce a cycle in the undirected graph. Something that we can add are multiple roots $r_1, \dots, r_l$ in our graph, that would still be a polytree. And we can calculate the \numTopo \ of it by adding a root $r_0$ that is connected to all of them and use the same formula as if it was a tree. 
+
+\begin{figure}[ht]
+\centering 
+ \begin{tikzpicture}[scale=.95, transform shape]
+
+        % ---- NODOS ----
+        \node[nodo] (r) at (0, 0) {$r_0$};
+        \node[nodo] (s1) at (-4, -2) {$r_1$};
+        \node[nodo] (s2) at (-2, -2) {$r_2$};
+        \node[nodo] (si) at (1, -2) {$r_i$};
+        \node[nodo] (sn-1) at (4, -2) {$r_{l}$};
+        
+        \node[draw=none, fill=none] (dots) at (-0.2, -2) {$\ldots$}; % Ellipsis
+        \node[draw=none, fill=none] (dots) at (2.2, -2) {$\ldots$}; % Ellipsis
+        
+        \node[draw=none, fill=none] (h1) at (-4, -4) {};
+        \node[draw=none, fill=none] (h2) at (-2, -4) {};
+        \node[draw=none, fill=none] (hi) at (1, -4) {};
+        \node[draw=none, fill=none] (hn-1) at (4, -4) {};
+
+
+         \path [->] (r) edge[arista]  (s1);
+         \path [->] (r) edge[arista]  (s2);
+         \path [->] (r) edge[arista]  (si);
+         \path [->] (r) edge[arista]  (sn-1);
+
+        \path [->] (s1) edge[arista,  decorate, decoration={snake, amplitude=.4mm, segment length=4mm, post length=1mm}]  (h1);
+         \path [->] (s2) edge[arista,  decorate, decoration={snake, amplitude=.4mm, segment length=4mm, post length=1mm}]  (h2);
+         \path [->] (si) edge[arista,  decorate, decoration={snake, amplitude=.4mm, segment length=4mm, post length=1mm}]  (hi);
+         \path [->] (sn-1) edge[arista,  decorate, decoration={snake, amplitude=.4mm, segment length=4mm, post length=1mm}]  (hn-1);
+    \end{tikzpicture}
+\end{figure}
+
+If we have multiple roots, then it could happen that they share some common descendants. But if two roots $r_i$ and $r_j$ share two or more descendants $d_1$ and $d_2$ then they would have a cycle in their undirected graph, between those two roots. That implies that two roots can only share one descendant at most. For example, this would be a valid polytree. 
+
+\begin{figure}[ht]
+\centering 
+ \begin{tikzpicture}[scale=.95, transform shape]
+
+        % ---- NODOS ----
+        \node[nodo] (r1) at (-2,0) {$r_1$};
+
+        \node[nodo] (r2) at  (2,0) {$r_2$};
+        
+        \node[nodo] (s1) at (-2,-2) {$s_1$};
+        \node[nodo] (s2) at (0,-2) {$s_2$};
+        \node[nodo] (s3) at (2,-2) {$s_3$};
+        
+
+        \node[draw=none, fill=none] (h1) at (-2, -4) {};
+        \node[draw=none, fill=none] (h2) at (0, -4) {};
+        \node[draw=none, fill=none] (h3) at (2, -4) {};
+
+
+         \path [->] (r1) edge[arista]  (s1);
+         \path [->] (r1) edge[arista]  (s2);
+         \path [->] (r2) edge[arista]  (s2);
+         \path [->] (r2) edge[arista]  (s3);
+
+        \path [->] (s1) edge[arista,  decorate, decoration={snake, amplitude=.4mm, segment length=4mm, post length=1mm}] (h1);
+         \path [->] (s2) edge[arista,  decorate, decoration={snake, amplitude=.4mm, segment length=4mm, post length=1mm}]  (h2);
+         \path [->] (s3) edge[arista,  decorate, decoration={snake, amplitude=.4mm, segment length=4mm, post length=1mm}]  (h3);
+
+
+        \path [->] (s2) edge[arista,  decorate, decoration={snake, amplitude=.4mm, segment length=4mm, post length=1mm}]  (h2);
+    \end{tikzpicture}
+\end{figure}
+
+%TODO: Resolver este caso!!! Consultas a Pablo que dice que es izi pizi esto
+
+In this case, we cannot use the same formula as the tree, cause there is some overlapping between the subtrees of $r_1$ and $r_2$. We know that there cannot be any edges between the subtrees of $s_1$, $s_2$ and $s_2$, $s_3$ because that would create a cycle. \emph{But we could not determine a closed formula for this scenario. }
+
+The formula that we have then is: $$\numTopo(t) =  \binom{n}{k_1, k_2, \ldots, k_r} \prod_{i=1}^{n} \numTopo(t_i)$$
+Analyzing this formula, we can see that:
+
+\begin{itemize}
+    \item If we have big subtrees, then the number of topological orders can be something closer to polynomial in $n$ (the number of nodes). 
+    \item If you have a small enough maximum out degree $m$, then you will know that for each level, the biggest $k$ (size of the subtree) will be bounded by $\frac{n}{m}$.
+    \item  If you have a tree that is composed of multiple paths without a great length, then the number of topological orders could be tractable. 
+\end{itemize}
+
+\begin{comment}
+    $TODO: Do this proof$
+    \begin{lemma}\label{lemma:pr_equals_prprime}
+    For any tree $T$ and it's root $n$, where $l$ is the number of leaves of the tree and $h$ is its height. Then for the formula: 
+    \[
+    \numTopo(n) = 
+    \begin{cases} 
+    1 & \text{if $n$ is a leaf} \\
+    \binom{n}{k_1, k_2, \ldots, k_r} \prod_{i=1}^{n} \numTopo(t_i) & \text{oc.}
+    \end{cases}
+    \]
+
+    We have the bound $\numTopo(n) \leq (2+h)^l + 1$
+      
+\end{lemma}
+
+    \begin{proof}
+        We want to prove that $\numEqCl(n) \leq (2+h)^l + 1$. This applies to any tree $T$ and it's root $n$, where $l$ is the number of leaves of the tree and $h$ is its height.
+
+        We have to prove this for the two cases that the formula presents. 
+
+        \textbf{Case 1: $n$ is a leaf}
+        If $n$ is a leaf, then it has height 0, and it's a number of leaves is 1. That leaves us with  $\numEqCl(n) = 2\leq  3 = (2+0)^1 + 1$. 
+
+        \textbf{Case 2: $n$ has children}
+
+        Our \textit{inductive hypothesis} is that for each subtree $T_h$ that has a child $c$ of $n$ as a root, our formula stands. That means that $\forall c \in children(n), \numEqCl(c) \leq (2+ h_c)^{l_c} + 1$. With this in mind let's start
+        \begin{align}\label{eq:pr_equals_prprime}
+            \numEqCl(n)  &= \prod_{c \in children(n)} \numEqCl(c) + 1 \\
+            & \leq (applying \ the \ IH) \prod_{c \in children(n)} ((2+ h_c)^{l_c} + 1) + 1 \\
+            & \leq \prod_{c \in children(n)} (2+ h_c)^{l_c} + 1 \\
+            & \leq (h>h_c) \prod_{c \in children(n)} (2+ h)^{l_c} + 1 \\
+            & = (2+ h)^{\sum_{c \in children(n)} l_c} + 1 \\
+            & = (\sum_{c \in children(n)} l_c = l) \ (2+ h)^l + 1 \\
+            & = (2+ h)^l + 1 \\
+        \end{align}
+
+    That's how we conclude that our formula has an upper bound of $(2+ h)^l + 1$. 
+    \end{proof}
+\end{comment}
+
+ 
+\subsubsection{Number of equivalence classes of a DAG} %¿Or polytree?
+
+We have defined a formula to calculate the size of each equivalence class, now we need one to calculate the number of equivalence classes. As it was mentioned in section \ref{heuristic_asv_section}, what we will be looking at are the \emph{unrelated nodes}, $U$, and the relationships between them. These are the nodes that aren't descendants or ancestors of $x_i$ (the feature for which we are calculating $ASV$). Let's start with the case of calculating the number of equivalence classes $\eqCl$ for a tree, with feature $x_i$.
+
+\begin{figure}[ht]
+\centering 
+ \begin{tikzpicture}[scale=.95, transform shape, 
+    unrelated/.style={circle, draw=red},
+    wiggly/.style={decorate, decoration={snake, amplitude=.2mm, segment length=2mm}}  % Define wiggly line style
+    ]
+        
+        
+        % ---- NODOS ----
+        \node[nodo] (r) at (0, 0) {$r$};
+        \node[unrelated] (a1) at (-1, -2) {$a_1$};
+        \node[nodo] (a2) at (1, -2) {$a_2$};
+
+        \node[unrelated] (b1) at (-1, -4) {$b_1$};
+        \node[nodo] (b2) at (1, -4) {$b_2$};
+        \node[unrelated] (b3) at (3, -4) {$b_3$};
+
+        \node[unrelated] (c1) at (0, -7) {$c_1$};
+        \node[nodo] (c2) at (3, -6) {$c_2$};
+
+        \node[nodo] (xi) at (3, -8) {$x_i$};
+
+
+        
+        \node[draw=none, fill=none] (hi) at (3, -10) {};
+
+
+         \path [->] (r) edge[arista]  (a1);
+         \path [->] (r) edge[arista]  (a2);
+
+         \path [->] (a2) edge[arista]  (b1);
+         \path [->] (a2) edge[arista]  (b2);
+         \path [->] (a2) edge[arista]  (b3);
+
+         \path [->] (b2) edge[arista]  (c1);
+         \path [->] (b2) edge[arista]  (c2);
+
+         \path [->] (c2) edge[arista]  (xi);
+
+
+        \node[text=red] at (-2, -8) {$c_1$ subtree}; 
+        \draw[red, wiggly] (-1, -9) -- (0,-7.4) -- (1, -9) -- cycle;  % Draw the triangle
+
+        \node[text=red] at (-3, -5) {$b_1$ subtree}; 
+        \draw[red, wiggly] (-2, -6) -- (-1,-4.4) -- (0, -6) -- cycle;  % Draw the triangle
+        
+         \path [->] (xi) edge[arista,  decorate, decoration={snake, amplitude=.4mm, segment length=4mm, post length=1mm}] node[right] {descendants of $x_i$} (hi);
+    \end{tikzpicture}
+\end{figure}
+
+In this case, the nodes that we care about are the ones in red. Because the descendants of $x_i$ will always be to the right of $x_i$ in the topological order and it's ancestors will appear before, so they won't define new equivalence classes. If there wasn't any relation between the \emph{unrelated} nodes then, the number of classes would be $2^{|U|}$. Because if you have a topological order $\toOr$, then you know that $\toOr =  \left[ ancestors, \dots x_i , \dots , descendants  \right] $ it will be something similar to this. Then you just need to define where to insert the $U$ nodes, but if they have no relationships between them then you each of them can be put to the left or to the right of $x_i$, defining a new equivalence class. 
+%TODO : Buscar una forma mejor de decir esto
+
+What happens when some of this unrelated nodes have descendants? Let's calculate the number of equivalence classes for one of the subtrees. For example, this could be the $b_1$ subtree in the previous example. 
+
+\begin{figure}[ht]
+\centering 
+ \begin{tikzpicture}[scale=.95, transform shape, 
+    unrelated/.style={circle, draw=red},
+    ]
+        
+        
+        % ---- NODOS ----
+        \node[unrelated] (b1) at (0, 0) {$b1$};
+        \node[unrelated] (11) at (-1, -2) {$1_1$};
+        \node[unrelated] (12) at (1, -2) {$1_2$};
+
+        \node[unrelated] (21) at (-1, -4) {$2_1$};
+        \node[unrelated] (22) at (1, -4) {$2_2$};
+        \node[unrelated] (23) at (3, -4) {$2_3$};
+
+         \path [->] (r) edge[arista, draw=red]  (a1);
+         \path [->] (r) edge[arista, draw=red]  (a2);
+
+         \path [->] (a1) edge[arista, draw=red]  (21);
+         \path [->] (a2) edge[arista, draw=red]  (b2);
+         \path [->] (a2) edge[arista, draw=red]  (b3);
+
+    \end{tikzpicture}
+\end{figure}
+
+We want to calculate the number of equivalence classes of the tree rooted in $b1$, $\numEqCl(b_1)$. For $b_1$ we have two options, it can be positioned to the right or to the left of $x_i$ in the topological order $\toOr$. If it's positioned to the right, then all of its descendants will be positioned to the right two, because it's a toposort (topological order). 
+%TODO: Reemplazar los topological order por toposort.
+%TODO: Usar otro conector que no sea because, cause, that means. 
+So our formula would be $$\numEqCl(b_1) = \numEqCl(b_1) \land \toOr(b_1) > \toOr(x_i) + \numEqCl(b_1) \land \toOr(b_1) < \toOr(x_i)  = 1 + \numEqCl(b_1) \land \toOr(b_1) < \toOr(x_i) $$
+
+\santi{Esta suma está rara.}
+\echu{Esta formula es una poronga, hay que modificarla y dejar algo más coherente. }
+
+Now if $b_1$ is positioned on the left of $x_i$ then there is no restriction for its children and their subtrees, and we can apply the same process. Then for each $\eqCl$ that we obtain in its subtrees we can combine them, cause they won't be restricted. In probability, that means multiplying the result that we obtain for each tree. We have to also take into account the case where the node has no children, there we can have two equivalence classes, taking into account the left and right possibilities. That's how we obtain this formula: 
+
+\label{formula:number_of_equiv_classes}
+\[
+\numEqCl(n) = 
+\begin{cases} 
+2 & \text{if $n$ is a leaf} \\
+\prod_{c \in children(n)} \numEqCl(c) + 1 & \text{oc.}
+\end{cases}
+\]
+
+This formula can also be used to calculate the equivalence classes of all the \emph{unrelated} nodes in the previous example, we can use a similar strategy than the one for calculating the toposorts. We create a node $r_0$ and connect it to the roots of all the subtrees of the unrelated nodes, and then calculate $\numEqCl(r_0)$ using the formula previously defined. 
+
+\begin{figure}[ht]
+\centering 
+     \begin{tikzpicture}[scale=.95, transform shape, 
+    unrelated/.style={circle, draw=red},
+    wiggly/.style={decorate, decoration={snake, amplitude=.2mm, segment length=2mm}}  % Define wiggly line style
+    ]
+        
+        
+        % ---- NODOS ----
+        \node[nodo] (r) at (0, 0) {$r$};
+        \node[nodo, draw=blue] (r0) at (4, 0) {$r_0$};
+        \node[unrelated] (a1) at (-1, -2) {$a_1$};
+        \node[nodo] (a2) at (1, -2) {$a_2$};
+
+        \node[unrelated] (b1) at (-1, -4) {$b_1$};
+        \node[nodo] (b2) at (1, -4) {$b_2$};
+        \node[unrelated] (b3) at (3, -4) {$b_3$};
+
+        \node[unrelated] (c1) at (0, -7) {$c_1$};
+        \node[nodo] (c2) at (3, -6) {$c_2$};
+
+        \node[nodo] (xi) at (3, -8) {$x_i$};
+
+
+        
+        \node[draw=none, fill=none] (hi) at (3, -10) {};
+
+
+         \path [->] (r) edge[arista]  (a1);
+         \path [->] (r) edge[arista]  (a2);
+
+         \path [->] (a2) edge[arista]  (b1);
+         \path [->] (a2) edge[arista]  (b2);
+         \path [->] (a2) edge[arista]  (b3);
+
+         \path [->] (b2) edge[arista]  (c1);
+         \path [->] (b2) edge[arista]  (c2);
+
+         \path [->] (c2) edge[arista]  (xi);
+
+        \path [->] (r) edge[arista]  (a1);
+        \path [->] (r0) edge[arista, draw=blue]  (a1);
+        \path [->] (r0) edge[arista, draw=blue]  (b1);
+        \path [->] (r0) edge[arista, draw=blue]  (b3);
+        \path [->] (r0) edge[arista, draw=blue]  (c1);
+        
+        \node[text=red] at (-2, -8) {$c_1$ subtree}; 
+        \draw[red, wiggly] (-1, -9) -- (0,-7.4) -- (1, -9) -- cycle;  % Draw the triangle
+
+        \node[text=red] at (-3, -5) {$b_1$ subtree}; 
+        \draw[red, wiggly] (-2, -6) -- (-1,-4.4) -- (0, -6) -- cycle;  % Draw the triangle
+        
+         \path [->] (xi) edge[arista,  decorate, decoration={snake, amplitude=.4mm, segment length=4mm, post length=1mm}] node[right] {descendants of $x_i$} (hi);
+    \end{tikzpicture}
+\end{figure}
+
+There is one case that we are not taking into consideration, and that's when the unrelated nodes have ancestors. But that's the same case for which \emph{we could not find an answer} in the counting of the toposorts. In this case it would be easy to fix it, cause you would just need to conect $r_0$ to the new root of the subtree. The problem is if the subtre has multiple roots, then the formula that we defined previously would not be enough, cause it would be counting some scenarios twice. 
+%TOOD: Resolver este caso para los ordenes topologicos, así lo podemos hacer para las clases de equivalencia también. 
+
+\paragraph{Bound for the number of equivalence classes}
+
+For the multiple scenarios that we took into consideration, we would want to find a bound for the number of equivalence classes. This formula has an upper bound, and we are going to prove it. 
+
+\begin{lemma}\label{lemma:upper_bound_equivalence_classes}
+    For any tree $T$ and it's root $n$, where $l$ is the number of leaves of the tree and $h$ is its height. Then for the formula: 
+    \[
+    \numEqCl(n) = 
+    \begin{cases} 
+    2 & \text{if $n$ is a leaf} \\
+    \prod_{c \in children(n)} \numEqCl(c) + 1 & \text{oc.}
+    \end{cases}
+    \]
+
+    We have the bound $\numEqCl(n) \leq (2+h)^l + 1$
+      
+\end{lemma}
+
+    \begin{proof}
+        We want to prove that $\numEqCl(n) \leq (2+h)^l + 1$. This applies to any tree $T$ and it's root $n$, where $l$ is the number of leaves of the tree and $h$ is its height.
+
+        We have to prove this for the two cases that the formula presents. 
+
+        \textbf{Case 1: $n$ is a leaf}
+        If $n$ is a leaf, then it has height 0, and it's a number of leaves is 1. That leaves us with  $\numEqCl(n) = 2\leq  3 = (2+0)^1 + 1$. 
+
+        \textbf{Case 2: $n$ has children}
+
+        Our \textit{inductive hypothesis} is that for each subtree $T_h$ that has a child $c$ of $n$ as a root, our formula stands. That means that $\forall c \in children(n), \numEqCl(c) \leq (2+ h_c)^{l_c} + 1$. With this in mind let's start
+        \begin{align}\label{eq:pr_equals_prprime}
+            \numEqCl(n)  &= \prod_{c \in children(n)} \numEqCl(c) + 1 \\
+            & \leq (applying \ the \ IH) \prod_{c \in children(n)} ((2+ h_c)^{l_c} + 1) + 1 \\
+            & \leq \prod_{c \in children(n)} (2+ h_c)^{l_c} + 1 \\
+            & \leq (h>h_c) \prod_{c \in children(n)} (2+ h)^{l_c} + 1 \\
+            & = (2+ h)^{\sum_{c \in children(n)} l_c} + 1 \\
+            & = (\sum_{c \in children(n)} l_c = l) \ (2+ h)^l + 1 \\
+            & = (2+ h)^l + 1 \\
+        \end{align}
+
+    That's how we conclude that our formula has an upper bound of $(2+ h)^l + 1$. 
+    \end{proof}
+%\sidesergio{Obs: si no se van a referenciar líneas, creo que es mejor usar align*}
+
+With this bound, we can see that: 
+
+\begin{itemize}
+    \item If the number of leaves is $O(\log n)$ and the height of the tree is $O(1)$ then we can have a number of equivalence classes polynomial in the size of $n$. \santi{Esto lo habíamos hablado una vez. SI tenés $O(\log n)$ hojas no podés tener altura $O(1)$ (porque multiplicar hojas por pisos da una cota superior a la cantidad de nodos).}
+    \item We want to have the minimum amount of leaves possible, that means that we want to have a small out degree from each vertex, the same that happens for the toposort. 
+    \item It's better to have a bigger height than a bigger out degree with a lot of branching. 
+\end{itemize}
+
+%TOOD: Pensar más cosas que podemos inferir de la misma
