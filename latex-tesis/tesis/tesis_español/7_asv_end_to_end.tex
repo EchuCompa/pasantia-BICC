@@ -1,0 +1,24 @@
+
+\subsection{ASV exacto}
+
+Recordemos la fórmula introducida en la sección \ref{Section:HeuristicaASV} para ASV, utilizando nuestra heurística.
+
+\begin{align*}
+   \phi_{i}^{assym}(\charactheristicFunction) = \sum_{\pi \in \perm(\players)} w(\pi) \left[ \charactheristicFunction(\pi_{<i} \cup {i}) - \charactheristicFunction(\pi_{<i}) \right] &= \\
+   \heuristicASVFormula
+\end{align*}
+
+Dado un DAG $G$, un nodo $x_i \in V(G)$ y una función característica $\charactheristicFunction$. Nuestro algoritmo completo queda así entonces: 
+
+\begin{itemize}
+    \item Calculamos $eqClass$ a través de $\eqClassSizes(G,x_i)$, el algoritmo que introducimos en la sección~ \ref{Section:AlgoritmoEquivClasses}
+    \item Luego para cada clase de equivalencia vamos a calcular el promedio teniendo en cuenta los features previos a $x_i$. Para realizar el promedio vamos a utilizar el algoritmo de la sección \ref{Section:RedesBayesianas}. (En el caso de que el modelo no sea un árbol, podemos aproximarlo utilizando Monte Carlo, pero el algoritmo dejaría de ser exacto )
+    \item Por último sumamos los resultados para obtener él $\assym$ para el feature $i$. 
+\end{itemize}
+
+Las modificaciones que introducimos son para mejorar la performance del mismo, sin modificar los resultados obtenidos a diferencia del enfoque aproximado. En la sección a continuación vamos a ver cuál es la mejora respecto al enfoque naive y el tiempo que tarda para distintas redes.  
+
+\subsection{ASV aproximado}
+
+Este algoritmo es igual al anterior. La única diferencia que tiene es respecto a cómo se calculan las clases de equivalencia, $eqClass(G, x_i)$, puesto que ahora las vamos a aproximar. Además, vamos a tener que agregar un parámetro extra, para definir la cantidad de órdenes topológicos que queremos generar. 
+Primero utilizamos el algoritmo \ref{alg:topoSortSampling} para samplear los órdenes topológicos. Esto nos va a permitir calcular él $ASV$ para polytrees y no simplemente \dtrees. Luego procesamos estos órdenes al igual que en la sección \ref{alg:naiveAlgorithmEquivalenceClass}, para obtener las clases de equivalencia. Una vez obtenidas las clases de equivalencia, repetimos el mismo proceso del algoritmo exacto. 

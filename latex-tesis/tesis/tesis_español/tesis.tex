@@ -1,0 +1,139 @@
+\documentclass{article}
+% SI NO PENSAS IMPRIMIRLO EN FORMATO LIBRO PODES USAR
+%\documentclass[11pt,a4paper]{tesis}
+
+\usepackage[spanish, es-noshorthands]{babel}
+\addto\captionsspanish{\renewcommand{\tablename}{Tabla}} %Para que diga Tabla en vez de Cuadro
+\usepackage{dsfont, amsmath, amsthm}
+
+\usepackage{caption}
+\usepackage{subcaption}  % Para tener captions dentro de las subfiguras
+\captionsetup{font=small}%para que las captions de las figuras sean más chicas
+
+\usepackage{amssymb}
+\usepackage{booktabs} % For better table formatting
+\usepackage{graphicx} % Required for inserting images
+\usepackage[colorlinks=true, urlcolor=blue, linkcolor=blue, citecolor=green]{hyperref}
+%linkColor = citas internas cómo ref
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{decorations.pathmorphing}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{pgf} % For arithmetic operations in TikZ
+\usepackage{comment}
+\usepackage{booktabs}
+\usepackage{url} %For writing paths
+\usepackage[normalem]{ulem}
+\usepackage{multirow}
+\newcommand{\scc}[1]{{\color{red}#1}}
+
+\usepackage[a4paper,margin=1in]{geometry} %Para achicar los márgenes
+
+\input{tesis_español/macros}
+
+\tikzset{
+    nodo/.style={
+        shape=circle,
+        draw=black,
+        line width=1pt,   
+        minimum size=7mm
+    },
+    arista/.style={
+        line width=1pt,  
+        -{Latex[length=3mm]}  
+    },  
+    mySnake/.style={
+        decorate, 
+        decoration={snake, amplitude=.4mm, segment length=4mm, post length=1mm}
+    }
+}
+
+\begin{document}
+
+
+
+%%%% CARATULA
+
+\def\autor{Ezequiel Companeetz}
+\def\tituloTesis{Optimización de ASV para árboles de decisión}
+\def\runtitulo{Optimización de ASV para árboles de decisión}
+\def\runtitle{ASV optimization for Decision Trees}
+\def\director{Santiago Cifuentes}
+\def\codirector{Sergio Abriola}
+\def\lugar{Buenos Aires, 2025}
+\input{caratula}
+
+%%%% ABSTRACTS, AGRADECIMIENTOS Y DEDICATORIA
+\pagestyle{empty}
+\input{abstract.tex}
+
+\cleardoublepage
+\input{agradecimientos.tex}
+
+\cleardoublepage
+\tableofcontents
+
+\pagestyle{headings}
+
+%%%% ACA VA EL CONTENIDO DE LA TESIS
+
+\section{Introducción}
+
+\input{1_introduction}
+
+\section{Introducción a Shapley y ASV}\label{Section:ComplejidadShap}
+
+\input{tesis_español/2_shap_complexity}
+
+\newpage
+
+\section{Grafos Causales}\label{Section:RedesBayesianas}
+
+\input{tesis_español/3_redes_bayesianas}
+
+\newpage
+
+\section{Optimización para ASV : Clases de equivalencia}\label{Section:HeuristicaASV}
+%\echu{Tiene sentido que se llame optimización para ASV? Mejora tal vez sino, pero no me convence. }
+%\santi{Capaz le pondría heurísticas. Igual tras leerla veo que esta sección tiene solo herramientas para calcular la cantidad de clases de equivalencia (y en general insight sobre ellas). Capaz el título debería ser ese más que otra cosa.}
+
+\input{tesis_español/4_heuristic_for_ASV}
+
+\section{Algoritmo exacto para clases de equivalencia en \dtrees{}}\label{Section:AlgoritmoEquivClasses}
+
+%\santi{En general me gustaría replantear esta sección, eligiendo notación que haga más conveniente las expresiones. Me refiero a escribir en el pizarrón qué cosas tienen que estar, y asi quitarle las que estén de más. Ahora mismo siento que es más difícil de entender de lo que debería.} Rta: Lo charlamos en la llamada del 17/04 y replanteamos algunas cosas
+
+\input{tesis_español/5_algorithm_for_equiv_class_in_trees}
+
+\newpage
+
+\section{Sampleo de toposorts en polytrees}\label{Section:SampleoToposorts}
+
+\input{tesis_español/6_topsort_sampling_polytrees}
+
+\newpage
+
+\section{ASV end to end}\label{Section:ASVCompleto}
+
+\input{tesis_español/7_asv_end_to_end}
+
+\newpage
+
+\section{Experimentos}\label{Section:Experimentos}
+
+\input{tesis_español/8_experiments}
+
+\section{Conclusión}\label{Section:Conclusion}
+
+\input{tesis_español/9_conclusion}
+
+%%%% BIBLIOGRAFIA
+\bibliography{biblio}{}
+\bibliographystyle{plain}
+
+\section{Apéndice}\label{Section:Apendice}
+
+\input{tesis_español/10_appendix}
+
+\end{document}

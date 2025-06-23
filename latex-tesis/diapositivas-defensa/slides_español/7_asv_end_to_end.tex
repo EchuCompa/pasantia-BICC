@@ -1,0 +1,59 @@
+\begin{frame}{ASV Exacto: Recordando la Fórmula}
+	\dificultyLevel{2}
+	\begin{equation*}
+		\phi_i^{\mathrm{assym}}(v)
+		= \heuristicASVFormula
+	\end{equation*}
+	\emph{Dado un DAG $G$, nodo $x_i$ y función característica $v$.}
+\end{frame}
+
+\begin{frame}[fragile]{ASV Exacto: Pasos del Algoritmo}
+	\dificultyLevel{2}
+	\begin{algorithm}[H]
+		\caption*{ASVExacto($G,x_i,v$)}
+		\begin{enumerate}
+			\item $\{(C_k,\mathrm{size}_k)\} \leftarrow \eqClassSizes(G,x_i)$
+			\item Para cada $C_k$:
+			\begin{itemize}
+				\item Evaluamos $v$ sobre representante de $C_k$ y multiplicamos por $size_k$.
+			\end{itemize}
+			\item Sumamos los promedios: $\phi_i^{\mathrm{assym}}$.
+		\end{enumerate}
+	\end{algorithm}
+\end{frame}
+
+\begin{frame}{ASV Aproximado}
+	\dificultyLevel{2}
+	\begin{itemize}[<+- | alert@+>]
+		\item Misma estructura que exacto, pero $eqClassSizes$ se aproxima.
+		\item Parámetro: $N_{\mathrm{samples}}$ (órdenes a samplear).
+		\item Usa \texttt{topoSortSampling} + el algoritmo naive que vimos previamente para generar las clases.
+	\end{itemize}
+	\pause
+	\begin{algorithm}[H]
+		\caption*{ASVAproximado($G,x_i,v$)}
+		\begin{enumerate}
+			\item $\{(C_k,\mathrm{size}_k)\} \leftarrow \alert{sampledEqClassSizes(G,x_i)}$
+			\item Para cada $C_k$:
+			\begin{itemize}
+				\item Evaluamos $v$ sobre representante de $C_k$ y multiplicamos por $size_k$.
+			\end{itemize}
+			\item Sumamos los promedios: $\phi_i^{\mathrm{assym}}$.
+		\end{enumerate}
+	\end{algorithm}
+\end{frame}
+
+\begin{frame}{Comparación: Exacto vs Aproximado}
+	\dificultyLevel{2}
+	\centering
+	\begin{tabular}{lcc}
+		\toprule
+		& \textbf{Exacto} & \textbf{Aproximado} \\
+		\midrule
+		Precisión   & 100\% & Controlable \\
+		Alcance     & \dtrees{} & Polytrees \\
+		Complejidad clases & $O(n^5|EC|^3)$ &  $O(topoSampling(N_{samples}))$ \\
+		Complejidad promedios & $O(v)*|EC|$ & $ O(v)*|EC_{sampled}|$ \\
+		\bottomrule
+	\end{tabular}
+\end{frame}

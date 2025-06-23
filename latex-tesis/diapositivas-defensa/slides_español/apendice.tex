@@ -1,0 +1,349 @@
+
+
+
+
+
+%Apéndice con cosas que no entraron por tiempo pero ya había hecho 
+
+\begin{frame}[noframenumbering]{Algoritmo de promedio}
+	\dificultyLevel{3}
+	\begin{enumerate}[<+- | alert@+>]
+		\item Recorrer todas las ramas del árbol de decisión, acumulando las decisiones tomadas.
+		\item Al llegar a una hoja:
+		\begin{itemize}
+			\item Evaluar la probabilidad de haber alcanzado esa hoja, dada la evidencia. 
+			%\[ Pr_B\bigl(pathCondition \mid ev\bigr).\]
+			\item Luego multiplicar dicha probabilidad por el valor de salida que retorna la hoja.
+		\end{itemize}
+		\item Sumar todas las contribuciones de cada hoja para obtener la predicción promedio. 
+	\end{enumerate}
+\end{frame}
+
+
+\begin{frame}[noframenumbering,fragile]{Algoritmo: Predicción Promedio}
+	\dificultyLevel{3}
+	\begin{algorithm}[H] % ← evita que flote
+		\caption{Predicción promedio para árbol de decisión binario}
+		\footnotesize            % opcional: letra más chica
+		\begin{algorithmic}[1]
+			\Function{Mean}{$node$, $B$, $pathCondition$, $evidence$}
+			\If{$evidence$ no coincide con $pathCondition$}
+			\State \Return $0$
+			\EndIf
+			\If{$node$.isLeaf}
+			\State \Return $Pr_B(pathCondition \mid evidence)\cdot node.value$
+			\EndIf
+			\State $X_i \gets node.feature$
+			\State $left \gets$  \Call{Mean}{$node$.left,  $B$, $pathCondition \cup\{X_i=0\}, evidence$}
+			\State $right\gets$  \Call{Mean}{$node$.right, $B$, $pathCondition \cup\{X_i=1\}, evidence$}
+			\State \Return $left + right$
+			\EndFunction
+		\end{algorithmic}
+	\end{algorithm}
+	\vspace{0.3cm}
+	Complejidad: $O(i|V| + l \cdot varElim)$, polinomial si $varElim$ lo es (e.g. polytrees).
+\end{frame}
+
+
+\begin{frame}[noframenumbering]{Fórmula Shapley}
+	\dificultyLevel{3}
+	\textbf{Fórmula general:}
+	
+	% Parte visual progresiva de la fórmula
+	\only<1,2>{%
+		\begin{mydefinition}[Shapley Value]
+			\[
+			\phi_i(v) = \text{Shapley Value del jugador $i$ para la función $v$}
+			\]
+		\end{mydefinition}
+	}
+	\only<3>{%
+		\begin{mydefinition}[Shapley Value]
+			\[
+			\phi_i(v) = \alert<3>{\frac{1}{|X|!} \sum_{S \subseteq X \setminus \{i\}}} \cdots
+			\]
+		\end{mydefinition}
+	}
+	\only<4>{%
+		\begin{mydefinition}[Shapley Value]
+			\[
+			\phi_i(v) = \frac{1}{|X|!} \sum_{S \subseteq X \setminus \{i\}} \alert<4>{|S|! (|X|-|S|-1)!} \cdot \cdots
+			\]
+		\end{mydefinition}
+	}
+	\only<5,6>{%
+		\begin{mydefinition}[Shapley Value]
+			\[
+			\phi_i(v) = \frac{1}{|X|!} \sum_{S \subseteq X \setminus \{i\}} |S|! (|X|-|S|-1)! \cdot \alert<5>{(v(S \cup \{i\}) - v(S))}
+			\]
+		\end{mydefinition}
+	}
+	
+	\only<2>{
+		\begin{mydefinition}
+			La función característica se define como:
+			\[
+			v : \mathcal{P}(X) \to \mathbb{R}
+			\]
+			Asigna un valor real a cada posible \textit{coalición} de jugadores, es decir, a cada subconjunto de \( X \).
+		\end{mydefinition}
+	}
+	
+	% Lista explicativa
+	\begin{itemize}
+		\item<3-> \alert<3>{Se suman todos los subconjuntos $S$ que no contienen a $i$, para ver cuánto colabora $i$ a cada uno.}
+		\item<4-> \alert<4>{El término $|S|!(|X|-|S|-1)!$ cuenta cuántas veces \( i \) puede llegar justo después de \( S \) en un orden.}
+		\item<5-> \alert<5>{Se calcula el aporte marginal de $i$ a $S$: $v(S \cup \{i\}) - v(S)$.}
+		\item<6-> \alert<6>{Se divide todo por $|X|!$, porque se está promediando sobre todas las permutaciones posibles.}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[noframenumbering]{Fórmula función característica en ML}
+	\dificultyLevel{3}
+	% Parte visual progresiva de la fórmula
+	\only<1>{%
+		\begin{mydefinition}[Función característica]
+			\scriptsize
+			\[
+			v_{M,e,\Pr}(S) = \text{Predicción promedio de $M$ cuando los features $S$ toman los valores de $e$}
+			\]
+		\end{mydefinition}
+	}
+	\only<2>{%
+		\begin{mydefinition}[Función característica]
+			\[
+			v_{M,e,\Pr}(S) = \alert<2>{\sum_{e' \in \consistsWith(e,S)}} \cdots
+			\]
+		\end{mydefinition}
+	}
+	\only<3>{%
+		\begin{mydefinition}[Función característica]
+			\[
+			v_{M,e,\Pr}(S) = \sum_{e' \in \consistsWith(e,S)} \alert<3>{\Pr[e'|\consistsWith(e,S)]} \cdot \cdots
+			\]
+		\end{mydefinition}
+	}
+	\only<4,5>{%
+		\begin{mydefinition}[Función característica]
+			\[
+			v_{M,e,\Pr}(S) = \sum_{e' \in \consistsWith(e,S)} \Pr[e'|\consistsWith(e,S)] \cdot \alert<4>{M(e')}
+			\]
+		\end{mydefinition}
+	}
+	
+	% Lista explicativa
+	\begin{itemize}
+		\item<2-> \alert<2>{Se consideran las instancias $e'$ que coinciden con la entidad $e$ en los atributos de $S$: $\consistsWith(e,S)$.}
+		\item<3-> \alert<3>{Se pondera cada $e'$ según su probabilidad condicional dado que coincide con $e$ en $S$: $\Pr[e'|\consistsWith(e,S)]$.}
+		\item<4-> \alert<4>{Se evalúa el modelo $M$ sobre cada $e'$.}
+		\item<5-> \alert<5>{En resumen: $v(S)$ es la predicción promedio del modelo dejando fijos los features de $S$.}
+	\end{itemize}
+\end{frame}
+
+
+\begin{frame}[noframenumbering]{Extensión a Features No Binarios}
+	\dificultyLevel{2}
+	\begin{itemize}[<+- | alert@+>]
+		\item El algoritmo original funciona con árboles y variables \textbf{binarios}.
+		\item Para admitir \textbf{features no binarios} adaptamos la inferencia.
+		\item Al llegar a un nodo con umbral \(v\), dividimos el dominio de \(f\):
+		\begin{itemize}
+			\item Lado izquierdo: \(f = i\) con \(i < v\)
+			\item Lado derecho: \(f = d\) con \(d \geq v\)
+		\end{itemize}
+		\item La probabilidad condicional requiere una \textbf{suma de múltiples consultas}. 
+		\begin{itemize}
+			\item  Si tuviéramos la consulta \set{$X_1 \in \set{1,2}, X_2 = 3$} la resolvemos cómo:
+			\[
+			Pr_B(X_1=1, X_2=3) + Pr_B(X_1=2, X_2=3)
+			\]
+		\end{itemize}
+		\item Esto hace que la complejidad ya no sea polinomial.
+		\item No optimizamos esta inferencia, ya que excede los objetivos de la tesis.
+	\end{itemize}
+\end{frame}
+
+
+\begin{frame}[noframenumbering]{Conteo de Órdenes en \dtrees}
+	\dificultyLevel{3}
+	\textbf{Fórmula general:}
+	
+	\only<1>{
+		\begin{mydefinition}
+			Sean \(k_i\) la cantidad de nodos del subárbol \(t_i\), con 
+			\(n = \sum_{i=1}^r k_i\). La cantidad de órdenes topológicos es:
+		\end{mydefinition}
+	}
+	
+	\only<2>{
+		\begin{mydefinition}
+			Sean \(k_i\) la cantidad de nodos del subárbol \(t_i\), con 
+			\(n = \sum_{i=1}^r k_i\). La cantidad de órdenes topológicos es:
+			\[
+			\numTopo(t) 
+			= \alert<2>{\binom{n}{k_1,\dots,k_r}}
+			\]
+		\end{mydefinition}
+	}
+	
+	\only<3->{
+		\begin{mydefinition}[Órdenes Topológicos en un \dtree]
+			Sean \(k_i\) la cantidad de nodos del subárbol \(t_i\), con 
+			\(n = \sum_{i=1}^r k_i\). La cantidad de órdenes topológicos es:
+			\[
+			\numTopo(t) 
+			= \binom{n}{k_1,\dots,k_r}
+			\;\cdot\;
+			\alert<3>{\prod_{i=1}^{r} \numTopo(t_i)}
+			\]
+		\end{mydefinition}
+	}
+	
+	\begin{itemize}
+		\item<2-> \alert<2>{Coeficiente multinomial: 
+			\(\binom{n}{k_1,\dots,k_r} = \frac{n!}{k_1!\cdots k_r!}\)} 
+		cuenta las maneras de intercalar nodos de subárboles sin alterar su orden interno.
+		\item<3-> \alert<3>{Producto de subárboles: 
+			\(\prod_{i=1}^{r} \numTopo(t_i)\)} 
+		corresponde a las combinaciones posibles dentro de cada subárbol.
+		\item<4-> \alert<4>{Combinación final: la fórmula multiplica ambas partes para obtener el total de órdenes topológicos.}
+	\end{itemize}
+\end{frame}
+
+
+\begin{frame}[noframenumbering]{Fórmula de \eqClassSizes}
+	\dificultyLevel{3}
+	\only<1>{%
+		Habiendo realizado estos cálculo estamos listos para definir nuestra fórmula para el \textbf{conjunto de clases de equivalencia y sus tamaños}.
+		\[
+		\eqClassSizes(G,x_i) = \,\cdots
+		\]
+		
+		%\textbf{Definición:} 		\begin{itemize}			\item $UR$: raíces de subárboles \alert{no relacionados} con $x_i$.		\end{itemize}
+	}
+	\only<2>{%
+		\[
+		\eqClassSizes(G,x_i)
+		= \bigcup_{\displaystyle mix\in
+			\prod_{j=1}^{|UR|}\unrEqCl(ur_j)} \,\cdots
+		\]
+		\vspace{1em}
+		\textbf{Nota:}
+		\begin{itemize}
+			\item Cada $mix$ es una combinación (producto cartesiano) de 
+			las clases de cada $ur_j\in UR$.
+		\end{itemize}
+	}
+	\only<3>{%
+		\[
+		\eqClassSizes(G,x_i)
+		= \bigcup_{mix}
+		\Bigl(\,eqCl(A,D,mix),\,\eqClassSize(A,D,mix)\Bigr)
+		\]
+		\vspace{1em}
+		\textbf{¿Qué hace?}
+		\begin{itemize}
+			\item $eqCl(A,D,mix)$ fusiona \alert{ancestros $A$}, 
+			\alert{descendientes $D$} y la combinación $mix$.
+		\end{itemize}
+	}
+	\only<4->{%
+		\[
+		\eqClassSizes(G,x_i)
+		= \hspace{-3em} \bigcup_{mix\in\prod_{j=1}^{|UR|}\unrEqCl(ur_j)} \hspace{-3em}
+		\Bigl(eqCl(A,D,mix),\,\eqClassSize(A,D,mix)\Bigr)
+		\]
+		\vspace{1em}
+		\textbf{Componentes finales:}
+		\begin{itemize}
+			\item<4-> $eqCl(A,D,mix)$: representa la clase resultante tras fusionar.
+			\item<5-> $\eqClassSize(A,D,mix)$: cantidad de órdenes topológicos de esa clase.
+		\end{itemize}
+	}
+	
+\end{frame}
+
+% ------------------------------------------------------------------------
+\begin{frame}[noframenumbering][fragile]{Algoritmo \texttt{leftOrders}}
+	\dificultyLevel{4}
+	\begin{algorithm}[H]
+		\caption*{leftOrders($A$, $\textit{actual ancestor}$, $\textit{nodes to place}$, $position$)} \label{alg:leftOrdersAlgorithm}
+		\begin{enumerate}
+			\item Definimos donde colocar $\textit{actual ancestor}$ en base a $position$ y a cuántos nodos tenemos disponibles en $\textit{nodes to place}$, generando $\textit{new position}$.
+			\item Luego seleccionamos cuántos nodos de cada unrelated tree vamos a usar para llenar todas las posiciones entre $position$ y $\textit{new position}$, generando $\textit{new nodes}$.
+			\item Eliminamos los $\textit{new nodes}$ de los $\textit{nodes to place}$, puesto que ya los colocamos, actualizando nuestros nodos disponibles.
+			\item Realizamos el llamado recursivo actualizando la posición, nuestros nodos disponibles y nuestro ancestro actual. 
+		\end{enumerate}
+	\end{algorithm}
+\end{frame}
+
+% ------------------------------------------------------------------------
+\begin{frame}[noframenumbering]{Intuición de \texttt{leftOrders}}
+\dificultyLevel{3}
+\begin{itemize}[<+- | alert@+>]
+	\item Recorre los ancestros en orden.
+	\item En cada paso reparte los nodos no relacionados en los “huecos” antes del ancestro:
+	\[
+	[\,\underbrace{\;\; }_{a_0}\;|\;\underbrace{\;\; }_{a_1}\;|\;\dots\;|\;\underbrace{\;\; }_{a_{|A|}}\;]
+	\]
+	%\item Al recorrer recursivamente, se reutilizan combinaciones parciales (DP). Puesto que podemos llegar a la misma configuración por varios caminos.
+\end{itemize}
+\end{frame}
+
+	% ------------------------------------------------------------------------
+\begin{frame}[noframenumbering]{Iteración: Nodos Disponibles}
+	\dificultyLevel{3}
+	\begin{figure}[H]
+		\centering
+		\begin{tikzpicture}[scale=.45, transform shape, 
+			unrelated/.style={circle, draw=red},
+			ancestor/.style={circle, draw=blue},
+			wiggly/.style={decorate, decoration={snake, amplitude=.2mm, segment length=2mm}}  % Define wiggly line style
+			]
+			
+			\node[draw=none, fill=none] (a1) at (0, 0) {};
+			\node[ancestor] (a2) at (1, -2) {$a_{i-1}$};
+			
+			\drawUnrelatedTreeWithTag{u2}{-1}{-4}{$u_{i-1}$}{orange}{Available nodes: npa[i-1]}
+			
+			\drawUnrelatedTree{u4}{0}{-7}{$u_{i}$}
+			\node[ancestor] (a3) at (3, -6) {$a_i$};
+			
+			\node[draw=none, fill=none] (xi) at (3, -8) {};
+			
+			\drawUnrelatedTreeWithTag{r1}{6}{0}{$u_5$}{orange}{Available nodes: npa[0]};
+			\drawUnrelatedTreeWithColor{r2}{10}{0}{$u_6$}{orange};
+			
+			
+			\path [->] (a1) edge[arista,  decorate, decoration={snake, amplitude=.4mm, segment length=4mm, post length=1mm}] (a2);
+			
+			\path [->] (a2) edge[arista]  (u2);
+			\path [->] (a2) edge[arista]  (a3);
+			
+			\path [->] (a3) edge[arista]  (u4);
+			\path [->] (a3) edge[arista,  decorate, decoration={snake, amplitude=.4mm, segment length=4mm, post length=1mm}] (xi);
+		\end{tikzpicture}
+		%\caption*{Los nodos pintados en naranja son los nodos disponibles para ser colocados en el paso $i$. Para cada conjunto de subárboles $npa$ (nodes to place) tiene la cantidad de nodos disponibles.}
+		\label{fig:leftOrdersIterationGraph}
+	\end{figure}
+	\begin{itemize}
+		\item Solo los nodos de $u_{i-1}$ pueden rellenar el hueco antes de $a_i$.
+		%\item Tras fijar $a_i$, ampliamos el conjunto de nodos disponibles.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[noframenumbering]{Sampleo Toposorts}
+	\begin{algorithm}[H]
+		\caption{SampleoTopoSort($D$)} \label{alg:topoSortSampling}
+		\begin{enumerate}
+			\item \textbf{Calculamos una probabilidad} $p$ para cada uno de los nodos fuente del DAG.
+			\begin{enumerate}
+				\item Para cada $s \in S$ lo removemos del DAG $D$, y contamos la cantidad de órdenes topológicos en $D-\set{s}$ ($toposorts_s$), este valor es la cantidad de órdenes que comienzan con $s$.
+				\item Luego a cada $s \in S$ le asignamos una probabilidad $p(s)= \frac{toposorts_s}{\#topos(D)}$. 
+			\end{enumerate}
+			\item \textbf{Sampleamos} sobre $S$ utilizando $p$ para obtener nuestro primer nodo $start$.
+			\item \textbf{Eliminamos} a $start$ de $D$ y llamamos al algoritmo recursivamente con  SampleoTopoSort($D-\set{start}$), guardando el resultado en $orden$. 
+			\item \textbf{Devolvemos} $start + orden$ como el orden topológico sampleado. 
+		\end{enumerate}
+	\end{algorithm}
+\end{frame}
