@@ -53,7 +53,7 @@ def writeASVAndShapleyIntoFile(
     first_instance: pd.Series,
     dataSet: pd.DataFrame,
     dtTreeClassifier: DecisionTreeClassifier,
-    asv,
+    asv : ASV,
     file: str,
     valuesPerFeature: dict[str, list],
     variableToPredict: str,

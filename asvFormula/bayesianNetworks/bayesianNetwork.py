@@ -11,6 +11,7 @@ from asvFormula.digraph import *
 from pathCondition import PathCondition
 import math
 from typing import Callable
+import os
 
 class DecisionTreeDigraph(nx.DiGraph):
 
@@ -117,7 +118,11 @@ def decisionTreeFromDataset(dataset : pd.DataFrame, target_feature, maximum_dept
     return rf_model
 
 def datasetFromBayesianNetwork(model : BayesianNetwork, n, seed : int):
-    return model.simulate(n_samples=n, seed = seed)
+    os.environ.setdefault('PYTHONHASHSEED', '0') 
+    # Make sure Python’s hash randomization is fixed (only needed if you didn’t set the env var). 
+    # This will make it so that the samples are reproducible across multiple kernels and sessions runs.
+    samples = model.simulate(n_samples=n, seed = seed)
+    return samples[sorted(samples.columns)]
 
 #It returns the mean value for each possible value of the feature. 
 def meanPredictionForDTinBN(dtClassifer : DecisionTreeClassifier, bayesianNetwork : VariableElimination, valuesPerFeature : dict[str, list], variableToPredict : str, instance : pd.Series, fixedFeatures : list[str]) -> list[float]:
@@ -143,7 +148,7 @@ def convertDecisionTreeToGraph(dtClassifer, valuesPerFeature, variableToPredict)
     dtAsNetwork = obtainDecisionTreeDigraph(dtClassifer, featureNames)
     return dtAsNetwork
 
-def meanPredictionForDTinBNWithEvidence(decisionTreeGraph : DecisionTreeDigraph, node, bayesianNetwork : VariableElimination, pathCondition : PathCondition, priorEvidence : dict[str, list] = None, nodePrediction : Callable = lambda n, tree : tree.nodePrediction(n)) -> list[float]:
+def meanPredictionForDTinBNWithEvidence(decisionTreeGraph : DecisionTreeDigraph, node, bayesianNetwork : VariableElimination, pathCondition : PathCondition, priorEvidence : dict[str, list] = {}, nodePrediction : Callable = lambda n, tree : tree.nodePrediction(n)) -> list[float]:
     
     if pathCondition.doesNotMatchEvidence(priorEvidence): #It would be more efficient to only do this check when you add the variable to the path condition, but it's more legible this way (and the perfomance loss is not significant)
         possibleOutputs = len(nodePrediction(node, decisionTreeGraph))

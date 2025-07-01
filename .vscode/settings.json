@@ -1,0 +1,15 @@
+{
+    //"python.analysis.typeCheckingMode": "basic",
+    "python.envFile": "${workspaceFolder}/.env",
+    "python.testing.unittestEnabled": true,
+    "python.testing.pytestEnabled": true,
+    "python.testing.pytestArgs": [
+        "asvFormula"
+    ], 
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s", "./asvFormula/tests",     // Path to the folder containing tests
+        "-p", "test*.py"     // Pattern to match test files
+    ]
+    
+}
