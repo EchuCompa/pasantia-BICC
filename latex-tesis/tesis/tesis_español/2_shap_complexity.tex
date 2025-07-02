@@ -1,9 +1,9 @@
 \begin{comment}
-    SHAP
-    Complejidad de SHAP
-        Resultados previos
-        ASV + Grafo Causal y Toposorts
-        Nuestro objetivo era calcular ASV en tiempo polinomial en Árboles de Decisión
+	SHAP
+	Complejidad de SHAP
+	Resultados previos
+	ASV + Grafo Causal y Toposorts
+	Nuestro objetivo era calcular ASV en tiempo polinomial en Árboles de Decisión
 \end{comment}
 
 \subsection{SHAP}
@@ -15,53 +15,53 @@ Sea $X$ un conjunto finito de features. Una entidad $e$ sobre $X$ es una funció
 
 Un \textit{feature attribution score} para un modelo $M$ y una entidad $e$ es una función $\phi : X \to \R$, tal que $\phi(x)$ indica el \textit{puntaje} o \textit{relevancia} del feature $x$ con respecto a la predicción $M(e)$. Uno de los puntajes de feature attribution más destacados es él \SHAPscore{} \cite{shapOriginalPaper}, que se basa en los Shapley values \cite{shapley1953value} de la teoría de juegos cooperativos. En ese contexto, los Shapley values representan el esquema único de distribución de la ganancia obtenida por una coalición de jugadores que satisface ciertas propiedades deseables. Una interpretación de los mismos es una función que nos dice cuánto aporta cada jugador al valor total que obtiene la coalición. %\sidesergio{En caso que no aparezca ya en la Intro, motivar un poco más esto, o dar algún ejemplo}
 
-Más formalmente, sea $\players$ un conjunto finito de jugadores, y definimos una \textit{función característica} para $\players$ como una función $\charactheristicFunction : \mathcal{P}(\players) \to \R$, que asigna un valor a cada posible \textit{coalición} de jugadores (es decir, subconjuntos de los jugadores). Por ejemplo, si los jugadores son features, se podría tomar $v(S)$ como la predicción promedio del modelo cuando los features de $S$ se dejan fijos con ciertos valores. Esta valuación daría un valor mayor en la medida que los valores fijos para las features de $S$ estén más correlacionados con que el modelo acepte. Los Shapley values $\{\phi_i\}_{i \in \players}$ son las únicas funciones que toman como entrada funciones características y devuelven valores reales que satisfacen las siguientes propiedades:
+Más formalmente, sea $\players$ un conjunto finito de jugadores, y definimos una \textit{función característica} para $\players$ como una función $\charactheristicFunction : \mathcal{P}(\players) \to \R$, que asigna un valor a cada posible \textit{coalición} de jugadores (es decir, subconjuntos de los jugadores). Por ejemplo, si los jugadores son features, se podría tomar $v(S)$ como la predicción promedio del modelo cuando los features de $S$ se dejan fijos con ciertos valores. Esta valuación daría un valor mayor en la medida que los valores fijos para las features de $S$ estén más correlacionados con que el modelo devuelva un valor más grande. Los Shapley values $\{\phi_i\}_{i \in \players}$ son las únicas funciones que toman como entrada funciones características y devuelven valores reales que satisfacen las siguientes propiedades:
 
 %\santi{Agregaría intuición de qué es esto.}
 
 \begin{itemize}
-    \item \textbf{Eficiencia}: toda la ganancia es distribuida.
-    \begin{align*}
-        \sum_{i \in \players} \phi_i(\charactheristicFunction) = \charactheristicFunction(\players)
-    \end{align*}
-
-    \item \textbf{Simetría}: cualquier par de jugadores $i,j \in \players$ que contribuyan igual reciben la misma recompensa.
-    \begin{align*}
-        \forall i,j \in \players : \left( \bigwedge_{S \subseteq \players \setminus \{i,j\}} \charactheristicFunction(S \cup \{i\}) = \charactheristicFunction(S \cup \{j\}) \right) \implies \phi_i(\charactheristicFunction) = \phi_j(\charactheristicFunction)
-    \end{align*}
-
-    \item \textbf{Linealidad}: si dos juegos se combinan, entonces la solución a ese nuevo juego es la suma de las soluciones de los originales. Si un juego es multiplicado por un escalar, entonces la solución también se multiplica por él. %\sidesergio{Unificar acá: siempre hablar de juegos o de funciones características. Posiblemente mejor hablar de juegos porque el nombre función característica es confuso}
-    \begin{align*}
-        \forall a \in \R : 
-        \phi_i(a \charactheristicFunction_1 + \charactheristicFunction_2) =  a \phi_i(\charactheristicFunction_1) + \phi_i(\charactheristicFunction_2)
-    \end{align*}
-
-    \item \textbf{Jugador nulo}: si un jugador no contribuye en ninguna coalición, entonces no recibe recompensa.
-    \begin{align*}
-        \forall i \in \players : \left( \bigwedge_{S \subseteq \players \setminus \{i\}} \charactheristicFunction(S) = \charactheristicFunction(S \cup \{i\}) \right) \implies \phi_i(\charactheristicFunction) = 0
-    \end{align*}
+	\item \textbf{Eficiencia}: toda la ganancia es distribuida.
+	\begin{align*}
+		\sum_{i \in \players} \phi_i(\charactheristicFunction) = \charactheristicFunction(\players)
+	\end{align*}
+	
+	\item \textbf{Simetría}: cualquier par de jugadores $i,j \in \players$ que contribuyan igual reciben la misma recompensa.
+	\begin{align*}
+		\forall i,j \in \players : \left( \bigwedge_{S \subseteq \players \setminus \{i,j\}} \charactheristicFunction(S \cup \{i\}) = \charactheristicFunction(S \cup \{j\}) \right) \implies \phi_i(\charactheristicFunction) = \phi_j(\charactheristicFunction)
+	\end{align*}
+	
+	\item \textbf{Linealidad}: si dos juegos se combinan, entonces la solución a ese nuevo juego es la suma de las soluciones de los originales. Si un juego es multiplicado por un escalar, entonces la solución también se multiplica por él. %\sidesergio{Unificar acá: siempre hablar de juegos o de funciones características. Posiblemente mejor hablar de juegos porque el nombre función característica es confuso}
+	\begin{align*}
+		\forall a \in \R : 
+		\phi_i(a \charactheristicFunction_1 + \charactheristicFunction_2) =  a \phi_i(\charactheristicFunction_1) + \phi_i(\charactheristicFunction_2)
+	\end{align*}
+	
+	\item \textbf{Jugador nulo}: si un jugador no contribuye en ninguna coalición, entonces no recibe recompensa.
+	\begin{align*}
+		\forall i \in \players : \left( \bigwedge_{S \subseteq \players \setminus \{i\}} \charactheristicFunction(S) = \charactheristicFunction(S \cup \{i\}) \right) \implies \phi_i(\charactheristicFunction) = 0
+	\end{align*}
 \end{itemize}
 
-Además, existe una forma cerrada para estas funciones. Dado un conjunto finito $A$, sea $perm(A)$ el conjunto de todas sus permutaciones\footnote{Formalmente, $perm(A) = \{(a_1, a_2, \dots, a_n) \mid \{a_1, a_2, \dots, a_n\} = A\}$, es decir, el conjunto de todas las secuencias que se pueden formar reordenando los elementos de $A$.}, y dada $\pi \in \perm(A)$ denotamos como $\pi_{<a}$ al conjunto $\{a' \in A : \pi(a') < \pi(a)\}$. Entonces:
+Además, existe una forma cerrada para estas funciones. Dado un conjunto finito $A$, sea $perm(A)$ el conjunto de todas sus permutaciones\footnote{Formalmente, $perm(A) = \{(a_1, a_2, \dots, a_n) \mid \{a_1, a_2, \dots, a_n\} = A\}$, es decir, el conjunto de todas las secuencias que se pueden formar reordenando los elementos de $A$.} y sea $\pi(a)$ la posición del elemento $a$ en $\pi$. Dada una permutación $\pi \in \perm(A)$ denotamos como $\pi_{<a}$ al conjunto $\{a' \in A : \pi(a') < \pi(a)\}$. Entonces:
 
 \begin{align}\label{eq:shapley_values_by_perm}
-    \phi_i(\charactheristicFunction) = \frac{1}{|\players|!} \sum_{\pi \in \perm(\players)} \left[\charactheristicFunction(\pi_{<i} \cup {i}) - \charactheristicFunction(\pi_{<i})\right]
+	\phi_i(\charactheristicFunction) = \frac{1}{|\players|!} \sum_{\pi \in \perm(\players)} \left[\charactheristicFunction(\pi_{<i} \cup {i}) - \charactheristicFunction(\pi_{<i})\right]
 \end{align}
 
 Intuitivamente, esta función considera todos los órdenes posibles en que los jugadores llegan al juego y utiliza la contribución que $i$ proporciona al llegar. Se puede demostrar que:
 
 \begin{align*}
-    \phi_i(\charactheristicFunction) = \sum_{S \subseteq \players \setminus \{i\}} c_{|S|}\left[\charactheristicFunction(S \cup {i}) - \charactheristicFunction(S)\right]
+	\phi_i(\charactheristicFunction) = \sum_{S \subseteq \players \setminus \{i\}} c_{|S|}\left[\charactheristicFunction(S \cup {i}) - \charactheristicFunction(S)\right]
 \end{align*}
 
 donde $c_m = \frac{m! (|\players|-m-1!)}{|\players|!}$.\\
 
-La analogía con el aprendizaje automático surge al entender el conjunto de \(n\) features \(X\) como jugadores, y la función característica \(\charactheristicFunction\) como la predicción promedio al considerar un subconjunto de estos features fijados. En el ejemplo que vimos en la subsección \ref{asvCaseExample}, $X$ serían los features del dataset (age, sex, etc.) y $\charactheristicFunction$ sería la predicción promedio que utiliza a la  red neuronal, que evalúa si el ingreso de una persona es superior a \$50\,000 para realizar la predicción. Dados \(M\) y \(e\), definimos el conjunto de entidades consistentes con (\textit{consistent with}) \(e\) teniendo en cuenta el subconjunto de features \(S \subseteq X\) como \(\consistsWith(e, S) = \{e' \in \entities(X) : e'(s) = e(s) \text{ para } s \in S\}\). Definimos a la probabilidad condicionada como: %\santi{Cuando definís $ent(X)$ estaría bueno decir que asumimos dada una distribución $\Pr[]$ sobre el conjunto.}
+La analogía con el aprendizaje automático surge al entender el conjunto de \(n\) features \(X\) como jugadores, y la función característica \(\charactheristicFunction\) como la predicción promedio al considerar un subconjunto de estos features fijados. En el ejemplo que vimos en la subsección \ref{asvCaseExample}, $X$ serían los features del dataset (age, sex, etc.) y $\charactheristicFunction$ sería la predicción promedio de la red neuronal que predice si el sueldo anual de una persona es superior a \$50\,000. Dados \(M\) y \(e\), definimos el conjunto de entidades consistentes con (\textit{consistent with}) \(e\) teniendo en cuenta el subconjunto de features \(S \subseteq X\) como \(\consistsWith(e, S) = \{e' \in \entities(X) : e'(s) = e(s) \text{ para } s \in S\}\). Definimos a la probabilidad condicionada como: %\santi{Cuando definís $ent(X)$ estaría bueno decir que asumimos dada una distribución $\Pr[]$ sobre el conjunto.}
 \[
 \Pr\bigl[e' \mid \consistsWith(e,S)\bigr] =
 \begin{cases}
-\displaystyle \frac{\Pr[e']}{\sum\limits_{e'' \in \consistsWith(e,S)} \Pr[e'']} & \text{si } e' \in \consistsWith(e,S), \\
-0 & \text{en caso contrario}.
+	\displaystyle \frac{\Pr[e']}{\sum\limits_{e'' \in \consistsWith(e,S)} \Pr[e'']} & \text{si } e' \in \consistsWith(e,S), \\
+	0 & \text{en caso contrario}.
 \end{cases}
 \]
 
@@ -70,9 +70,9 @@ La analogía con el aprendizaje automático surge al entender el conjunto de \(n
 %Echu: Esta fórmula surge de P(A | B ) = P (A ∩ B) / P (B). En este caso B = cw(e,s) y A ∩ B = A = e', con e' in B. 
 De este modo se define la función característica como:
 \begin{align} \label{formula:characteristicFunctionDefinition}
-    \charFunML_{M,e,\Pr}(S)
-        = \sum_{e'\in\consistsWith(e,S)}
-    \Pr\bigl[e'\mid\consistsWith(e,S)\bigr]\;M(e').    
+	\charFunML_{M,e,\Pr}(S)
+	= \sum_{e'\in\consistsWith(e,S)}
+	\Pr\bigl[e'\mid\consistsWith(e,S)\bigr]\;M(e').    
 \end{align}
 
 
@@ -92,7 +92,7 @@ Nótese que los axiomas que estos valores satisfacen no tienen un significado cl
 
 \subsubsection{Resultados conocidos sobre los Shapley Values}
 
-Calcular estos valores en tiempo polinomial con respecto al tamaño del modelo es un desafío: por ejemplo, la sumatoria externa itera sobre un conjunto de tamaño exponencial en el número de features \(n\). Sin embargo, para algunas familias específicas de modelos y distribuciones, es posible desarrollar algoritmos eficientes.
+Calcular estos valores en tiempo polinomial con respecto al tamaño del modelo es un desafío: por ejemplo, la sumatoria externa de la fórmula de SHAP itera sobre un conjunto de tamaño exponencial en el número de features \(n\). Sin embargo, para algunas familias específicas de modelos y distribuciones, es posible desarrollar algoritmos eficientes.
 
 %\footnote{Ojo que estás yendo y veniendo en la forma que escribís. A veces usás impersonal (observar que) y a veces te dirigís al lector (observe). Ídem si vas a hablar de "nosotros hicimos" o "Se hizo... Escribite en un itemize tus criterios de redacción y notaciones, asi podes tenerlos de referencia y no variar tanto"}\sergio{Estoy de acuerdo con este footnote}
 
@@ -104,7 +104,7 @@ El primer resultado de este tipo provino de \cite{lundberg2020local}, donde los 
 
 Estos resultados se extendieron en \cite{arenas2021tractability}, donde se demostró que también es posible calcular los Shapley values para distribuciones producto cuando el modelo está condicionado a ser un circuito \textit{determinístico} y \textit{descomponible}. Además, se mostró que eliminar cualquiera de estas condiciones hace que el problema sea \(\sharpPhard\), y en un artículo posterior también obtuvieron resultados de no-aproximabilidad \cite{arenas2023complexity}.
 
-Un resultado más general fue demostrado simultáneamente en \cite{van2022tractability}: es posible calcular los Shapley values para una familia de modelos \(\mathcal{F}\) bajo la distribución producto si y solo si es posible calcular la predicción promedio para ese modelo dado cualquier conjunto de probabilidades \(\{p_x\}_{x \in X}\) en tiempo polinomial. A través de este lema, deducen inmediatamente la factibilidad de calcular los Shapley values para modelos de regresión lineal, árboles de decisión, funciones booleanas d-DNNF y circuitos CNF de anchura acotada. Luego, también demostraron la intratabilidad de este problema para modelos más expresivos como modelos de regresión logística, redes neuronales con funciones de activación sigmoide y funciones booleanas generales en CNF.
+Un resultado más general fue demostrado simultáneamente en \cite{van2022tractability}: es posible calcular los Shapley values para una familia de modelos \(\mathcal{F}\) bajo la distribución producto si y solo si es posible calcular la predicción promedio para ese modelo dado cualquier conjunto de probabilidades \(\{p_x\}_{x \in X}\) en tiempo polinomial. A través de este lema, deducen inmediatamente la factibilidad de calcular los Shapley values para modelos de regresión lineal, árboles de decisión y circuitos Booleanos, determinísticos y descomponibles. Luego, también demostraron la intratabilidad de este problema para modelos más expresivos como modelos de regresión logística, redes neuronales con funciones de activación sigmoide y funciones booleanas generales en CNF.
 
 En \cite{lundberg2020local} se afirma que es posible calcular los Shapley values para árboles de decisión bajo la \textit{distribución empírica}, que es la dada por los datos de entrenamiento. Más formalmente, dado un multiconjunto de muestras \(D \subseteq \entities(X)\) de tamaño \(m\), la distribución empírica inducida por \(D\) se define como:
 
@@ -118,18 +118,18 @@ Sin embargo los autores no proporcionan una demostración que respalde la correc
 
 %\sidesergio{shots fired. Quizás empezaría la oración con un 'Sin embargo', o suavizaría un poco}
 \begin{comment}
-    Sacó esto de acá porque literal menciono lo mismo acá: "En \cite{van2022tractability}, se demostró que...", además era NP-Hard, no #P-Hard
-    
-    Por último, en \cite{van2022tractability} también se demuestra que el problema es \(\sharpPhard\) al considerar el modelo trivial \(f(x_1,\ldots,x_n) = x_1\) y una distribución Naive Bayes. Una distribución Naive Bayes asume que los features son independientes entre sí, dado el valor de la variable objetivo. \sergio{trataría de explicar un poco más o dar un ejemplito}\santi{Aparte, creo que la definición en ese contexto no es esta. Ellos tienen una red bayesiana que modela las correlaciones entre los features. Por otro lado completamente distinto está el valor del modelo con una cierta entrada. El punto es que una red naive bayes es básicamente dos distribuciones independientes, moduladas por una única feature de la cual depende qué indpendiente se usa.}
+	Sacó esto de acá porque literal menciono lo mismo acá: "En \cite{van2022tractability}, se demostró que...", además era NP-Hard, no #P-Hard
+	
+	Por último, en \cite{van2022tractability} también se demuestra que el problema es \(\sharpPhard\) al considerar el modelo trivial \(f(x_1,\ldots,x_n) = x_1\) y una distribución Naive Bayes. Una distribución Naive Bayes asume que los features son independientes entre sí, dado el valor de la variable objetivo. \sergio{trataría de explicar un poco más o dar un ejemplito}\santi{Aparte, creo que la definición en ese contexto no es esta. Ellos tienen una red bayesiana que modela las correlaciones entre los features. Por otro lado completamente distinto está el valor del modelo con una cierta entrada. El punto es que una red naive bayes es básicamente dos distribuciones independientes, moduladas por una única feature de la cual depende qué indpendiente se usa.}
 \end{comment}
 
 
 \begin{comment}
-%Creo que esto no hace falta porque después lo mencionó más adelante. 
-Matemáticamente, esto se representa como 
-\[
-P(X_1, X_2, \ldots, X_n | Y) = \prod_{i=1}^n P(X_i | Y)
-\]    
+	%Creo que esto no hace falta porque después lo mencionó más adelante. 
+	Matemáticamente, esto se representa como 
+	\[
+	P(X_1, X_2, \ldots, X_n | Y) = \prod_{i=1}^n P(X_i | Y)
+	\]    
 \end{comment}
 
 %\santi{Agregaría el resultado que encontramos donde calculan shapley values para distribuciones markovianas}
@@ -141,7 +141,7 @@ La definición de los Shapley values en la Ecuación~\ref{eq:shapley_values_by_p
 %\santi{Una pavada, pero estaría bueno que los links se vean en azul, a mi me parece mejor qsy. Debe ser algo que hay que configurar en hyperref}\sergio{apoyo. Puse azul a los links internos y verde a las citas. Se puede cambiar} 
 
 \begin{align}\label{eq:assymetric_shap_def}
-   \phi_{i}^{assym}(\charactheristicFunction) = \sum_{\pi \in \perm(\players)} w(\pi) \left[ \charactheristicFunction(\pi_{<i} \cup {i}) - \charactheristicFunction(\pi_{<i}) \right] 
+	\phi_{i}^{assym}(\charactheristicFunction) = \sum_{\pi \in \perm(\players)} w(\pi) \left[ \charactheristicFunction(\pi_{<i} \cup {i}) - \charactheristicFunction(\pi_{<i}) \right] 
 \end{align}
 
 Asumiendo \(\sum_{\pi \in \perm(\players)} w(\pi) = 1\), esta es la expresión más general para cualquier función que satisfaga Eficiencia, Linealidad y Jugador Nulo \cite{frye2019asymmetric}. Para cualquier función de peso diferente de la uniforme, \(\phi_i^{assym}\) no satisface Simetría (y de ahí el nombre).
@@ -150,8 +150,8 @@ En \cite{frye2019asymmetric}, se definen los \textit{Asymmetric Shapley Values} 
 
 \[
 w(\pi) = \begin{cases}
-\frac{1}{|\topo(G)|}  & \pi \in \topo(G) \\
-0 & \text{en otro caso}
+	\frac{1}{|\topo(G)|}  & \pi \in \topo(G) \\
+	0 & \text{en otro caso}
 \end{cases}    
 \]
 
@@ -177,37 +177,37 @@ En \cite{van2022tractability}, se demostró que calcular los Shapley values para
 %Esto es el teorema 8 del paper. 
 
 \begin{figure}[ht]
-    \centering
-    \scalebox{0.75}{
-        \begin{tikzpicture}[
-            every node/.style={circle, minimum size=1.2cm, font=\small, text=white},
-            class/.style={draw, fill=red!70},
-            feature/.style={draw, fill=blue!60},
-            node distance=1.8cm and 1.8cm,
-            ->, thick
-        ]
-    
-            % Central class node
-            \node[class] (Disease) {Enfermo};
-    
-            % Features aligned horizontally below
-            \node[feature, below left=of Disease, xshift=-3.6cm] (Fever) {Fiebre};
-            \node[feature, right=of Fever] (Cough) {Tos};
-            \node[feature, right=of Cough] (Fatigue) {Fatiga};
-            \node[feature, right=of Fatigue] (Test) {Dolor};
-            \node[feature, right=of Test] (Age) {Edad};
-    
-            % Edges
-            \draw (Disease) -- (Fever);
-            \draw (Disease) -- (Cough);
-            \draw (Disease) -- (Fatigue);
-            \draw (Disease) -- (Test);
-            \draw (Disease) -- (Age);
-    
-        \end{tikzpicture}
-    }
-    \caption{Distribución Naive Bayes para predicción de enfermedades. La variable \textbf{Enfermo} influencia al resto.}
-    \label{fig:naiveBayesExample}
+	\centering
+	\scalebox{0.75}{
+		\begin{tikzpicture}[
+			every node/.style={circle, minimum size=1.2cm, font=\small, text=white},
+			class/.style={draw, fill=red!70},
+			feature/.style={draw, fill=blue!60},
+			node distance=1.8cm and 1.8cm,
+			->, thick
+			]
+			
+			% Central class node
+			\node[class] (Disease) {Enfermo};
+			
+			% Features aligned horizontally below
+			\node[feature, below left=of Disease, xshift=-3.6cm] (Fever) {Fiebre};
+			\node[feature, right=of Fever] (Cough) {Tos};
+			\node[feature, right=of Cough] (Fatigue) {Fatiga};
+			\node[feature, right=of Fatigue] (Test) {Dolor};
+			\node[feature, right=of Test] (Age) {Edad};
+			
+			% Edges
+			\draw (Disease) -- (Fever);
+			\draw (Disease) -- (Cough);
+			\draw (Disease) -- (Fatigue);
+			\draw (Disease) -- (Test);
+			\draw (Disease) -- (Age);
+			
+		\end{tikzpicture}
+	}
+	\caption{Distribución Naive Bayes para predicción de enfermedades. La variable \textbf{Enfermo} influencia al resto.}
+	\label{fig:naiveBayesExample}
 \end{figure}
 
 
@@ -222,7 +222,7 @@ Teniendo en cuenta que nuestra distribución es una Naive Bayes, calcular los As
 %\santi{Ese amplia me parece un poco vendehumo, diría directamente lo que dice el teorema simplificando un toque.}
 
 \begin{theorem}\label{the:assym_naive_equivalent_mean_prediction}
-Los Asymmetric Shapley Values pueden calcularse en tiempo polinomial para distribuciones dadas como una Red Bayesiana Naive y para una familia de modelos \(\mathcal{F}\) si y solo si los Shapley values pueden calcularse para la familia \(\mathcal{F}\) bajo una distribución producto arbitraria en tiempo polinomial.
+	Los Asymmetric Shapley Values pueden calcularse en tiempo polinomial para distribuciones dadas como una Red Bayesiana Naive y para una familia de modelos \(\mathcal{F}\) si y solo si los Shapley values pueden calcularse para la familia \(\mathcal{F}\) bajo una distribución producto arbitraria en tiempo polinomial.
 \end{theorem}
 
 La demostración de este teorema se puede encontrar en el apéndice en la sección \ref{subsubSection:proofASVPolynomialNaiveBayes}.
