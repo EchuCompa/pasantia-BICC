@@ -1,0 +1,28 @@
+\section*{\runtitulo}
+
+
+\noindent En esta tesis se aborda el problema de la explicabilidad en modelos de aprendizaje automático mediante métodos de feature attribution.
+
+En particular, se estudia una variante de los Shapley values conocida como Asymmetric Shapley Values (ASV), que permite incorporar conocimiento causal en la explicación de modelos de forma model-agnostic. A partir del análisis de su complejidad, se demuestra que el cálculo exacto de ASV es polinomial en modelos cuya distribución de entrada está representada por una red bayesiana del tipo Naive Bayes, en contraste con SHAP, que es \#P-hard aún en este caso restringido.
+
+Con el objetivo de extender estos resultados a clases más generales de redes bayesianas, se introduce una noción de clases de equivalencia sobre los órdenes topológicos del grafo causal subyacente, lo cual permite reducir drásticamente el número de permutaciones necesarias para computar ASV. Se presenta un algoritmo polinomial en el número de clases para identificarlas, y se implementa un esquema de cómputo exacto de ASV basado en estas clases. Además, se propone un nuevo método para computar en tiempo polinomial la predicción esperada de un árbol de decisión, sobre una distribución dada por una red bayesiana arbitraria, permitiendo así evaluar el algoritmo desarrollado para el cómputo de ASV en estos modelos. 
+
+Por último, se propone un algoritmo aproximado para calcular el ASV en familias de DAG's causales del tipo polytree. Para ello, se desarrolla un algoritmo de muestreo aleatorio de órdenes topológicos de polytrees. Estos resultados respaldan la viabilidad del enfoque propuesto en estructuras causales realistas, y se contrastan empíricamente con SHAP tanto en precisión como en eficiencia computacional.
+    \bigskip
+    
+    \noindent\textbf{Palabras clave:} Explicabilidad, Árboles de decisión, Asymmetric Shapley Values (ASV), Shap, Polytrees, Ordenes topológicos
+
+\cleardoublepage
+
+\section*{\runtitle}
+
+\noindent This thesis addresses the problem of explainability in machine learning models through feature attribution methods.
+
+In particular, it studies a variant of the Shapley values known as Asymmetric Shapley Values (ASV), which allows for the incorporation of causal knowledge into model-agnostic explanations. Through a complexity analysis, it is shown that the exact computation of ASV is polynomial for models whose input distribution is represented by a Naive Bayes Bayesian network, in contrast to SHAP, which is \#P-hard even in this restricted case.
+
+To extend these results to more general classes of Bayesian networks, a notion of equivalence classes over the topological orderings of the underlying causal graph is introduced. This approach drastically reduces the number of permutations required to compute ASV. A polynomial-time algorithm is presented to identify these classes, and an exact ASV computation scheme based on them is implemented. Additionally, a new method is proposed to compute the expected prediction of a decision tree in polynomial time over a distribution given by an arbitrary Bayesian network, thereby enabling the evaluation of the developed ASV computation algorithm on these models.
+
+Finally, an approximate algorithm is proposed to compute the ASV in families of causal DAGs of the polytree type. To this end, a random sampling algorithm for topological orderings of polytrees is developed. These results support the feasibility of the proposed approach in realistic causal structures and are empirically compared with SHAP in terms of both accuracy and computational efficiency.
+\bigskip
+
+\noindent\textbf{Keywords:} Explainability, Decision Trees, Asymmetric Shapley Values (ASV), Shap, Polytrees, Topological Orders

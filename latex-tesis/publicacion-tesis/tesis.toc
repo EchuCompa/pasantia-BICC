@@ -1,0 +1,60 @@
+\babel@toc {spanish}{}\relax 
+\contentsline {section}{\numberline {1}Introducción}{6}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Explicaciones basadas en causalidad: Un ejemplo comparativo entre SHAP y ASV}{7}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Código fuente}{8}{subsection.1.2}%
+\contentsline {section}{\numberline {2}Introducción a Shapley y ASV}{8}{section.2}%
+\contentsline {subsection}{\numberline {2.1}SHAP}{8}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Complejidad de las explicaciones basadas en Shapley values}{10}{subsection.2.2}%
+\contentsline {subsubsection}{\numberline {2.2.1}Resultados conocidos sobre los Shapley Values}{10}{subsubsection.2.2.1}%
+\contentsline {subsubsection}{\numberline {2.2.2}Asymmetric Shapley Values (ASV)}{10}{subsubsection.2.2.2}%
+\contentsline {section}{\numberline {3}Grafos Causales}{13}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Redes Bayesianas}{13}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Predicción promedio en árboles de decisión}{14}{subsection.3.2}%
+\contentsline {subsubsection}{\numberline {3.2.1}Expandiendo la predicción promedio a features no binarios}{16}{subsubsection.3.2.1}%
+\contentsline {section}{\numberline {4}Optimización para ASV : Clases de equivalencia}{17}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Número de órdenes topológicos de un DAG}{18}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Número de clases de equivalencias para \emph {dtrees}}{20}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Cota superior para las clases de equivalencia}{22}{subsection.4.3}%
+\contentsline {section}{\numberline {5}Algoritmo exacto para clases de equivalencia en \emph {dtrees}{}}{22}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Solución Naive}{22}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Algoritmo recursivo}{23}{subsection.5.2}%
+\contentsline {subsubsection}{\numberline {5.2.1}Clases de equivalencia para árboles unrelated}{24}{subsubsection.5.2.1}%
+\contentsline {paragraph}{Optimizaciones}{25}{section*.20}%
+\contentsline {subsubsection}{\numberline {5.2.2}Fusión de clases de unrelated trees con ancestros y descendientes}{25}{subsubsection.5.2.2}%
+\contentsline {subsubsection}{\numberline {5.2.3}Combinando los ancestros y los nodos no relacionados}{25}{subsubsection.5.2.3}%
+\contentsline {subsection}{\numberline {5.3}Complejidad del algoritmo}{26}{subsection.5.3}%
+\contentsline {subsubsection}{\numberline {5.3.1}Complejidad temporal de UnrEC}{26}{subsubsection.5.3.1}%
+\contentsline {subsubsection}{\numberline {5.3.2}Complejidad temporal total}{26}{subsubsection.5.3.2}%
+\contentsline {section}{\numberline {6}Sampleo de toposorts en polytrees}{27}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Algoritmo de sampleo}{27}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Número de órdenes topológicos de un polytree}{28}{subsection.6.2}%
+\contentsline {subsubsection}{\numberline {6.2.1}Idea inicial}{29}{subsubsection.6.2.1}%
+\contentsline {subsubsection}{\numberline {6.2.2}Algoritmo final}{30}{subsubsection.6.2.2}%
+\contentsline {subsection}{\numberline {6.3}Complejidad del algoritmo}{31}{subsection.6.3}%
+\contentsline {section}{\numberline {7}ASV end to end}{33}{section.7}%
+\contentsline {subsection}{\numberline {7.1}ASV exacto}{33}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}ASV aproximado}{33}{subsection.7.2}%
+\contentsline {section}{\numberline {8}Experimentos}{34}{section.8}%
+\contentsline {paragraph}{Especificaciones de los experimentos}{34}{section*.28}%
+\contentsline {subsection}{\numberline {8.1}Clases de equivalencia vs Órdenes Topológicos}{35}{subsection.8.1}%
+\contentsline {subsection}{\numberline {8.2}ASV exacto sin EqClasses vs ASV aproximado}{37}{subsection.8.2}%
+\contentsline {section}{\numberline {9}Conclusión}{38}{section.9}%
+\contentsline {paragraph}{Trabajo futuro}{39}{section*.35}%
+\contentsline {section}{\numberline {10}Apéndice}{40}{section.10}%
+\contentsline {subsection}{\numberline {10.1}Fórmulas }{40}{subsection.10.1}%
+\contentsline {subsubsection}{\numberline {10.1.1}Funciones auxiliares del cálculo de los unrelated trees}{40}{subsubsection.10.1.1}%
+\contentsline {paragraph}{Complejidad temporal de $union$}{40}{section*.37}%
+\contentsline {subsubsection}{\numberline {10.1.2}Función completa de \#LO}{40}{subsubsection.10.1.2}%
+\contentsline {paragraph}{Complejidad temporal de $\#LO$}{41}{section*.40}%
+\contentsline {subsubsection}{\numberline {10.1.3}Funciones auxiliares del cálculo de clases de equivalencias}{42}{subsubsection.10.1.3}%
+\contentsline {paragraph}{Complejidad de eqClassTopos}{42}{section*.41}%
+\contentsline {subsubsection}{\numberline {10.1.4}Complejidad de \texttt {allPossibleOrders}}{42}{subsubsection.10.1.4}%
+\contentsline {paragraph}{Número de estados}{43}{section*.42}%
+\contentsline {paragraph}{Costo por estado}{43}{section*.43}%
+\contentsline {paragraph}{Complejidad total}{43}{section*.44}%
+\contentsline {paragraph}{Casos particulares}{43}{section*.45}%
+\contentsline {subsection}{\numberline {10.2}Demostraciones}{44}{subsection.10.2}%
+\contentsline {subsubsection}{\numberline {10.2.1}ASV puede calcularse en tiempo polinomial para una distribución Naive Bayes}{44}{subsubsection.10.2.1}%
+\contentsline {subsubsection}{\numberline {10.2.2}Cota superior para la cantidad de clases de equivalencia}{46}{subsubsection.10.2.2}%
+\contentsline {subsubsection}{\numberline {10.2.3}Error para la estimación de ASV a través de sampleos}{46}{subsubsection.10.2.3}%
+\contentsline {subsection}{\numberline {10.3}Figuras}{48}{subsection.10.3}%
