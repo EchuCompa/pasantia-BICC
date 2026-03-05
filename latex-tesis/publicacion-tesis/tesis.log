@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.6.6)  5 MAR 2026 20:12
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.6.6)  5 MAR 2026 20:24
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -925,7 +925,7 @@ LaTeX Font Info:    Trying to load font information for U+msb on input line 9.
 (D:\Users\Echu\AppData\Local\Programs\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-<img/logofcen.pdf, id=202, 108.405pt x 108.405pt>
+<img/logofcen.pdf, id=198, 108.405pt x 108.405pt>
 File: img/logofcen.pdf Graphic file (type pdf)
 <use img/logofcen.pdf>
 Package pdftex.def Info: img/logofcen.pdf  used on input line 10.
@@ -946,160 +946,134 @@ LaTeX Info: Redefining \% on input line 1.
 \tf@toc=\write6
 \openout6 = `tesis.toc'.
 
- [5
-
-] (tesis_español/1_introduction.tex
+ (tesis_español/1_introduction.tex
 Excluding 'comment' comment.
 
-LaTeX Warning: Citation `frontierMath' on page 6 undefined on input line 9.
+LaTeX Warning: Citation `frontierMath' on page 5 undefined on input line 9.
 
 
-LaTeX Warning: Citation `EpochLargeScaleModels2024' on page 6 undefined on inpu
+LaTeX Warning: Citation `EpochLargeScaleModels2024' on page 5 undefined on inpu
 t line 9.
 
+[5
 
-LaTeX Warning: Citation `interpretabilityPaper' on page 6 undefined on input li
-ne 11.
+]
 
-
-LaTeX Warning: Citation `interpretabilityBook' on page 6 undefined on input lin
-e 13.
-
-
-LaTeX Warning: Citation `MILLER20191' on page 6 undefined on input line 28.
+LaTeX Warning: Citation `shapOriginalPaper' on page 6 undefined on input line 1
+1.
 
 
-LaTeX Warning: Citation `lipton2017mythosmodelinterpretability' on page 6 undef
-ined on input line 28.
-
-
-LaTeX Warning: Citation `shapOriginalPaper' on page 6 undefined on input line 3
-3.
-
-LaTeX Info: Redefining \. on input line 34.
-LaTeX Info: Redefining \% on input line 34.
-Package babel Info: 'spanish' activates 'spanish' shorthands.
-(babel)             Reported  on input line 34.
-[6]
-
-LaTeX Warning: Citation `arenas2021tractability' on page 7 undefined on input l
-ine 37.
+LaTeX Warning: Citation `arenas2021tractability' on page 6 undefined on input l
+ine 15.
 
 
 LaTeX Warning: Citation `marzouk2025computationaltractabilitymanyshapley' on pa
-ge 7 undefined on input line 38.
+ge 6 undefined on input line 16.
 
 
-LaTeX Warning: Citation `shapley1953value' on page 7 undefined on input line 40
+LaTeX Warning: Citation `shapley1953value' on page 6 undefined on input line 18
 .
 
 
-LaTeX Warning: Citation `frye2019asymmetric' on page 7 undefined on input line 
-40.
+LaTeX Warning: Citation `frye2019asymmetric' on page 6 undefined on input line 
+18.
 
-
-LaTeX Warning: Citation `frye2019asymmetric' on page 7 undefined on input line 
-44.
-
-
-LaTeX Warning: Citation `dua2017uci' on page 7 undefined on input line 44.
-
-<img/asvPaperPlotExample.png, id=295, 774.64406pt x 561.59813pt>
-File: img/asvPaperPlotExample.png Graphic file (type png)
-<use img/asvPaperPlotExample.png>
-Package pdftex.def Info: img/asvPaperPlotExample.png  used on input line 50.
-(pdftex.def)             Requested size: 226.48395pt x 164.18752pt.
-LaTeX Info: Redefining \. on input line 56.
-LaTeX Info: Redefining \% on input line 56.
-[7 <./img/asvPaperPlotExample.png>]) (tesis_español/2_shap_complexity.tex
-Excluding 'comment' comment.
+) (tesis_español/2_shap_complexity.tex Excluding 'comment' comment.
 LaTeX Font Info:    Trying to load font information for U+dsrom on input line 1
 3.
 
 (D:\Users\Echu\AppData\Local\Programs\tex/latex/doublestroke\udsrom.fd
 File: Udsrom.fd 1995/08/01 v0.1 Double stroke roman font definitions
 )
+LaTeX Info: Redefining \. on input line 16.
+LaTeX Info: Redefining \% on input line 16.
+Package babel Info: 'spanish' activates 'spanish' shorthands.
+(babel)             Reported  on input line 16.
 
-LaTeX Warning: Citation `shapOriginalPaper' on page 8 undefined on input line 1
+[6]
+
+LaTeX Warning: Citation `shapOriginalPaper' on page 7 undefined on input line 1
 6.
 
 
-LaTeX Warning: Citation `shapley1953value' on page 8 undefined on input line 16
+LaTeX Warning: Citation `shapley1953value' on page 7 undefined on input line 16
 .
 
-LaTeX Info: Redefining \. on input line 34.
-LaTeX Info: Redefining \% on input line 34.
-[8]
-Underfull \hbox (badness 10000) in paragraph at lines 57--58
+
+Underfull \hbox (badness 10000) in paragraph at lines 32--33
 
  []
 
 
-LaTeX Warning: Citation `fryer2021shapley' on page 9 undefined on input line 89
+LaTeX Warning: Citation `fryer2021shapley' on page 7 undefined on input line 64
 .
 
 
-LaTeX Warning: Citation `marques2023logic' on page 9 undefined on input line 89
+LaTeX Warning: Citation `marques2023logic' on page 7 undefined on input line 64
 .
 
 
-LaTeX Warning: Citation `huang2023inadequacy' on page 9 undefined on input line
- 89.
+LaTeX Warning: Citation `huang2023inadequacy' on page 7 undefined on input line
+ 64.
 
-LaTeX Info: Redefining \. on input line 96.
-LaTeX Info: Redefining \% on input line 96.
-[9]
+LaTeX Info: Redefining \. on input line 71.
+LaTeX Info: Redefining \% on input line 71.
+[7]
 
-LaTeX Warning: Citation `lundberg2020local' on page 10 undefined on input line 
-99.
-
-
-LaTeX Warning: Citation `arenas2021tractability' on page 10 undefined on input 
-line 105.
+LaTeX Warning: Citation `lundberg2020local' on page 8 undefined on input line 7
+4.
 
 
-LaTeX Warning: Citation `arenas2023complexity' on page 10 undefined on input li
-ne 105.
+LaTeX Warning: Citation `arenas2021tractability' on page 8 undefined on input l
+ine 80.
 
 
-LaTeX Warning: Citation `van2022tractability' on page 10 undefined on input lin
-e 107.
+LaTeX Warning: Citation `arenas2023complexity' on page 8 undefined on input lin
+e 80.
 
 
-LaTeX Warning: Citation `lundberg2020local' on page 10 undefined on input line 
-109.
+LaTeX Warning: Citation `van2022tractability' on page 8 undefined on input line
+ 82.
 
 
-LaTeX Warning: Citation `van2022tractability' on page 10 undefined on input lin
-e 117.
+LaTeX Warning: Citation `lundberg2020local' on page 8 undefined on input line 8
+4.
+
+
+LaTeX Warning: Citation `van2022tractability' on page 8 undefined on input line
+ 92.
 
 Excluding 'comment' comment. Excluding 'comment' comment.
 
-LaTeX Warning: Citation `frye2019asymmetric' on page 10 undefined on input line
- 147.
+LaTeX Warning: Citation `frye2019asymmetric' on page 8 undefined on input line 
+122.
 
 
-LaTeX Warning: Citation `frye2019asymmetric' on page 10 undefined on input line
- 149.
+LaTeX Warning: Citation `frye2019asymmetric' on page 8 undefined on input line 
+124.
 
 
-LaTeX Warning: Citation `countingLinearExtensions' on page 10 undefined on inpu
-t line 149.
+LaTeX Warning: Citation `countingLinearExtensions' on page 8 undefined on input
+ line 124.
 
-LaTeX Info: Redefining \. on input line 151.
-LaTeX Info: Redefining \% on input line 151.
-[10]
+LaTeX Info: Redefining \. on input line 126.
+LaTeX Info: Redefining \% on input line 126.
+[8]
 
-LaTeX Warning: Citation `van2022tractability' on page 11 undefined on input lin
-e 176.
+LaTeX Warning: Reference `asvCaseExample' on page 9 undefined on input line 140
+.
 
-LaTeX Info: Redefining \. on input line 226.
-LaTeX Info: Redefining \% on input line 226.
-[11])
+
+LaTeX Warning: Citation `van2022tractability' on page 9 undefined on input line
+ 151.
+
+LaTeX Info: Redefining \. on input line 201.
+LaTeX Info: Redefining \% on input line 201.
+[9])
 LaTeX Info: Redefining \. on input line 89.
 LaTeX Info: Redefining \% on input line 89.
- [12] (tesis_español/3_redes_bayesianas.tex Excluding 'comment' comment.
-<img/bayesianNetworks/bayesianNetworks.png, id=370, 691.08188pt x 420.82219pt>
+ [10] (tesis_español/3_redes_bayesianas.tex Excluding 'comment' comment.
+<img/bayesianNetworks/bayesianNetworks.png, id=349, 691.08188pt x 420.82219pt>
 File: img/bayesianNetworks/bayesianNetworks.png Graphic file (type png)
 <use img/bayesianNetworks/bayesianNetworks.png>
 Package pdftex.def Info: img/bayesianNetworks/bayesianNetworks.png  used on inp
@@ -1107,33 +1081,33 @@ ut line 45.
 (pdftex.def)             Requested size: 276.42784pt x 168.32588pt.
 
 
-LaTeX Warning: Citation `probabilisticGraphicalModels' on page 13 undefined on 
+LaTeX Warning: Citation `probabilisticGraphicalModels' on page 11 undefined on 
 input line 46.
 
 
-LaTeX Warning: Citation `probabilisticGraphicalModels' on page 13 undefined on 
+LaTeX Warning: Citation `probabilisticGraphicalModels' on page 11 undefined on 
 input line 46.
 
 LaTeX Info: Redefining \. on input line 57.
 LaTeX Info: Redefining \% on input line 57.
-[13 <./img/bayesianNetworks/bayesianNetworks.png>]
+[11 <./img/bayesianNetworks/bayesianNetworks.png>]
 
-LaTeX Warning: Citation `pearl1986bayesianInference' on page 14 undefined on in
+LaTeX Warning: Citation `pearl1986bayesianInference' on page 12 undefined on in
 put line 60.
 
 
-LaTeX Warning: Citation `variableElimination' on page 14 undefined on input lin
+LaTeX Warning: Citation `variableElimination' on page 12 undefined on input lin
 e 64.
 
 
-LaTeX Warning: Citation `audemard2021explanatorypowerdecisiontrees' on page 14 
+LaTeX Warning: Citation `audemard2021explanatorypowerdecisiontrees' on page 12 
 undefined on input line 70.
 
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
 put line 106.
 LaTeX Info: Redefining \. on input line 125.
 LaTeX Info: Redefining \% on input line 125.
-[14]
+[12]
 Overfull \hbox (22.92621pt too wide) detected at line 179
 []
  []
@@ -1141,31 +1115,31 @@ Overfull \hbox (22.92621pt too wide) detected at line 179
 Excluding 'comment' comment.
 LaTeX Info: Redefining \. on input line 209.
 LaTeX Info: Redefining \% on input line 209.
- [15] Excluding 'comment' comment.)
+ [13] Excluding 'comment' comment.)
 LaTeX Info: Redefining \. on input line 95.
 LaTeX Info: Redefining \% on input line 95.
- [16]
+ [14]
 (tesis_español/4_heuristic_for_ASV.tex Excluding 'comment' comment.
 LaTeX Info: Redefining \. on input line 68.
 LaTeX Info: Redefining \% on input line 68.
- [17]
+ [15]
 Excluding 'comment' comment.
 
-LaTeX Warning: Citation `countingLinearExtensions' on page 18 undefined on inpu
+LaTeX Warning: Citation `countingLinearExtensions' on page 16 undefined on inpu
 t line 111.
 
 LaTeX Info: Redefining \. on input line 185.
 LaTeX Info: Redefining \% on input line 185.
-[18]
+[16]
 LaTeX Info: Redefining \. on input line 289.
 LaTeX Info: Redefining \% on input line 289.
- [19]
+ [17]
 LaTeX Info: Redefining \. on input line 415.
 LaTeX Info: Redefining \% on input line 415.
- [20] Excluding 'comment' comment.
+ [18] Excluding 'comment' comment.
 LaTeX Info: Redefining \. on input line 505.
 LaTeX Info: Redefining \% on input line 505.
- [21])
+ [19])
 (tesis_español/5_algorithm_for_equiv_class_in_trees.tex
 Excluding 'comment' comment.
 Overfull \hbox (2.87865pt too wide) in paragraph at lines 20--22
@@ -1175,22 +1149,22 @@ ro el con-jun-to de cla-ses de equi-va-len-cia $\OML/cmm/m/it/10 eqCl\OT1/cmr/m
  []
 
 
-LaTeX Warning: Citation `algorithmForAllTopoSorts' on page 22 undefined on inpu
+LaTeX Warning: Citation `algorithmForAllTopoSorts' on page 20 undefined on inpu
 t line 27.
 
 LaTeX Info: Redefining \. on input line 28.
 LaTeX Info: Redefining \% on input line 28.
-[22]
+[20]
 LaTeX Info: Redefining \. on input line 83.
 LaTeX Info: Redefining \% on input line 83.
- [23]
+ [21]
 Underfull \hbox (badness 10000) in paragraph at lines 95--96
 
  []
 
 LaTeX Info: Redefining \. on input line 128.
 LaTeX Info: Redefining \% on input line 128.
-[24] Excluding 'comment' comment.
+[22] Excluding 'comment' comment.
 Underfull \hbox (badness 10000) in paragraph at lines 178--179
 
  []
@@ -1203,26 +1177,26 @@ Underfull \hbox (badness 10000) in paragraph at lines 215--216
 
 LaTeX Info: Redefining \. on input line 216.
 LaTeX Info: Redefining \% on input line 216.
-[25])
+[23])
 LaTeX Info: Redefining \. on input line 109.
 LaTeX Info: Redefining \% on input line 109.
- [26] (tesis_español/6_topsort_sampling_polytrees.tex
+ [24] (tesis_español/6_topsort_sampling_polytrees.tex
 
-LaTeX Warning: Citation `algorithmForAllTopoSorts' on page 27 undefined on inpu
+LaTeX Warning: Citation `algorithmForAllTopoSorts' on page 25 undefined on inpu
 t line 6.
 
 LaTeX Info: Redefining \. on input line 77.
 LaTeX Info: Redefining \% on input line 77.
-[27]
+[25]
 LaTeX Info: Redefining \. on input line 129.
 LaTeX Info: Redefining \% on input line 129.
- [28]
+ [26]
 LaTeX Info: Redefining \. on input line 182.
 LaTeX Info: Redefining \% on input line 182.
- [29]
+ [27]
 LaTeX Info: Redefining \. on input line 272.
 LaTeX Info: Redefining \% on input line 272.
- [30]
+ [28]
 Overfull \hbox (13.59306pt too wide) in paragraph at lines 358--359
 []\OT1/cmr/m/n/10 Vamos a eva-luar cu^^Santo cues-ta el lla-ma-do en ba-se a $\
 OML/cmm/m/it/10 node$ \OT1/cmr/m/n/10 y $\OML/cmm/m/it/10 D$\OT1/cmr/m/n/10 . O
@@ -1232,15 +1206,15 @@ b-te-ner $\OML/cmm/m/it/10 allNVNeighbourOrders\OT1/cmr/m/n/10 (\OML/cmm/m/it/1
 
 LaTeX Info: Redefining \. on input line 359.
 LaTeX Info: Redefining \% on input line 359.
-[31])
+[29])
 LaTeX Info: Redefining \. on input line 115.
 LaTeX Info: Redefining \% on input line 115.
- [32] (tesis_español/7_asv_end_to_end.tex)
+ [30] (tesis_español/7_asv_end_to_end.tex)
 LaTeX Info: Redefining \. on input line 121.
 LaTeX Info: Redefining \% on input line 121.
- [33]
+ [31]
 (tesis_español/8_experiments.tex
-<img/bayesianNetworks/cancerNetwork.png, id=610, 521.69907pt x 581.92406pt>
+<img/bayesianNetworks/cancerNetwork.png, id=590, 521.69907pt x 581.92406pt>
 File: img/bayesianNetworks/cancerNetwork.png Graphic file (type png)
 <use img/bayesianNetworks/cancerNetwork.png>
 Package pdftex.def Info: img/bayesianNetworks/cancerNetwork.png  used on input 
@@ -1248,28 +1222,28 @@ line 13.
 (pdftex.def)             Requested size: 135.89174pt x 151.58083pt.
 
 
-LaTeX Warning: Citation `cancerNetwork' on page 34 undefined on input line 14.
+LaTeX Warning: Citation `cancerNetwork' on page 32 undefined on input line 14.
 
 
-LaTeX Warning: Citation `cancerNetwork' on page 34 undefined on input line 14.
+LaTeX Warning: Citation `cancerNetwork' on page 32 undefined on input line 14.
 
-<img/bayesianNetworks/childNetwork.png, id=611, 665.48625pt x 613.54219pt>
+<img/bayesianNetworks/childNetwork.png, id=591, 665.48625pt x 613.54219pt>
 File: img/bayesianNetworks/childNetwork.png Graphic file (type png)
 <use img/bayesianNetworks/childNetwork.png>
 Package pdftex.def Info: img/bayesianNetworks/childNetwork.png  used on input l
 ine 20.
 (pdftex.def)             Requested size: 271.7835pt x 250.57092pt.
 
-LaTeX Warning: Citation `childNetwork' on page 34 undefined on input line 21.
+LaTeX Warning: Citation `childNetwork' on page 32 undefined on input line 21.
 
 
-LaTeX Warning: Citation `childNetwork' on page 34 undefined on input line 21.
+LaTeX Warning: Citation `childNetwork' on page 32 undefined on input line 21.
 
 LaTeX Info: Redefining \. on input line 33.
 LaTeX Info: Redefining \% on input line 33.
-[34 <./img/bayesianNetworks/cancerNetwork.png> <./img/bayesianNetworks/childNet
+[32 <./img/bayesianNetworks/cancerNetwork.png> <./img/bayesianNetworks/childNet
 work.png>]
-<img/equivalentClassesVsToposorts.png, id=623, 722.7pt x 433.62pt>
+<img/equivalentClassesVsToposorts.png, id=603, 722.7pt x 433.62pt>
 File: img/equivalentClassesVsToposorts.png Graphic file (type png)
 <use img/equivalentClassesVsToposorts.png>
 Package pdftex.def Info: img/equivalentClassesVsToposorts.png  used on input li
@@ -1277,14 +1251,14 @@ ne 51.
 (pdftex.def)             Requested size: 452.9679pt x 271.77934pt.
 LaTeX Info: Redefining \. on input line 63.
 LaTeX Info: Redefining \% on input line 63.
- [35 <./img/equivalentClassesVsToposorts.png>]
-<img/equivalentClasses_time.png, id=635, 722.7pt x 433.62pt>
+ [33 <./img/equivalentClassesVsToposorts.png>]
+<img/equivalentClasses_time.png, id=615, 722.7pt x 433.62pt>
 File: img/equivalentClasses_time.png Graphic file (type png)
 <use img/equivalentClasses_time.png>
 Package pdftex.def Info: img/equivalentClasses_time.png  used on input line 76.
 
 (pdftex.def)             Requested size: 452.9679pt x 271.77934pt.
-<img/equivalentClassesVsAllToposorts_time.png, id=636, 722.7pt x 433.62pt>
+<img/equivalentClassesVsAllToposorts_time.png, id=616, 722.7pt x 433.62pt>
 File: img/equivalentClassesVsAllToposorts_time.png Graphic file (type png)
 <use img/equivalentClassesVsAllToposorts_time.png>
 Package pdftex.def Info: img/equivalentClassesVsAllToposorts_time.png  used on 
@@ -1292,11 +1266,11 @@ input line 83.
 (pdftex.def)             Requested size: 452.9679pt x 271.77934pt.
 LaTeX Info: Redefining \. on input line 101.
 LaTeX Info: Redefining \% on input line 101.
- [36 <./img/equivalentClasses_time.png>]
+ [34 <./img/equivalentClasses_time.png>]
 LaTeX Info: Redefining \. on input line 169.
 LaTeX Info: Redefining \% on input line 169.
- [37 <./img/equivalentClassesVsAllToposorts_time.png>]
-<img/asvResults/ChildAllSeedsASVBoxplot.png, id=665, 867.24pt x 578.16pt>
+ [35 <./img/equivalentClassesVsAllToposorts_time.png>]
+<img/asvResults/ChildAllSeedsASVBoxplot.png, id=644, 867.24pt x 578.16pt>
 File: img/asvResults/ChildAllSeedsASVBoxplot.png Graphic file (type png)
 <use img/asvResults/ChildAllSeedsASVBoxplot.png>
 Package pdftex.def Info: img/asvResults/ChildAllSeedsASVBoxplot.png  used on in
@@ -1306,16 +1280,16 @@ put line 173.
 (tesis_español/9_conclusion.tex
 LaTeX Info: Redefining \. on input line 17.
 LaTeX Info: Redefining \% on input line 17.
- [38]
+ [36]
 
-LaTeX Warning: Citation `efficientToposort' on page 39 undefined on input line 
+LaTeX Warning: Citation `efficientToposort' on page 37 undefined on input line 
 30.
 
 
-LaTeX Warning: Citation `HUBER2006420' on page 39 undefined on input line 32.
+LaTeX Warning: Citation `HUBER2006420' on page 37 undefined on input line 32.
 
 
-LaTeX Warning: Citation `efficientCountingOfToposorts' on page 39 undefined on 
+LaTeX Warning: Citation `efficientCountingOfToposorts' on page 37 undefined on 
 input line 32.
 
 ) (tesis.bbl
@@ -1325,7 +1299,7 @@ LaTeX Warning: Empty `thebibliography' environment on input line 3.
 ) (tesis_español/10_appendix.tex Excluding 'comment' comment.
 LaTeX Info: Redefining \. on input line 43.
 LaTeX Info: Redefining \% on input line 43.
- [39 <./img/asvResults/ChildAllSeedsASVBoxplot.png>]
+ [37 <./img/asvResults/ChildAllSeedsASVBoxplot.png>]
 Overfull \hbox (50.00565pt too wide) detected at line 46
 []
  []
@@ -1340,12 +1314,12 @@ Ancestor$\OT1/cmr/m/n/10 .
 
 LaTeX Info: Redefining \. on input line 94.
 LaTeX Info: Redefining \% on input line 94.
-[40]
+[38]
 Missing character: There is no ; in font nullfont!
 Missing character: There is no ; in font nullfont!
 LaTeX Info: Redefining \. on input line 174.
 LaTeX Info: Redefining \% on input line 174.
-[41]
+[39]
 Overfull \hbox (21.9212pt too wide) in paragraph at lines 177--178
 \OT1/cmr/m/n/10 ro de su-mas de-ter-mi-nar^^Sa nues-tra com-ple-ji-dad. $\OML/c
 mm/m/it/10 toFill$ \OT1/cmr/m/n/10 pue-de to-mar co-mo m^^Saxi-mo $[][] \OML/cm
@@ -1377,31 +1351,31 @@ r/m/n/10 .
 
 LaTeX Info: Redefining \. on input line 215.
 LaTeX Info: Redefining \% on input line 215.
-[42]
+[40]
 LaTeX Info: Redefining \. on input line 288.
 LaTeX Info: Redefining \% on input line 288.
- [43]
+ [41]
 LaTeX Info: Redefining \. on input line 350.
 LaTeX Info: Redefining \% on input line 350.
- [44]
+ [42]
 Overfull \hbox (20.64249pt too wide) detected at line 380
 []
  []
 
 
-LaTeX Warning: Citation `van2022tractability' on page 45 undefined on input lin
+LaTeX Warning: Citation `van2022tractability' on page 43 undefined on input lin
 e 397.
 
 LaTeX Info: Redefining \. on input line 415.
 LaTeX Info: Redefining \% on input line 415.
-[45]
+[43]
 LaTeX Info: Redefining \. on input line 481.
 LaTeX Info: Redefining \% on input line 481.
- [46]
+ [44]
 LaTeX Info: Redefining \. on input line 505.
 LaTeX Info: Redefining \% on input line 505.
- [47]
-<img/asvResults/childMultipleSeedsASVandShapley.png, id=755, 1445.4pt x 1084.05
+ [45]
+<img/asvResults/childMultipleSeedsASVandShapley.png, id=736, 1445.4pt x 1084.05
 pt>
 File: img/asvResults/childMultipleSeedsASVandShapley.png Graphic file (type png
 )
@@ -1409,7 +1383,7 @@ File: img/asvResults/childMultipleSeedsASVandShapley.png Graphic file (type png
 Package pdftex.def Info: img/asvResults/childMultipleSeedsASVandShapley.png  us
 ed on input line 511.
 (pdftex.def)             Requested size: 433.62335pt x 325.21751pt.
-<img/asvResults/cancerMultipleSeedsASVandShapley.png, id=756, 1445.4pt x 1084.0
+<img/asvResults/cancerMultipleSeedsASVandShapley.png, id=737, 1445.4pt x 1084.0
 5pt>
 File: img/asvResults/cancerMultipleSeedsASVandShapley.png Graphic file (type pn
 g)
@@ -1420,11 +1394,11 @@ sed on input line 518.
 )
 LaTeX Info: Redefining \. on input line 139.
 LaTeX Info: Redefining \% on input line 139.
- [48 <./img/asvResults/childMultipleSeedsASVandShapley.png>]
+ [46 <./img/asvResults/childMultipleSeedsASVandShapley.png>]
 LaTeX Info: Redefining \. on input line 139.
 LaTeX Info: Redefining \% on input line 139.
 
-[49 <./img/asvResults/cancerMultipleSeedsASVandShapley.png>] (tesis.aux
+[47 <./img/asvResults/cancerMultipleSeedsASVandShapley.png>] (tesis.aux
 LaTeX Info: Redefining \. on input line 7.
 LaTeX Info: Redefining \% on input line 7.
 )
@@ -1437,19 +1411,19 @@ L3 programming layer <2024-01-04>
 LaTeX Warning: There were undefined references.
 
 Package rerunfilecheck Info: File `tesis.out' has not changed.
-(rerunfilecheck)             Checksum: 9DB458F3B50AA40DDE270F122DFBBACE;11467.
+(rerunfilecheck)             Checksum: 91271697CC6814B6EC8AF96F84FE27B5;10999.
  ) 
 Here is how much of TeX's memory you used:
- 27345 strings out of 474486
- 519304 string characters out of 5747511
- 1957542 words of memory out of 5000000
- 48910 multiletter control sequences out of 15000+600000
+ 27332 strings out of 474486
+ 518981 string characters out of 5747511
+ 1958542 words of memory out of 5000000
+ 48901 multiletter control sequences out of 15000+600000
  576988 words of font info for 110 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  84i,22n,93p,1814b,1110s stack positions out of 10000i,1000n,20000p,200000b,200000s
- <C:\Users\Echu\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm0
-800.pk> <C:\Users\Echu\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\
-tcrm1000.pk><D:/Users/Echu/AppData/Local/Programs/fonts/type1/public/amsfonts/c
+ <C:\Users\Echu\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm1
+000.pk> <C:\Users\Echu\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\
+tcrm0800.pk><D:/Users/Echu/AppData/Local/Programs/fonts/type1/public/amsfonts/c
 m/cmbx10.pfb><D:/Users/Echu/AppData/Local/Programs/fonts/type1/public/amsfonts/
 cm/cmbx12.pfb><D:/Users/Echu/AppData/Local/Programs/fonts/type1/public/amsfonts
 /cm/cmbx8.pfb><D:/Users/Echu/AppData/Local/Programs/fonts/type1/public/amsfonts
@@ -1489,9 +1463,9 @@ ublic/amsfonts/cm/cmtt9.pfb><D:/Users/Echu/AppData/Local/Programs/fonts/type1/p
 ublic/doublestroke/dsrom10.pfb><D:/Users/Echu/AppData/Local/Programs/fonts/type
 1/public/doublestroke/dsrom8.pfb><D:/Users/Echu/AppData/Local/Programs/fonts/ty
 pe1/public/amsfonts/symbols/msbm10.pfb>
-Output written on tesis.pdf (49 pages, 1662985 bytes).
+Output written on tesis.pdf (47 pages, 1610591 bytes).
 PDF statistics:
- 984 PDF objects out of 1000 (max. 8388607)
- 212 named destinations out of 1000 (max. 500000)
- 460 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 962 PDF objects out of 1000 (max. 8388607)
+ 208 named destinations out of 1000 (max. 500000)
+ 447 words of extra memory for PDF output out of 10000 (max. 10000000)
 

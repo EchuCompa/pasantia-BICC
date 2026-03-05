@@ -15,32 +15,7 @@ Sea $X$ un conjunto finito de features. Una entidad $e$ sobre $X$ es una funció
 
 Un \textit{feature attribution score} para un modelo $M$ y una entidad $e$ es una función $\phi : X \to \R$, tal que $\phi(x)$ indica el \textit{puntaje} o \textit{relevancia} del feature $x$ con respecto a la predicción $M(e)$. Uno de los puntajes de feature attribution más destacados es él \SHAPscore{} \cite{shapOriginalPaper}, que se basa en los Shapley values \cite{shapley1953value} de la teoría de juegos cooperativos. En ese contexto, los Shapley values representan el esquema único de distribución de la ganancia obtenida por una coalición de jugadores que satisface ciertas propiedades deseables. Una interpretación de los mismos es una función que nos dice cuánto aporta cada jugador al valor total que obtiene la coalición. %\sidesergio{En caso que no aparezca ya en la Intro, motivar un poco más esto, o dar algún ejemplo}
 
-Más formalmente, sea $\players$ un conjunto finito de jugadores, y definimos una \textit{función característica} para $\players$ como una función $\charactheristicFunction : \mathcal{P}(\players) \to \R$, que asigna un valor a cada posible \textit{coalición} de jugadores (es decir, subconjuntos de los jugadores). Por ejemplo, si los jugadores son features, se podría tomar $v(S)$ como la predicción promedio del modelo cuando los features de $S$ se dejan fijos con ciertos valores. Esta valuación daría un valor mayor en la medida que los valores fijos para las features de $S$ estén más correlacionados con que el modelo devuelva un valor más grande. Los Shapley values $\{\phi_i\}_{i \in \players}$ son las únicas funciones que toman como entrada funciones características y devuelven valores reales que satisfacen las siguientes propiedades:
-
-%\santi{Agregaría intuición de qué es esto.}
-
-\begin{itemize}
-	\item \textbf{Eficiencia}: toda la ganancia es distribuida.
-	\begin{align*}
-		\sum_{i \in \players} \phi_i(\charactheristicFunction) = \charactheristicFunction(\players)
-	\end{align*}
-	
-	\item \textbf{Simetría}: cualquier par de jugadores $i,j \in \players$ que contribuyan igual reciben la misma recompensa.
-	\begin{align*}
-		\forall i,j \in \players : \left( \bigwedge_{S \subseteq \players \setminus \{i,j\}} \charactheristicFunction(S \cup \{i\}) = \charactheristicFunction(S \cup \{j\}) \right) \implies \phi_i(\charactheristicFunction) = \phi_j(\charactheristicFunction)
-	\end{align*}
-	
-	\item \textbf{Linealidad}: si dos juegos se combinan, entonces la solución a ese nuevo juego es la suma de las soluciones de los originales. Si un juego es multiplicado por un escalar, entonces la solución también se multiplica por él. %\sidesergio{Unificar acá: siempre hablar de juegos o de funciones características. Posiblemente mejor hablar de juegos porque el nombre función característica es confuso}
-	\begin{align*}
-		\forall a \in \R : 
-		\phi_i(a \charactheristicFunction_1 + \charactheristicFunction_2) =  a \phi_i(\charactheristicFunction_1) + \phi_i(\charactheristicFunction_2)
-	\end{align*}
-	
-	\item \textbf{Jugador nulo}: si un jugador no contribuye en ninguna coalición, entonces no recibe recompensa.
-	\begin{align*}
-		\forall i \in \players : \left( \bigwedge_{S \subseteq \players \setminus \{i\}} \charactheristicFunction(S) = \charactheristicFunction(S \cup \{i\}) \right) \implies \phi_i(\charactheristicFunction) = 0
-	\end{align*}
-\end{itemize}
+Más formalmente, sea $\players$ un conjunto finito de jugadores, y definimos una \textit{función característica} para $\players$ como una función $\charactheristicFunction : \mathcal{P}(\players) \to \R$, que asigna un valor a cada posible \textit{coalición} de jugadores (es decir, subconjuntos de los jugadores). Por ejemplo, si los jugadores son features, se podría tomar $v(S)$ como la predicción promedio del modelo cuando los features de $S$ se dejan fijos con ciertos valores. Esta valuación daría un valor mayor en la medida que los valores fijos para las features de $S$ estén más correlacionados con que el modelo devuelva un valor más grande. Los Shapley values $\{\phi_i\}_{i \in \players}$ son las únicas funciones que toman como entrada funciones características y devuelven valores reales que satisfacen propiedades útiles para la teoría de juegos.
 
 Además, existe una forma cerrada para estas funciones. Dado un conjunto finito $A$, sea $perm(A)$ el conjunto de todas sus permutaciones\footnote{Formalmente, $perm(A) = \{(a_1, a_2, \dots, a_n) \mid \{a_1, a_2, \dots, a_n\} = A\}$, es decir, el conjunto de todas las secuencias que se pueden formar reordenando los elementos de $A$.} y sea $\pi(a)$ la posición del elemento $a$ en $\pi$. Dada una permutación $\pi \in \perm(A)$ denotamos como $\pi_{<a}$ al conjunto $\{a' \in A : \pi(a') < \pi(a)\}$. Entonces:
 
@@ -56,7 +31,7 @@ Intuitivamente, esta función considera todos los órdenes posibles en que los j
 
 donde $c_m = \frac{m! (|\players|-m-1!)}{|\players|!}$.\\
 
-La analogía con el aprendizaje automático surge al entender el conjunto de \(n\) features \(X\) como jugadores, y la función característica \(\charactheristicFunction\) como la predicción promedio al considerar un subconjunto de estos features fijados. En el ejemplo que vimos en la subsección \ref{asvCaseExample}, $X$ serían los features del dataset (age, sex, etc.) y $\charactheristicFunction$ sería la predicción promedio de la red neuronal que predice si el sueldo anual de una persona es superior a \$50\,000. Dados \(M\) y \(e\), definimos el conjunto de entidades consistentes con (\textit{consistent with}) \(e\) teniendo en cuenta el subconjunto de features \(S \subseteq X\) como \(\consistsWith(e, S) = \{e' \in \entities(X) : e'(s) = e(s) \text{ para } s \in S\}\). Definimos a la probabilidad condicionada como: %\santi{Cuando definís $ent(X)$ estaría bueno decir que asumimos dada una distribución $\Pr[]$ sobre el conjunto.}
+La analogía con el aprendizaje automático surge al entender el conjunto de \(n\) features \(X\) como jugadores, y la función característica \(\charactheristicFunction\) como la predicción promedio al considerar un subconjunto de estos features fijados. Dados \(M\) y \(e\), definimos el conjunto de entidades consistentes con (\textit{consistent with}) \(e\) teniendo en cuenta el subconjunto de features \(S \subseteq X\) como \(\consistsWith(e, S) = \{e' \in \entities(X) : e'(s) = e(s) \text{ para } s \in S\}\). Definimos a la probabilidad condicionada como: %\santi{Cuando definís $ent(X)$ estaría bueno decir que asumimos dada una distribución $\Pr[]$ sobre el conjunto.}
 \[
 \Pr\bigl[e' \mid \consistsWith(e,S)\bigr] =
 \begin{cases}
