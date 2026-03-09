@@ -87,8 +87,54 @@ la metodología utilizada y los principales hallazgos obtenidos.
 \section*{TODO}
 
 \begin{itemize}
-    \item Esqueleto del trabajo.
+    \item Escribir todo xD
 \end{itemize}
+
+\section{Introduction}
+
+\begin{enumerate}
+    \item Qué es la explicabilidad y por qué importa?
+    \item Qué es el Shappley value? Intuitivamente.
+    \item Limitaciones del Shappley value. Hablar tanto de temas de complejidad como de calidad de las explicaciones.
+    \item Propuestas para superar los problemas: ASV. Observar que solo busca mejorar calidad pero capaz tambien mejora algun aspecto computacional
+    \item Listar nuestras contribuciones en un parrafito.
+    \item Organización del resto del trabajo.
+\end{enumerate}
+
+\section{Definitions}
+
+\begin{enumerate}
+    \item Definición formal del Shappley value. Contar que es la única opción que cumple ciertos axiomas.
+    \item En el marco anterior explicar el ASV. Capaz antes hace falta hablar de redes causales para poder definirlo bien.
+    \item Hablar de redes bayesianas como formas de modelar distribuciones. Comentar con cuidado la relación entre redes causales y bayesianas.
+    \item Acá deberíamos nombrar todas las familias restringidas de redes bayesianas que consideramos.
+\end{enumerate}
+
+\section{Theoretical results}
+
+\begin{enumerate}
+    \item Resultado de que ASV se puede calcular en algunos casos donde el otro no se podía (el caso se la naiva bayes digo). Creo que no hay apendice, asi que diria de, en principio, poner todas 
+    las demos en el main text. Tienen que estar prolijas.
+    \item Idea de las clases de equivalencia. Definición y relación con la cantidad de órdenes topológicos.
+    \item Descripción general del algoritmo basado en clases de equivalencias para cómputo exacto.
+    \item Instanciar este algoritmo en el caso de árboles y dar la complejidad.
+    \item Introducir la opción de samplear para aproximar el ASV, tanto clases de equivalencia como ordenes topológicos.
+    \item Dar dos resultados generales diciendo "Si podes samplear clases / ordenes en X tiempo y calcular promedios en Y, la complejidad es f(XY)".
+    \item Instanciar este resultado en casos particulares. Hablar de los algoritmos para promedios de arboles. Capaz el resultado de imposibilidad.
+    \item Dar el resultado basado en sampleo de ordenes topologicos en general.
+\end{enumerate}
+
+\section{Experimental results}
+
+\begin{enumerate}
+    \item Comparación entre clases de equivalencia y ordenes topologicos.
+    \item Algun resultado de performance sobre algoritmos de clases de equivalencias. 
+    \item Si podemos, estaria bueno implementar el otro algoritmo basado en sampleo de ordenes topologicos.
+    \item No me parece necesario contar la performance de los algoritmos que calculan promedios, aunque si hay lugar podemos.
+    \item Si hay lugar tambien podriamos hacer una comparacion de shapley y ASV (no me queda claro si hay o no pq son 14 paginas pero el formato es una verga)
+\end{enumerate}
+
+\section{Conclusions}
 
 \section{First Section}
 \subsection{A Subsection Sample}
