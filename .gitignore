@@ -1,0 +1,23 @@
+# LaTeX build files
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.toc
+*.synctex.gz
+
+# Optional common LaTeX artifacts
+*.fls
+*.fdb_latexmk
+*.nav
+*.snm
+*.vrb
+*.lof
+*.lot
+*.xdv
+*.dvi
+*.ps
+
+# If you don't want to track compiled PDFs
+*.pdf

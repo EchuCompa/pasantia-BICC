@@ -1,7 +1,3 @@
-% This is samplepaper.tex, a sample chapter demonstrating the
-% LLNCS macro package for Springer Computer Science proceedings;
-% Version 2.21 of 2022/01/12
-%
 \documentclass{llncs}
 %
 \usepackage[T1]{fontenc}
@@ -19,9 +15,56 @@
 %\renewcommand\UrlFont{\color{blue}\rmfamily}
 %\urlstyle{rm}
 %
+\usepackage[spanish, es-noshorthands]{babel}
+\addto\captionsspanish{\renewcommand{\tablename}{Tabla}} %Para que diga Tabla en vez de Cuadro
+\usepackage{dsfont, amsmath}
+
+\usepackage{caption}
+\usepackage{subcaption}  % Para tener captions dentro de las subfiguras
+\captionsetup{font=small}%para que las captions de las figuras sean más chicas
+
+\usepackage{amssymb}
+\usepackage{booktabs} % For better table formatting
+\usepackage{graphicx} % Required for inserting images
+\usepackage[colorlinks=true, urlcolor=blue, linkcolor=blue, citecolor=green]{hyperref}
+%linkColor = citas internas cómo ref
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{decorations.pathmorphing}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{pgf} % For arithmetic operations in TikZ
+\usepackage{comment}
+\usepackage{booktabs}
+\usepackage{url} %For writing paths
+\usepackage[normalem]{ulem}
+\usepackage{multirow}
+\newcommand{\scc}[1]{{\color{red}#1}}
+
 
 \usepackage[style=apa]{biblatex} % <- AGREGAR ESTA LÍNEA
-\addbibresource{thebiblio.bib} % <- AGREGAR ESTA LÍNEA
+\addbibresource{biblio.bib} % <- AGREGAR ESTA LÍNEA
+
+\input{secciones/macros}
+
+\tikzset{
+	nodo/.style={
+		shape=circle,
+		draw=black,
+		line width=1pt,   
+		minimum size=7mm
+	},
+	arista/.style={
+		line width=1pt,  
+		-{Latex[length=3mm]}  
+	},  
+	mySnake/.style={
+		decorate, 
+		decoration={snake, amplitude=.4mm, segment length=4mm, post length=1mm}
+	}
+}
+
+
 \begin{document}
 %
 % ENGLISH VERSION
@@ -70,13 +113,17 @@ the methodology used, and the main findings obtained.
 \end{center}
 
 \begin{abstract}
-El resumen debe resumir brevemente el contenido del artículo en
-150-250 palabras. Esta es la versión en español del resumen que
-proporciona una visión general completa de la investigación realizada,
-la metodología utilizada y los principales hallazgos obtenidos.
+\noindent En este artículo se aborda el problema de la explicabilidad en modelos de aprendizaje automático mediante métodos de feature attribution.
 
-% palabras clave en minúsculas
-\keywords{primera palabra clave\and segunda palabra clave\and otra palabra clave}
+En particular, se estudia una variante de los Shapley values conocida como Asymmetric Shapley Values (ASV), que permite incorporar conocimiento causal en la explicación de modelos de forma model-agnostic. A partir del análisis de su complejidad, se demuestra que el cálculo exacto de ASV es polinomial en modelos cuya distribución de entrada está representada por una red bayesiana del tipo Naive Bayes, en contraste con SHAP, que es \#P-hard aún en este caso restringido.
+
+Con el objetivo de extender estos resultados a clases más generales de redes bayesianas, se introduce una noción de clases de equivalencia sobre los órdenes topológicos del grafo causal subyacente, lo cual permite reducir drásticamente el número de permutaciones necesarias para computar ASV. Se presenta un algoritmo polinomial en el número de clases para identificarlas, y se implementa un esquema de cómputo exacto de ASV basado en estas clases. Además, se propone un nuevo método para computar en tiempo polinomial la predicción esperada de un árbol de decisión, sobre una distribución dada por una red bayesiana arbitraria, permitiendo así evaluar el algoritmo desarrollado para el cómputo de ASV en estos modelos. 
+
+Por último, se propone un algoritmo aproximado para calcular el ASV en familias de DAG's causales del tipo polytree. Para ello, se desarrolla un algoritmo de muestreo aleatorio de órdenes topológicos de polytrees. Estos resultados respaldan la viabilidad del enfoque propuesto en estructuras causales realistas, y se contrastan empíricamente con SHAP tanto en precisión como en eficiencia computacional.
+\bigskip
+
+
+\keywords{ explicabilidad, árboles de decisión, Asymmetric Shapley Values (ASV), Shap, polytrees, ordenes topológicos}
 \end{abstract}
 
 
@@ -91,6 +138,8 @@ la metodología utilizada y los principales hallazgos obtenidos.
 \end{itemize}
 
 \section{Introduction}
+
+\input{secciones/1_introduction}
 
 \begin{enumerate}
     \item Qué es la explicabilidad y por qué importa?
@@ -179,7 +228,7 @@ schemas. Whenever possible, use vector graphics instead (see
 Fig.~\ref{fig1}).
 
 \begin{figure}
-\includegraphics[width=\textwidth]{fig1.eps}
+\includegraphics[width=\textwidth]{img/cancerDecisionTree.png}
 \caption{A figure caption is always placed below the illustration.
 Please note that short captions are centered, while long ones are
 justified by the macro package automatically.} \label{fig1}
@@ -224,7 +273,6 @@ Company X and owns stock in Company Y. Author C is a member of committee Z.
 %
 % ---- Bibliography ----
 %
-
 \printbibliography
 
 \end{document}

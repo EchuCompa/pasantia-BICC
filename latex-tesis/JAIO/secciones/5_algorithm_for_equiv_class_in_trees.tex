@@ -114,64 +114,8 @@ Para la fórmula a continuación, dado un nodo $n \in V$ notamos como $n_i$ al $
 %\santi{Me parece que la mejor forma de escribir esto sería simplemente contar la relación recursiva de los conjuntos y listo, mandamos al apéndice esta función. Tratemos de escribirlo bien la próxima reunión. También, tratemos de elegir mejores nombres, $UnrEC$ es muy largo.}
 La función \textit{union} nos sirve para combinar las distintas clases de equivalencia de cada subárbol para una explicación más detallada de la misma, pueden ir al apéndice a la sección \ref{subsubSection:auxiliaryFormulasUnrelatedTrees}. Para tener una intuición respecto a la correctitud de la función, se puede observar que hay una correspondencia directa entre las clases de equivalencia de un nodo y las de sus hijos. Dado un nodo $n$, cada clase de equivalencia que lo incluye puede descomponerse de manera única en una combinación de clases de equivalencia de sus hijos. Análogamente, si conocemos todas las clases de equivalencia posibles de los hijos de $n$, podemos combinarlas para reconstruir todas las clases de equivalencia de $n$. Esta biyección es la que permite realizar el proceso recursivo definido en la ecuación \ref{formula:unrelated_equiv_classes}.
 
-Por fuera de la unión, tenemos una clase de equivalencia más, la cual tiene al nodo $n$ a la derecha de $x_i$. Utilizamos $right$ pues es la única unión de clases de equivalencia en la cual todos sus nodos aparecen después de $x_i$, y si $n$ está a la derecha, entonces todos sus descendientes deben estar a la derecha también. Observar que $right$ pertenece al mismo producto cartesiano generado en la unión. %\santi{No se a que se refiera la última oración, la sacaría.} Rta: Se explico en persona
-%\echu{Falta esto: "Agregar un parrafito explicando que hay una biyección entre cómo podes -> a través de una clase del padre inferir la de los hijos y cómo a través de las de los hijos podes mezclarlas y obtener la de los padres. " pero no sabría donde meterlo}
-%Así se define $right$: \\  $right \in \unrEqCl(n_1) \times \dots \times \unrEqCl(n_{|n|}), \forall (repEC, \_ , \_) \in right, L(repEC) = 0$ \\ Lo saco y no lo pongo porque no tiene mucho sentido
-%\santi{Ok, hoy lo escribimos. Quedó medio suelto el $right$, no se cual es tu objetivo.} Lo flete, no pega mucho con la onda de la sección
+Por fuera de la unión, tenemos una clase de equivalencia más, la cual tiene al nodo $n$ a la derecha de $x_i$. Utilizamos $right$ pues es la única unión de clases de equivalencia en la cual todos sus nodos aparecen después de $x_i$, y si $n$ está a la derecha, entonces todos sus descendientes deben estar a la derecha también. Observar que $right$ pertenece al mismo producto cartesiano generado en la unión. 
 
-\paragraph{Optimizaciones}\label{slight_improvement}
-
-Más adelante en este algoritmo vamos a tener que combinar cada uno de nuestros árboles no relacionados con los ancestros. Esa parte del proceso es la más costosa en tiempo. Por lo tanto, nuestro objetivo es terminar con la menor cantidad de subárboles para combinar. En base a esta idea, encontramos esta optimización. Imaginemos que tenemos los resultados para $\unrEqCl(ur_1)$ y $\unrEqCl(ur_2)$. Si $ur_1$ y $ur_2$ tienen el mismo padre o ambos son raíces, entonces los vamos a unificar. El procedimiento es análogo a agregar un nodo virtual $v$ en la Figura \ref{fig:ASV_forest_example}, que es el padre de $u_5$ y $u_6$, y luego ejecutamos $\unrEqCl$ desde este nodo, utilizando únicamente a $\union$ (ya que este nodo no existe y nunca podría estar a la derecha de $x_i$). De esta forma solo vamos a tener como máximo un árbol no relacionado por cada ancestro de $x_i$. Otra forma más visual de interpretar esta optimización es que en vez de correr nuestro algoritmo sobre cada $ur$, lo vamos a ejecutar sobre cada ancestro $a$. Teniendo el cuidado de no recorrer el eje que conecta al ancestro $a$ a $x_i$.
-%\santi{No entendí cuál es la optimización expliacada acá.} 
-%\echu{¿Ahora se entiende más la idea?}
-%\santi{Si. Pero, ¿No es equivalente decir que se ejecuta el algoritmo desde cada ancestro? Teniendo el cuidado de no recorrer, al ejecutarlo sobre un cierto ancestro $a$, el eje que lo acerca a $x_i$ (o sea, el eje que va a otro ancestro). }
-
-\begin{comment}
-    Al pedo esta figura, igual que la anterior
-    
-\begin{figure}[H]
-    \centering
-    \begin{tikzpicture}[scale=.65, transform shape, 
-    unrelated/.style={circle, draw=red},
-    ancestor/.style={circle, draw=blue},
-    wiggly/.style={decorate, decoration={snake, amplitude=.2mm, segment length=2mm}}  % Define wiggly line style
-    ]
-
-        \node[ancestor] (a1) at (0, 0) {$a_1$};
-        \node[unrelated] (u1) at (-1, -2) {$u_1$};
-        \node[ancestor] (a2) at (1, -2) {$a_2$};
-
-        \drawUnrelatedTree{u2}{-1}{-4}{$u_2$}
-        \node[unrelated] (u3) at (3, -4) {$u_3$};
-
-        \drawUnrelatedTree{u4}{0}{-7}{$u_4$}
-        \node[ancestor] (a4) at (3, -6) {$a_3$};
-
-        \node[nodo] (xi) at (3, -8) {$x_i$};
-
-        \drawUnrelatedTree{r1}{6}{0}{$u_5$} 
-        \drawUnrelatedTree{r2}{10}{0}{$u_6$} 
-        
-        \node[draw=none, fill=none] (hi) at (3, -10) {};
-
-
-         \path [->] (a1) edge[arista]  (u1);
-         \path [->] (a1) edge[arista]  (a2);
-
-         \path [->] (a2) edge[arista]  (u2);
-         \path [->] (a2) edge[arista]  (u3);
-
-         \path [->] (a2) edge[arista]  (u4);
-         \path [->] (a2) edge[arista]  (a4);
-
-         \path [->] (a4) edge[arista]  (xi);      
-         \path [->, teal] (xi) edge[arista,  decorate, decoration={snake, amplitude=.4mm, segment length=4mm, post length=1mm}] node[right] {descendants of $x_i$} (hi);
-    \end{tikzpicture}
-    \caption{En este caso, los nodos que unificaríamos con esta optimización son $u5$ y $u6$ pues ambos son raíces, y $u2$ y $u4$ pues comparten un padre.}
-    \label{fig:equivClass_optimization_example}
-\end{figure}
-
-\end{comment}
 
 \subsubsection{Fusión de clases de unrelated trees con ancestros y descendientes}
 
