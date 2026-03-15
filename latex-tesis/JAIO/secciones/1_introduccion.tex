@@ -1,0 +1,44 @@
+En los últimos años, las capacidades de los modelos de inteligencia artificial han crecido de forma acelerada, al igual que la complejidad de sus arquitecturas. Este avance permitió resolver tareas que antes parecían inalcanzables, como la resolución de problemas matemáticos complejos por parte de modelos de lenguaje \cite{frontierMath}. Al mismo tiempo, los modelos actuales han alcanzado escalas muy superiores a las de hace algunos años, tanto en cantidad de parámetros como en complejidad estructural \cite{EpochLargeScaleModels2024}. Esta falta de transparencia es especialmente problemática en contextos sensibles, como diagnósticos médicos o decisiones de alto impacto, donde no alcanza con obtener una predicción correcta: también es fundamental comprender cómo fue alcanzada. En este contexto surge el área de \textit{Explainable Artificial Intelligence} (XAI), cuyo objetivo es desarrollar métodos que permitan explicar las decisiones de los modelos.
+
+Dentro del área de explicabilidad, uno de los enfoques más influyentes es el de \textit{feature attribution}, donde se asigna a cada variable de entrada un puntaje que refleja cuánto contribuyó a una predicción. En esta línea, \textit{SHAP} es uno de los métodos más conocidos \cite{shapOriginalPaper}. Está basado en los \textit{Shapley values}, un concepto originado en teoría de juegos cooperativos \cite{shapley1953value}. Intuitivamente, los Shapley values permiten repartir de manera justa el valor total obtenido por una coalición entre sus participantes, según cuánto aporta cada uno en promedio al incorporarse. Trasladado al aprendizaje automático, las features juegan el rol de los jugadores, y el valor asignado a cada una busca cuantificar cuánto contribuye a la predicción del modelo para una instancia particular.
+
+A pesar de su popularidad, SHAP presenta limitaciones importantes. Por un lado, su cálculo exacto suele ser costoso, ya que requiere considerar una cantidad exponencial de subconjuntos o permutaciones de features. De hecho, existen resultados que muestran que calcular SHAP resulta intratable incluso para modelos o distribuciones relativamente simples \cite{arenas2021tractability, van2022tractability, arenas2023complexity, marzouk2025computationaltractabilitymanyshapley}. Por otro lado, también existen cuestionamientos sobre la calidad de las explicaciones que produce. En particular, no siempre resulta claro cómo interpretar en inteligencia artificial los axiomas heredados de la teoría de juegos, y varios trabajos señalan que estas explicaciones pueden fallar en reflejar adecuadamente relaciones de dependencia, relevancia o causalidad entre las variables \cite{fryer2021shapley, marques2023logic, huang2023inadequacy}. Más en general, tampoco existe un consenso absoluto sobre qué debe considerarse una ``explicación'' en IA: muchas de las técnicas actuales son aproximaciones pragmáticas a un problema mucho más amplio, relacionado con comprensión, causalidad e interpretación humana \cite{MILLER20191, lipton2017mythosmodelinterpretability}.
+
+Una propuesta para superar algunas de estas limitaciones son los \textit{Asymmetric Shapley Values} (ASV), introducidos por Frye et al. \cite{frye2019asymmetric}. Esta variante incorpora información causal al cálculo de los puntajes, restringiendo la atención a aquellas permutaciones de variables que respetan un grafo causal. De este modo, en lugar de tratar a todas las features simétricamente, se priorizan aquellas que aparecen causalmente antes que otras. Esto puede producir explicaciones más fieles al proceso generador de los datos y ayudar a detectar mejor fenómenos como sesgos o discriminación. Además, aunque ASV fue propuesto principalmente para mejorar la calidad explicativa, surge naturalmente la pregunta de si esta restricción adicional también puede traer beneficios desde el punto de vista computacional.
+
+En esta tesis estudiamos el problema de calcular ASV cuando la distribución de los datos está representada por una red bayesiana. En particular, analizamos tanto el cómputo exacto como aproximado de ASV, considerando a la red bayesiana también como grafo causal subyacente. Mostramos que, en el caso de distribuciones Naive Bayes, ASV puede calcularse en tiempo polinomial en escenarios donde SHAP resulta intratable \cite{van2022tractability}. A partir de este resultado, nos enfocamos en árboles de decisión y en el desarrollo de algoritmos para calcular eficientemente predicciones promedio y explicaciones causales en estructuras más generales.
+
+\echu{Esto se puede cambiar todavía, la verdad no tenemos muy clara cómo va a ser la estructura así que lo dejo cómo placeholder.}
+El resto del trabajo se organiza de la siguiente manera. En la Sección~2 introducimos las definiciones formales necesarias sobre SHAP, ASV, clasificadores y distribuciones probabilísticas. En la Sección~3 presentamos los principales resultados teóricos y de complejidad, junto con los algoritmos desarrollados. Luego, en la Sección~4 mostramos resultados experimentales que ilustran y validan el enfoque propuesto. Finalmente, en la Sección~5 discutimos las conclusiones y posibles líneas de trabajo futuro.
+
+\subsection{Explicaciones basadas en causalidad: un ejemplo con la red Cancer} \label{asvCaseExample}
+
+Para ilustrar cómo la información causal puede afectar las explicaciones de un modelo, consideramos la red bayesiana \cancerNetwork{}, mostrada en la Figura~\ref{fig:cancer_network_example}. En esta red, las variables \variableNetwork{Pollution} y \variableNetwork{Smoker} influyen sobre \variableNetwork{Cancer}, mientras que \variableNetwork{Xray} y \variableNetwork{Dyspnoea} son consecuencias de esta última.
+
+\begin{figure}[ht]
+	\centering
+	
+	\begin{subfigure}[b]{0.35\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{img/bayesianNetworks/cancerNetwork.png}
+		\caption{Red bayesiana \cancerNetwork{}.}
+		\label{fig:cancer_network_example}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.6\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{img/asvResults/cancerASVAndShapleyExactASVAndShapley.png}
+		\caption{Comparación entre SHAP y ASV.}
+		\label{fig:cancer_asv_shap_comparison}
+	\end{subfigure}
+	
+	\caption{Ejemplo en la red \cancerNetwork{}. SHAP puede asignar relevancia a variables que son consecuencias de otras (como \variableNetwork{Xray} o \variableNetwork{Dyspnoea}), mientras que ASV prioriza variables causalmente más cercanas al fenómeno.}
+	\label{fig:cancer_example_combined}
+	
+\end{figure}
+
+A partir de datos sampleados de esta red entrenamos un árbol de decisión para predecir la variable \variableNetwork{Smoker}. En este contexto podemos comparar dos formas de explicar una predicción: los valores de SHAP, que consideran todas las permutaciones posibles de features, y los Asymmetric Shapley Values (ASV), que restringen el cálculo a órdenes topológicos compatibles con la estructura causal del grafo.
+
+La Figura~\ref{fig:cancer_asv_shap_comparison} muestra un ejemplo de esta comparación. Se observa que SHAP asigna relevancia considerable a variables como \variableNetwork{Xray} y \variableNetwork{Dyspnoea}, que en la red son consecuencias de \variableNetwork{Cancer}. Esto ocurre porque dichas variables pueden estar fuertemente correlacionadas con la predicción, aun cuando no sean causas directas del fenómeno. En cambio, ASV tiende a priorizar variables más cercanas a las causas del proceso generador de los datos, reduciendo la importancia de variables descendientes.
+
+Este ejemplo ilustra cómo incorporar información causal puede producir explicaciones más alineadas con la estructura del problema. En redes donde se conoce (o se asume) una relación causal entre las variables, los ASVs permiten distinguir mejor entre variables que originan información relevante para la predicción y variables que simplemente reflejan efectos de otras.

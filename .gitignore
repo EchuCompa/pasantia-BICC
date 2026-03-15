@@ -18,6 +18,5 @@
 *.xdv
 *.dvi
 *.ps
-
-# If you don't want to track compiled PDFs
-*.pdf
+*.bcf
+*.xml
