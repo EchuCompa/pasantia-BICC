@@ -39,6 +39,7 @@
 \usepackage{url} %For writing paths
 \usepackage[normalem]{ulem}
 \usepackage{multirow}
+\usepackage{placeins} % For removing strange spaces
 \newcommand{\scc}[1]{{\color{red}#1}}
 
 
@@ -64,6 +65,7 @@
 	}
 }
 
+\raggedbottom % This so that not all pages have the same height. 
 
 \begin{document}
 %
@@ -130,13 +132,6 @@ Por último, se propone un algoritmo aproximado para calcular el ASV en familias
 \vspace{0.5cm}
 \setcounter{page}{1}
 
-%
-\section*{TODO}
-
-\begin{itemize}
-    \item Escribir todo xD
-\end{itemize}
-
 \section{Introducción}
 
 \input{secciones/1_introduccion}
@@ -145,7 +140,9 @@ Por último, se propone un algoritmo aproximado para calcular el ASV en familias
 
 \input{secciones/2_definiciones}
 
-\section{Theoretical results}
+\section{Resultados teóricos}
+
+\input{secciones/3_resultados_teoricos}
 
 \begin{enumerate}
     \item Resultado de que ASV se puede calcular en algunos casos donde el otro no se podía (el caso se la naiva bayes digo). Creo que no hay apendice, asi que diria de, en principio, poner todas 
@@ -203,25 +200,6 @@ Title (centered) &  {\Large\bfseries Lecture Notes} & 14 point, bold\\
 \end{tabular}
 \end{table}
 
-
-\noindent Displayed equations are centered and set on a separate
-line.
-\begin{equation}
-x + y = z
-\end{equation}
-Please try to avoid rasterized images for line-art diagrams and
-schemas. Whenever possible, use vector graphics instead (see
-Fig.~\ref{fig1}).
-
-\begin{theorem}
-This is a sample theorem. The run-in heading is set in bold, while
-the following text appears in italics. Definitions, lemmas,
-propositions, and corollaries are styled the same way.
-\end{theorem}
-%
-% the environments 'definition', 'lemma', 'proposition', 'corollary',
-% 'remark', and 'example' are defined in the LLNCS documentclass as well.
-%
 \begin{proof}
 Proofs, examples, and remarks have the initial word in italics,
 while the following text appears in normal font.

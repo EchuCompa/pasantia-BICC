@@ -1,29 +1,18 @@
-En esta sección introducimos las nociones formales que utilizaremos a lo largo del trabajo. Primero definimos los \textit{Shapley values} y su instanciación al problema de \textit{feature attribution}. Luego presentamos los \textit{Asymmetric Shapley Values} (ASV), que incorporan información estructural mediante un grafo causal. Finalmente, introducimos las redes bayesianas como modelo para la distribución de los datos y describimos las familias restringidas de redes que consideraremos en nuestros resultados.
+En esta sección introducimos las nociones formales que utilizaremos a lo largo del trabajo. Primero definimos los \textit{Shapley values} y su instanciación al problema de \textit{feature attribution}. Luego presentamos los \textit{Asymmetric Shapley Values} (ASV), que incorporan relaciones entre las variables a la atribución mediante un grafo causal. Finalmente, introducimos las redes bayesianas como modelo para la distribución de los datos y describimos las familias restringidas de redes que consideraremos en nuestros resultados.
 
 \subsection{Shapley values y feature attribution}
 
 Trabajaremos con clasificadores binarios y features binarias. Esta restricción simplifica la notación sin afectar las ideas centrales ni los algoritmos desarrollados, que pueden extenderse naturalmente a dominios finitos más generales.
 
-Sea $X$ un conjunto finito de features. Una \emph{entidad} sobre $X$ es una función
-\[
-e:X\to\{0,1\},
-\]
-donde $e(x)$ representa el valor que la entidad $e$ toma en el feature $x$. Denotamos por $\entities(X)$ al conjunto de todas las entidades posibles sobre $X$, y asumimos dada una distribución de probabilidad $\Pr$ sobre $\entities(X)$. Un \emph{clasificador binario} es una función
-\[
-M:\entities(X)\to\{0,1\}.
-\]
+Sea $X$ un conjunto finito de features. Una \emph{entidad} sobre $X$ es una función $e:X\to\{0,1\},$ donde $e(x)$ representa el valor que la entidad $e$ toma en el feature $x$. Denotamos por $\entities(X)$ al conjunto de todas las entidades posibles sobre $X$, y asumimos dada una distribución de probabilidad $\Pr$ sobre $\entities(X)$. Un \emph{clasificador binario} es una función $M:\entities(X)\to\{0,1\}.$
 
-Dado un modelo $M$ y una entidad $e$, un \emph{feature attribution score} es una función
-\[
-\phi:X\to\mathbb{R},
-\]
-donde $\phi(x)$ mide la relevancia del feature $x$ respecto de la predicción $M(e)$.
+Dado un modelo $M$ y una entidad $e$, un \emph{feature attribution score} es una función $\phi:X\to\mathbb{R},$ donde $\phi(x)$ mide la relevancia del feature $x$ respecto de la predicción $M(e)$.
 
-Uno de los métodos de atribución más estudiados es \SHAPscore{} \cite{shapOriginalPaper}, basado en los \emph{Shapley values} \cite{shapley1953value}. En teoría de juegos cooperativos, los Shapley values describen cómo repartir el valor total obtenido por una coalición entre sus jugadores. Más precisamente, dado un conjunto finito de jugadores $\players$, una \emph{función característica} es una función
+Uno de los métodos de atribución más estudiados es el \SHAPscore{} \cite{shapOriginalPaper}, basado en los \emph{Shapley values} \cite{shapley1953value}. En teoría de juegos cooperativos, los Shapley values describen cómo repartir el valor total obtenido por una coalición entre sus jugadores. Más precisamente, dado un conjunto finito de jugadores $\players$, una \emph{función característica} es una función
 \[
 \charactheristicFunction:\mathcal{P}(\players)\to\mathbb{R}
 \]
-que asigna un valor a cada coalición. Los Shapley values son la única asignación de pagos que satisface simultáneamente un conjunto de axiomas clásicos: \emph{eficiencia}, \emph{simetría}, \emph{jugador nulo} y \emph{linealidad}. Una forma cerrada de definirlos es la siguiente.
+que asigna un valor a cada coalición. Los Shapley values son la única asignación que satisface simultáneamente un conjunto de axiomas clásicos: \emph{eficiencia}, \emph{simetría}, \emph{jugador nulo} y \emph{linealidad}. Una forma cerrada de definirlos es la siguiente.
 
 \begin{definition}[Shapley values]
 	Sea $\players$ un conjunto finito y sea $\charactheristicFunction:\mathcal{P}(\players)\to\mathbb{R}$ una función característica. Para cada jugador $i\in \players$, su valor de Shapley se define como
@@ -102,13 +91,13 @@ Esto nos permite instanciar directamente los Shapley values en el problema de \t
 	\]
 \end{definition}
 
-Nótese que los axiomas que estos valores satisfacen no tienen un significado claro en el contexto de la inteligencia artificial, ya que dependen de la definición de \(\charFunML_{M,e,\Pr}\) \cite{fryer2021shapley}. Además, para algunas nociones simples y robustas de \textit{feature attribution} basadas en \textit{explicaciones abductivas} \cite{marques2023logic}, los Shapley values no logran asignar un puntaje de 0 a features irrelevantes \cite{huang2023inadequacy}. Aun así, constituyen uno de los marcos más influyentes para estudiar explicaciones locales basadas en atribución.
+Nótese que los axiomas que estos valores satisfacen no tienen un significado claro en el contexto de la inteligencia artificial, ya que dependen de la definición de \(\charFunML_{M,e,\Pr}\) \cite{fryer2021shapley}. Además, para algunas nociones simples y robustas de \textit{feature attribution} basadas en \textit{explicaciones abductivas} , los Shapley values no logran asignar un puntaje de 0 a features irrelevantes \cite{huang2023inadequacy, marques2023logic}. Aun así, constituyen uno de los marcos más influyentes para estudiar explicaciones locales basadas en atribución.
 
 \subsection{Asymmetric Shapley Values y grafos causales}
 
-La definición anterior trata a todas las permutaciones de features de manera uniforme. Sin embargo, en muchos problemas existe información estructural adicional que sugiere que no todos los órdenes son igualmente razonables. En particular, si se dispone de un grafo causal sobre las variables, resulta natural restringir la atención a aquellas permutaciones compatibles con dicha estructura.
+La definición anterior trata a todas las permutaciones de features de manera uniforme. Sin embargo, si se dispone de un grafo causal sobre las variables, resulta natural restringir la atención a aquellas permutaciones compatibles con dicha estructura.
 
-La generalización más simple consiste en reemplazar el promedio uniforme por una función de pesos arbitraria sobre permutaciones.
+La generalización más simple consiste en reemplazar el promedio uniforme por una función de pesos arbitraria sobre las permutaciones.
 
 \begin{definition}[Shapley values ponderados]
 	Sea $w:\perm(\players)\to\mathbb{R}$ una función tal que $\sum_{\pi\in\perm(\players)} w(\pi)=1$. Definimos
@@ -149,21 +138,15 @@ La familia de \emph{Asymmetric Shapley Values} propuesta en \cite{frye2019asymme
 	\]
 \end{definition}
 
-La intuición detrás de esta definición es que sólo se consideran órdenes que respetan la causalidad. De este modo, si una variable $x$ es causa de una variable $y$, entonces $x$ siempre aparece antes que $y$ en las permutaciones admitidas. Esto tiende a favorecer a las variables causalmente anteriores y a reducir la importancia de variables que son meramente consecuencias de otras. En consecuencia, ASV constituye una variante de SHAP diseñada para capturar asimetrías estructurales entre las features.
+La intuición detrás de esta definición es que sólo se consideran órdenes que respetan la causalidad. De este modo, si una variable $x$ es causa de una variable $y$, entonces $x$ siempre aparece antes que $y$ en las permutaciones admitidas. Esto tiende a favorecer a las variables causalmente anteriores y a reducir la importancia de variables que son meramente consecuencias de otras.
 
 \subsection{Redes bayesianas como modelo de distribución}
 
-Para evaluar las cantidades definidas arriba no alcanza con fijar un modelo predictivo: también es necesario especificar una distribución sobre el espacio de entidades. En este trabajo utilizamos redes bayesianas para representar dicha distribución.
+Para evaluar los ASV no alcanza con fijar un modelo predictivo: también es necesario especificar una distribución sobre el espacio de entidades. En este trabajo utilizamos redes bayesianas para representar dicha distribución.
 
 \begin{definition}[Red bayesiana]
 	Una Red Bayesiana $\aBayesianNetwork$ sobre un conjunto de variables $X$ es una tupla
-	\[
-	\aBayesianNetwork=(X,E,\Pr),
-	\]
-	donde $(X,E)$ es un DAG y, para cada variable $x\in X$, se especifica una distribución condicional
-	\[
-	\Pr(x\mid \parents(x)).
-	\]
+	$\aBayesianNetwork=(X,E,\Pr)$, donde $(X,E)$ es un DAG y, para cada variable $x\in X$, se especifica una distribución condicional $\Pr(x\mid \parents(x)).$
 	Estas distribuciones se representan mediante tablas de probabilidad condicional (\emph{Conditional Probability Tables}, CPTs).
 \end{definition}
 
@@ -173,18 +156,15 @@ La propiedad central de una red bayesiana es que factoriza la distribución conj
 \]
 Esta factorización permite realizar inferencia probabilística de forma mucho más eficiente que manipulando directamente la distribución conjunta.
 
-Conviene distinguir con cuidado entre \emph{red causal} y \emph{red bayesiana}. Una red bayesiana modela dependencias condicionales y define una distribución conjunta; un grafo causal, en cambio, pretende reflejar relaciones de causa y efecto entre variables. En general, ambas nociones no coinciden necesariamente. Sin embargo, en este trabajo asumiremos que el DAG subyacente a la red bayesiana puede utilizarse también como grafo causal para definir ASV. Esta decisión responde a dos motivos: por un lado, es consistente con el tipo de datos y experimentos que analizamos; por otro, nos permite estudiar simultáneamente el costo de la inferencia probabilística y el efecto de imponer restricciones causales en el cálculo de explicaciones.
+Conviene distinguir con cuidado entre \emph{red causal} y \emph{red bayesiana}. Una red bayesiana modela dependencias condicionales y define una distribución conjunta; un grafo causal, en cambio, pretende reflejar relaciones de causa y efecto entre variables. En general, ambas nociones no coinciden necesariamente. Sin embargo, en este trabajo asumiremos que el DAG subyacente a la red bayesiana puede utilizarse también como grafo causal para caclular los ASV. Esta decisión responde a dos motivos: por un lado, es consistente con el tipo de datos y experimentos que analizamos; por otro, nos permite estudiar simultáneamente el costo de la inferencia probabilística y el efecto de imponer restricciones causales en el cálculo de explicaciones.
 
 Más precisamente, dado un modelo $M$, una entidad $e$ y una red bayesiana $\aBayesianNetwork$ sobre las features, utilizaremos la distribución inducida por $\aBayesianNetwork$ para calcular la función característica $\charFunML_{M,e,\Pr}$, y el DAG de $\aBayesianNetwork$ como estructura causal para definir $\assym_{M,e,\Pr}$.
 
 \subsection{Familias restringidas de redes bayesianas}
 
-La complejidad de la inferencia en redes bayesianas depende fuertemente de la estructura del grafo subyacente. En redes generales, calcular probabilidades marginales o condicionadas es un problema $\sharpPhard$, mientras que para ciertas familias restringidas la inferencia puede realizarse en tiempo polinomial. Por esta razón, nuestros resultados se concentran en clases estructurales bien delimitadas.
+La complejidad de la inferencia en redes bayesianas depende fuertemente de la estructura del grafo subyacente. En redes generales, calcular probabilidades marginales o condicionadas es un problema $\sharpPhard$, mientras que para ciertas familias restringidas la inferencia es tratable. Por esta razón nos centramos en grafos para los cuáles la inferencia puede realizarse en tiempo polinomial.
 
-La primera familia que consideramos es la de las redes \emph{Naive Bayes}. En este caso, existe una variable raíz $X_1$ tal que todas las demás variables son sus hijas, y no hay otras aristas. Es decir, el conjunto de aristas es
-\[
-E=\{(X_1,X_j):2\leq j\leq n\}.
-\]
+La primera familia que consideramos es la de las redes \emph{Naive Bayes}. En este caso, existe una variable raíz $X_1$ tal que todas las demás variables son sus hijas, y no hay otras aristas. Es decir, el conjunto de aristas es $ E=\{(X_1,X_j):2\leq j\leq n\}.$.
 La distribución conjunta factoriza entonces como
 \[
 \Pr[e]=\Pr[X_1=e(X_1)]\prod_{j=2}^n \Pr[X_j=e(X_j)\mid X_1=e(X_1)].
@@ -198,3 +178,5 @@ La segunda familia central en este trabajo es la de los \emph{polytrees}, es dec
 \echu{¿Se dice tratable o tractable?}
 
 En síntesis, a lo largo de esta tesis trabajaremos principalmente con dos tipos de restricciones estructurales sobre la distribución de los datos: redes Naive Bayes, que sirven como caso base para nuestros resultados de tractabilidad, y polytrees, que constituyen la clase más general sobre la que desarrollamos algoritmos eficientes para inferencia y cómputo de explicaciones.
+
+\echu{¿Este parrafo juega o este de más?}
