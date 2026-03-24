@@ -6,9 +6,11 @@ from asvFormula.topoSorts.utils import allForestTopoSorts
 from functools import lru_cache
 from asvFormula.topoSorts.randomTopoSortsGeneration import randomTopoSorts
 from asvFormula.classesSizes.naiveFormula import naiveEquivalenceClassesSizes
+import numpy.typing as npt
+from typing import Optional
 
 class ASV:
-    def __init__(self, bayesianNetwork : BayesianNetwork, model : DecisionTreeClassifier, featureDistributions : VariableElimination, valuesPerFeature : dict[str, list], featureToPredict : str, predictionFunction : str = 'Exact', instance : pd.Series = None):
+    def __init__(self, bayesianNetwork : BayesianNetwork, model : DecisionTreeClassifier, featureDistributions : VariableElimination, valuesPerFeature : dict[Node, list], featureToPredict : Node, predictionFunction : str = 'Exact', instance : Optional[pd.Series] = None):
         self.dag = bayesianNetworkToDigraph(bayesianNetwork)
         self.model = model
         self.featureDistributions = featureDistributions
@@ -22,11 +24,11 @@ class ASV:
         self.modelAsTree = obtainDecisionTreeDigraph(model, list(modelFeatures))
 
     #It returns the ASV value for each possible value of the feature for that specific instance. 
-    def asvForFeature(self, feature : str, instance : pd.Series, showProgress = False) -> list[float]: 
+    def asvForFeature(self, feature : Node, instance : pd.Series, showProgress = False) -> npt.NDArray[np.float64]:
         self.instance = instance
 
         equivalenceClasses = self.equivalenceClasses(feature)
-        asvValue = 0
+        asvValue = np.zeros(len(self.valuesPerFeature[feature]))
         totalTopologicalOrders = 0
         allTopologicalOrders = allForestTopoSorts(self.dag)
 
@@ -41,16 +43,16 @@ class ASV:
                                     self.meanPredictionForEquivalenceClass(fixedFeaturesWithFeature))
             if showProgress: print(f'Progress of classes processed: {i/len(equivalenceClass)}%')
 
-        self.asssertToposortsMatches(totalTopologicalOrders, allTopologicalOrders)
+        self.assertToposortsMatches(totalTopologicalOrders, allTopologicalOrders)
         return asvValue/totalTopologicalOrders 
 
-    def asssertToposortsMatches(self, totalTopologicalOrders, allTopologicalOrders):
+    def assertToposortsMatches(self, totalTopologicalOrders, allTopologicalOrders):
         assert totalTopologicalOrders == allTopologicalOrders, f"The total number of topological orders for the equivalence classes is {totalTopologicalOrders} and the total number of topological orders for the graph is {allTopologicalOrders}"
 
     def equivalenceClasses(self, feature):
         return equivalenceClassesFor(self.dag, feature)#This is the normalization for the ASV value
 
-    def meanPredictionForEquivalenceClass(self, fixedFeatures : List[str]) -> list[float]:
+    def meanPredictionForEquivalenceClass(self, fixedFeatures : List[Node]) -> npt.NDArray[np.float64]:
 
         return meanPredictionForDTinBNWithEvidence(self.modelAsTree, rootNode(self.modelAsTree), self.featureDistributions, PathCondition(self.valuesPerFeature), priorEvidenceFrom(self.instance, fixedFeatures), nodePrediction=self.predictionFunction)
     
@@ -123,7 +125,7 @@ class ASV:
     
     #TODO: Finish this so that I can compare the mean predictions of the two approaches. I need to adapt the old mean prediction output to the new one
 
-    def assertAllMeanPredictionsAreSimilar(self, instance : pd.Series) -> list[float]: 
+    def assertAllMeanPredictionsAreSimilar(self, instance : pd.Series) -> None: 
 
         features = [feature for feature in self.valuesPerFeature.keys() if feature in self.dag.nodes]
         for feature in features:
@@ -131,7 +133,7 @@ class ASV:
                 classFeaturesOrder = equivalenceClass[0]
                 self.assertMeanPredictionsAreSimilar(classFeaturesOrder, feature, instance, True)
 
-    def assertMeanPredictionsAreSimilar(self, classFeaturesOrder : List[str], feature : str, instance : pd.Series, featureFixed : bool):
+    def assertMeanPredictionsAreSimilar(self, classFeaturesOrder : List[Node], feature : Node, instance : pd.Series, featureFixed : bool):
         featureIndex = classFeaturesOrder.index(feature) + int(featureFixed)
         fixedFeatures = classFeaturesOrder[:featureIndex]
         variableFeatures = classFeaturesOrder[featureIndex:]
@@ -147,8 +149,8 @@ class ApproximateASV(ASV):
         self.numberOfToposorts = numTopologicalOrders
 
     def equivalenceClasses(self, feature):
-        topologoicalOrders = randomTopoSorts(self.dag, self.numberOfToposorts)
-        return naiveEquivalenceClassesSizes(topologoicalOrders, feature, TopoSortHasher(self.dag, feature)).values()
+        topologicalOrders = randomTopoSorts(self.dag, self.numberOfToposorts)
+        return naiveEquivalenceClassesSizes(topologicalOrders, feature, TopoSortHasher(self.dag, feature)).values()
     
     def asssertToposortsMatches(self, totalTopologicalOrders, allTopologicalOrders):
         assert totalTopologicalOrders == self.numberOfToposorts, f"The total number of topological orders for the equivalence classes is {totalTopologicalOrders} and the total number of topological orders generated for the graph is {self.numberOfToposorts}"

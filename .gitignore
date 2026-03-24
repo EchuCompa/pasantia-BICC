@@ -20,3 +20,7 @@
 *.ps
 *.bcf
 *.xml
+
+#Pycache files.
+
+*.pyc

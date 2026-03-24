@@ -12,6 +12,7 @@ from pathCondition import PathCondition
 import math
 from typing import Callable
 import os
+import numpy.typing as npt
 
 class DecisionTreeDigraph(nx.DiGraph):
 
@@ -82,7 +83,7 @@ def obtainDecisionTreeDigraph(decisionTree : tree.DecisionTreeClassifier, featur
             G.add_node(node_id, label=f"Pred: {prediction}") #Other option: {node_id}: {prediction}
     return G
 
-def drawDecisionTree(decisionTree: nx.DiGraph, filePath : str = None):
+def drawDecisionTree(decisionTree: nx.DiGraph, filePath : str = ""):
     num_nodes = len(decisionTree.nodes())
     dynamic_size = max(8, min(num_nodes * 0.5, 20))
 
@@ -125,21 +126,21 @@ def datasetFromBayesianNetwork(model : BayesianNetwork, n, seed : int):
     return samples[sorted(samples.columns)]
 
 #It returns the mean value for each possible value of the feature. 
-def meanPredictionForDTinBN(dtClassifer : DecisionTreeClassifier, bayesianNetwork : VariableElimination, valuesPerFeature : dict[str, list], variableToPredict : str, instance : pd.Series, fixedFeatures : list[str]) -> list[float]:
+def meanPredictionForDTinBN(dtClassifer : DecisionTreeClassifier, bayesianNetwork : VariableElimination, valuesPerFeature : dict[str, list], variableToPredict : str, instance : pd.Series, fixedFeatures : list[str]) -> npt.NDArray[np.float64]:
     assert variableToPredict in valuesPerFeature.keys(), "The variable to predict must be in the valuesPerFeature dictionary"
 
     dtAsNetwork = convertDecisionTreeToGraph(dtClassifer, valuesPerFeature, variableToPredict)
     
     return meanPredictionForDTinBNWithEvidence(dtAsNetwork, rootNode(dtAsNetwork), bayesianNetwork, PathCondition(valuesPerFeature), priorEvidence=priorEvidenceFrom(instance, fixedFeatures))
 
-def meanProbabilityPredictionForDTinBN(dtClassifer : DecisionTreeClassifier, bayesianNetwork : VariableElimination, valuesPerFeature : dict[str, list], variableToPredict : str, instance : pd.Series, fixedFeatures : list[str]) -> list[float]:
+def meanProbabilityPredictionForDTinBN(dtClassifer : DecisionTreeClassifier, bayesianNetwork : VariableElimination, valuesPerFeature : dict[str, list], variableToPredict : str, instance : pd.Series, fixedFeatures : list[str]) -> npt.NDArray[np.float64]:
     assert variableToPredict in valuesPerFeature.keys(), "The variable to predict must be in the valuesPerFeature dictionary"
 
     dtAsNetwork = convertDecisionTreeToGraph(dtClassifer, valuesPerFeature, variableToPredict)
     
     return meanPredictionForDTinBNWithEvidence(dtAsNetwork, rootNode(dtAsNetwork), bayesianNetwork, PathCondition(valuesPerFeature), priorEvidenceFrom(instance, fixedFeatures), lambda n, tree : tree.nodeProbabilityPrediction(n))
 
-def priorEvidenceFrom(instance, fixedFeatures):
+def priorEvidenceFrom(instance, fixedFeatures) -> dict[str, list]:
     return {featureEvidence : instance[featureEvidence] for featureEvidence in fixedFeatures}
 
 def convertDecisionTreeToGraph(dtClassifer, valuesPerFeature, variableToPredict):
@@ -148,7 +149,7 @@ def convertDecisionTreeToGraph(dtClassifer, valuesPerFeature, variableToPredict)
     dtAsNetwork = obtainDecisionTreeDigraph(dtClassifer, featureNames)
     return dtAsNetwork
 
-def meanPredictionForDTinBNWithEvidence(decisionTreeGraph : DecisionTreeDigraph, node, bayesianNetwork : VariableElimination, pathCondition : PathCondition, priorEvidence : dict[str, list] = {}, nodePrediction : Callable = lambda n, tree : tree.nodePrediction(n)) -> list[float]:
+def meanPredictionForDTinBNWithEvidence(decisionTreeGraph : DecisionTreeDigraph, node, bayesianNetwork : VariableElimination, pathCondition : PathCondition, priorEvidence : dict[str, list] = {}, nodePrediction : Callable = lambda n, tree : tree.nodePrediction(n)) -> npt.NDArray[np.float64]:
     
     if pathCondition.doesNotMatchEvidence(priorEvidence): #It would be more efficient to only do this check when you add the variable to the path condition, but it's more legible this way (and the perfomance loss is not significant)
         possibleOutputs = len(nodePrediction(node, decisionTreeGraph))
@@ -174,7 +175,7 @@ def meanPredictionForDTinBNWithEvidence(decisionTreeGraph : DecisionTreeDigraph,
 
     return leftMean + rightMean
 
-def leafNodePrediction(decisionTreeGraph, node, bayesianNetwork, pathCondition, priorEvidence, nodePrediction) -> list[float]:
+def leafNodePrediction(decisionTreeGraph, node, bayesianNetwork, pathCondition, priorEvidence, nodePrediction) -> npt.NDArray[np.float64]:
     pathCondition.removeEvidence(priorEvidence)
     pathVariables = pathCondition.getVariables()
         
