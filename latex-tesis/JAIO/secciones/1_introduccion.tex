@@ -42,3 +42,17 @@ A partir de datos sampleados de esta red entrenamos un árbol de decisión para 
 La Figura~\ref{fig:cancer_asv_shap_comparison} muestra un ejemplo de esta comparación. Se observa que SHAP asigna relevancia considerable a variables como \variableNetwork{Xray} y \variableNetwork{Dyspnoea}, que en la red son consecuencias de \variableNetwork{Cancer}. Esto ocurre porque dichas variables pueden estar fuertemente correlacionadas con la predicción, aun cuando no sean causas directas del fenómeno. En cambio, ASV tiende a priorizar variables más cercanas a las causas del proceso generador de los datos, reduciendo la importancia de variables descendientes.
 
 Este ejemplo ilustra cómo incorporar información causal puede producir explicaciones más alineadas con la estructura del problema. En redes donde se conoce (o se asume) una relación causal entre las variables, los ASVs permiten distinguir mejor entre variables que originan información relevante para la predicción y variables que simplemente reflejan efectos de otras.
+
+\subsection{Código fuente}
+
+Todos los algoritmos presentados en este trabajo fueron implementados. El código fuente puede ser encontrado online en el siguiente repositorio: 
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ll}
+		\toprule
+		\textbf{Repository} & \textbf{Repository} \\
+		\midrule
+		Source code & \url{https://github.com/EchuCompa/pasantia-BICC} \\
+	\end{tabular}
+\end{table}
