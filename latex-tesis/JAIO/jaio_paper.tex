@@ -70,34 +70,29 @@
 \begin{document}
 %
 % ENGLISH VERSION
-\title{Contribution title}
+\title{Beyond Shapley: Efficient Computation of Assymetric Shapley Values}
 
 %\titlerunning{Abbreviated paper title}
 % If the paper title is too long for the running head, you can set
 % an abbreviated paper title here
 %
-\author{First Author\inst{1}\orcidID{0000-1111-2222-3333} \and
-Second Author\inst{2,3}\orcidID{1111-2222-3333-4444} \and
-Third Author\inst{3}\orcidID{2222--3333-4444-5555}}
+\author{Ezequiel Companeetz\inst{1},
+Santiago Cifuentes\inst{2},
+Sergio Abriola\inst{2}}
 %
-\authorrunning{F. Author et al.}
+\authorrunning{Companeetz et al.}
 % First names are abbreviated in the running head.
 % If there are more than two authors, 'et al.' is used.
 %
-\institute{Princeton University, Princeton NJ 08544, USA \and
-Springer Heidelberg, Tiergartenstr. 17, 69121 Heidelberg, Germany
-\email{lncs@springer.com}\\
-\url{http://www.springer.com/gp/computer-science/lncs} \and
-ABC Institute, Rupert-Karls-University Heidelberg, Heidelberg, Germany\\
-\email{\{abc,lncs\}@uni-heidelberg.de}}
+\institute{Departamento de Computación, Facultad de Ciencias Exactas y Naturales, UBA \and
+Institudo de Ciencias de la Computación (ICC), Conicet}
 %
 \maketitle              % typeset the header of the contribution
 %
 \begin{abstract}
-The abstract should briefly summarize the contents of the paper in
-150--250 words. This is the English version of the abstract that 
-provides a comprehensive overview of the research conducted, 
-the methodology used, and the main findings obtained.
+We address the problem of explainability in machine learning models through feature attribution methods. In particular, we consider a variant of Shapley values known as Asymmetric Shapley Values (ASV), which enables the incorporation of causal knowledge into model-agnostic explanations through the use of a causal graph. We show that in certain contexts in which the computation of SHAP is \#\textsc{P}-hard, the exact computation of ASV can be done in polynomial time.
+To extend this algorithmic result, we introduce a notion of equivalence classes over the topological orderings of the underlying causal graph, which is useful to reduce the time to compute ASV. In particular, we present a polynomial-time algorithm (in the number of equivalence classes) to compute it whenever the causal graph is a rooted directed tree.
+Finally, we develop an algorithm for approximating ASV in arbitrary causal DAGs which relies on a procedure to sample topological orderings uniformly at random. To implement this sampling mechanism we leverage known algorithms as well as simpler alternatives. Our experimental result demonstrate the practical viability of the proposed approach in realistic causal structures.
 
 % keywords in lowercase
 \keywords{first keyword\and second keyword\and another keyword}
@@ -109,7 +104,7 @@ the methodology used, and the main findings obtained.
 % Spanish title and abstract
 \begin{center}
 \vspace{1cm}
-{\Large \bfseries\boldmath Título de la contribución}
+{\Large \bfseries\boldmath Más allá de Shapley: Algoritmos Eficientes para calcular los Shapley Values Asimétricos}
 
 \vspace{0.5cm}
 \end{center}
