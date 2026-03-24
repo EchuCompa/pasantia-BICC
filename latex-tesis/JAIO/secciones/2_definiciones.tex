@@ -1,97 +1,43 @@
-En esta sección introducimos las nociones formales que utilizaremos a lo largo del trabajo. Primero definimos los \textit{Shapley values} y su instanciación al problema de \textit{feature attribution}. Luego presentamos los \textit{Asymmetric Shapley Values} (ASV), que incorporan relaciones entre las variables a la atribución mediante un grafo causal. Finalmente, introducimos las redes bayesianas como modelo para la distribución de los datos y describimos las familias restringidas de redes que consideraremos en nuestros resultados.
+% En esta sección introducimos las nociones formales que utilizaremos a lo largo del trabajo. Primero definimos los \textit{Shapley values} y su instanciación al problema de \textit{feature attribution}. Luego presentamos los \textit{Asymmetric Shapley Values} (ASV), que incorporan relaciones entre las variables a la atribución mediante un grafo causal. Finalmente, introducimos las redes bayesianas como modelo para la distribución de los datos y describimos las familias restringidas de redes que consideraremos en nuestros resultados.
 
-\subsection{Shapley values y feature attribution}
+%\subsection{Shapley values y feature attribution}
 
-Trabajaremos con clasificadores binarios y features binarias. Esta restricción simplifica la notación sin afectar las ideas centrales ni los algoritmos desarrollados, que pueden extenderse naturalmente a dominios finitos más generales.
+Let $X$ be a finite set of features. A (binary) \textit{entity} over $X$ is a mapping $e:X \to \{0, 1\}$ assigning a value to every feature from $X$. We denote by $\entities{}(X)$ the set of all entities, and we will assume that some probability distribution is provided over this set.
+A (binary) classifier is a mapping $M: \entities{}(X) \to \{0, 1\}$. We restrict to both binary entities and classifiers only for simplicity: all the results and algorithms we obtain can be extended to more general cases straightforwardly (unless we say otherwise). 
 
-Sea $X$ un conjunto finito de features. Una \emph{entidad} sobre $X$ es una función $e:X\to\{0,1\},$ donde $e(x)$ representa el valor que la entidad $e$ toma en el feature $x$. Denotamos por $\entities(X)$ al conjunto de todas las entidades posibles sobre $X$, y asumimos dada una distribución de probabilidad $\Pr$ sobre $\entities(X)$. Un \emph{clasificador binario} es una función $M:\entities(X)\to\{0,1\}.$
+Given a model $M$ and an entity $e$, a \textit{feature attribution score} is a mapping $\phi_{M,e}:X \to \R$. Intuitively, the value $\phi_{M,e}(x)$ indicates the relevance of feature $x$ with respect to prediction $M(e)$. One of the most 
+studied feature attribution schemes is the \SHAPscore{} \parencite{shapOriginalPaper}, which is theoretically grounded on the \emph{Shapley values} \parencite{shapley1953value} from cooperative game theory. In that context, the Shapley values
+come up as the ``most fair'' way to distribute some capital earned during a team game. More precisely, given a finite set of players $\players$ and a \emph{characteristic function} $\charactheristicFunction:\mathcal{P}(\players)\to\mathbb{R}$ describing, for each subset
+of the players, the reward that such coalition would obtain in some fixed game; the shapley values are the unique assignment $\varphi_\nu: \players \to \R$ of reward to each player $i$ satisfying the following desired properties:
 
-Dado un modelo $M$ y una entidad $e$, un \emph{feature attribution score} es una función $\phi:X\to\mathbb{R},$ donde $\phi(x)$ mide la relevancia del feature $x$ respecto de la predicción $M(e)$.
+\begin{enumerate}
+	\item Efficiency: All the reward is distributed, i.e. $\sum_{i \in \players} \varphi_{\nu}(i) = \nu(\players)$.
+	\item Symmetry: If $\nu(S \cup \{i\}) = \nu(S \cup \{j\})$ for every $S \subseteq \players$, then $\varphi_{\nu}(i) = \varphi_{\nu}(j)$.
+	\item Null Player: If $\nu(S \cup \{i\}) = 0$ for every $S \subseteq \players$, then $\varphi_{\nu}(i) = 0$.
+	\item Linearity: For any pair of characteristic functions $\nu_1,\nu_2$ and $a \in \R$ it holds that $\varphi_{a\nu_1 + \nu_2}(i) = a\varphi_{\nu_1}(i) + \varphi_{\nu_2}(i)$\footnote{The characteristic function $a \nu_1 + \nu_2$ is naturally defined as $(a \nu_1 + \nu_2)(S) = a \nu_1(S) + \nu_2(S)$.}. 
+\end{enumerate}
 
-Uno de los métodos de atribución más estudiados es el \SHAPscore{} \cite{shapOriginalPaper}, basado en los \emph{Shapley values} \cite{shapley1953value}. En teoría de juegos cooperativos, los Shapley values describen cómo repartir el valor total obtenido por una coalición entre sus jugadores. Más precisamente, dado un conjunto finito de jugadores $\players$, una \emph{función característica} es una función
-\[
-\charactheristicFunction:\mathcal{P}(\players)\to\mathbb{R}
-\]
-que asigna un valor a cada coalición. Los Shapley values son la única asignación que satisface simultáneamente un conjunto de axiomas clásicos: \emph{eficiencia}, \emph{simetría}, \emph{jugador nulo} y \emph{linealidad}. Una forma cerrada de definirlos es la siguiente.
+Moreover, the Shapley values have an exact closed form: if we refer to players with indices in the range $\{1,\ldots, n\}$, we can write
+%
+\begin{align}\label{eq:shapley}
+	\phi_{\nu}(i) =  \frac{1}{|\players|!} \sum_{\pi \in perm(\players)} \left[ \nu(\pi_{<i} \cup \{i\}) - \nu(\pi_{<i}) \right]
+\end{align}
+%
+where $perm(\players)$ denotes the set of all permutations of the number from 1 to $n$ and $\pi_{<i}$ denotes the set of indices before $i$ in the permutation $\pi$ (i.e. $\pi_{<i} = \{j : \pi(j) < i\}$). Fundamentally, Eq.~\eqref{eq:shapley} is summing accross all possible ways
+of ordering the features, considering the impact of the inclusion of player $i$ to the reward of the game when adding the players according to each of these orderings.
 
-\begin{definition}[Shapley values]
-	Sea $\players$ un conjunto finito y sea $\charactheristicFunction:\mathcal{P}(\players)\to\mathbb{R}$ una función característica. Para cada jugador $i\in \players$, su valor de Shapley se define como
-	\begin{align}
-		\phi_i(\charactheristicFunction)
-		=
-		\frac{1}{|\players|!}
-		\sum_{\pi\in\perm(\players)}
-		\left[
-		\charactheristicFunction(\pi_{<i}\cup\{i\})-
-		\charactheristicFunction(\pi_{<i})
-		\right],
-		\label{eq:shapley_values_by_perm_definitions}
-	\end{align}
-	donde $\perm(\players)$ es el conjunto de todas las permutaciones de $\players$, y $\pi_{<i}$ denota el conjunto de jugadores que aparecen antes que $i$ en la permutación $\pi$.
-\end{definition}
+In the context of machine learning explainability, the Shapley values are instantiated by thinking of the features as players and considering the characteristic function
+%
+\begin{align}\label{eq:char_fun_for_ML}
+	\nu_{M,e}(S) = \mathbb{E}[M(e') | S, e] = \sum_{e'\in \entities(X)} M(e') \Pr[e'| \{e'(x) = e(x) : x \in S\}] 
+\end{align}
+%
+which represents the expected value of the model $M$ when restricting the features from $S$ to have the value dictated by entity $e$. 
+Note that the properties that these values satisfy do not have an evident satisfactory meaning in the context of explainability \parencite{fryer2021shapley}. Furthermore, reasonable requisites for \textit{feature attribution} methods related to the theory of \textit{abductive explanations} are not entailed by these properties \parencite{huang2023inadequacy, marques2023logic}.
 
-Intuitivamente, esta expresión promedia la contribución marginal de un jugador sobre todos los órdenes posibles de llegada al juego. De manera equivalente, puede escribirse como
-\[
-\phi_i(\charactheristicFunction)
-=
-\sum_{S\subseteq \players\setminus\{i\}}
-c_{|S|}
-\left[
-\charactheristicFunction(S\cup\{i\})-
-\charactheristicFunction(S)
-\right],
-\]
-donde
-\[
-c_m=\frac{m!(|\players|-m-1)!}{|\players|!}.
-\]
+PARRAFO SOBRE COMPLEJIDAD
 
-En aprendizaje automático, el conjunto de jugadores se identifica con el conjunto de features $X$, en nuestro ejemplo de la red \cancerNetwork, $X$ sería el conjunto \variableNetwork{Cancer, Pollution, Dyspnoea, Xray}. Dada una entidad $e$ y un subconjunto $S\subseteq X$, queremos evaluar el comportamiento promedio del modelo al fijar los valores de las variables de $S$ según la entidad $e$ y marginalizar el resto de acuerdo con la distribución de los datos.
-
-Para ello, definimos primero el conjunto de entidades \emph{consistentes} con $e$ en $S$:
-\[
-\consistsWith(e,S)=\{e'\in\entities(X): e'(x)=e(x)\text{ para todo }x\in S\}.
-\]
-La probabilidad condicionada a este conjunto queda dada por
-\[
-\Pr[e'\mid \consistsWith(e,S)] =
-\begin{cases}
-	\displaystyle
-	\frac{\Pr[e']}{\sum\limits_{e''\in\consistsWith(e,S)} \Pr[e'']} & \text{si } e'\in\consistsWith(e,S),\\[1.2em]
-	0 & \text{en caso contrario}.
-\end{cases}
-\]
-
-Con esta notación, la función característica asociada a $M$, $e$ y $\Pr$ se define como la predicción promedio condicionada a los valores fijados en $S$.
-
-\begin{definition}[Función característica inducida por un modelo]
-	Dados un modelo $M$, una entidad $e$ y una distribución $\Pr$ sobre $\entities(X)$, definimos
-	\begin{align}
-		\charFunML_{M,e,\Pr}(S)
-		=
-		\sum_{e'\in\consistsWith(e,S)}
-		\Pr[e'\mid\consistsWith(e,S)]\,M(e').
-		\label{formula:characteristicFunctionDefinition_definitions}
-	\end{align}
-\end{definition}
-
-Esto nos permite instanciar directamente los Shapley values en el problema de \textit{feature attribution}.
-
-\begin{definition}[SHAP]
-	Dado un modelo $M$, una entidad $e$, una distribución $\Pr$ y un feature $x_i\in X$, el valor SHAP de $x_i$ se define como
-	\[
-	\Shap_{M,e,\Pr}(x_i)
-	=
-	\sum_{S\subseteq X\setminus\{x_i\}}
-	c_{|S|}
-	\left[
-	\charFunML_{M,e,\Pr}(S\cup\{x_i\})-
-	\charFunML_{M,e,\Pr}(S)
-	\right].
-	\]
-\end{definition}
-
-Nótese que los axiomas que estos valores satisfacen no tienen un significado claro en el contexto de la inteligencia artificial, ya que dependen de la definición de \(\charFunML_{M,e,\Pr}\) \cite{fryer2021shapley}. Además, para algunas nociones simples y robustas de \textit{feature attribution} basadas en \textit{explicaciones abductivas} , los Shapley values no logran asignar un puntaje de 0 a features irrelevantes \cite{huang2023inadequacy, marques2023logic}. Aun así, constituyen uno de los marcos más influyentes para estudiar explicaciones locales basadas en atribución.
+DEFINIR FORMALMENTE ASV, ENMARCAR EN UNA DEFINICION
 
 \subsection{Asymmetric Shapley Values y grafos causales}
 
