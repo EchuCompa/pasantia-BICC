@@ -20,10 +20,10 @@ of the players, the reward that such coalition would obtain in some fixed game; 
 Moreover, the Shapley values have an exact closed form: if we refer to players with indices in the range $\{1,\ldots, n\}$, we can write
 %
 \begin{align}\label{eq:shapley}
-	\phi_{\nu}(i) =  \frac{1}{|\players|!} \sum_{\pi \in perm(\players)} \left[ \nu(\pi_{<i} \cup \{i\}) - \nu(\pi_{<i}) \right]
+	\varphi_{\nu}(i) =  \frac{1}{|\players|!} \sum_{\pi \in perm(\players)} \left[ \nu(\pi_{<i} \cup \{i\}) - \nu(\pi_{<i}) \right]
 \end{align}
 %
-where $perm(\players)$ denotes the set of all permutations of the number from 1 to $n$ and $\pi_{<i}$ denotes the set of indices before $i$ in the permutation $\pi$ (i.e. $\pi_{<i} = \{j : \pi(j) < i\}$). Fundamentally, Eq.~\eqref{eq:shapley} is summing accross all possible ways
+where $perm(\players)$ denotes the set of all permutations of the number from 1 to $n$ and $\pi_{<i}$ denotes the set of indices before $i$ in the permutation $\pi$ (i.e. $\pi_{<i} = \{j : \pi(j) < i\}$). Fundamentally, Eq.~\eqref{eq:shapley} is summing across all possible ways
 of ordering the features, considering the impact of the inclusion of player $i$ to the reward of the game when adding the players according to each of these orderings.
 
 In the context of machine learning explainability, the Shapley values are instantiated by thinking of the features as players and considering the characteristic function
@@ -32,13 +32,60 @@ In the context of machine learning explainability, the Shapley values are instan
 	\nu_{M,e}(S) = \mathbb{E}[M(e') | S, e] = \sum_{e'\in \entities(X)} M(e') \Pr[e'| \{e'(x) = e(x) : x \in S\}] 
 \end{align}
 %
-which represents the expected value of the model $M$ when restricting the features from $S$ to have the value dictated by entity $e$. 
-Note that the properties that these values satisfy do not have an evident satisfactory meaning in the context of explainability \parencite{fryer2021shapley}. Furthermore, reasonable requisites for \textit{feature attribution} methods related to the theory of \textit{abductive explanations} are not entailed by these properties \parencite{huang2023inadequacy, marques2023logic}.
+which represents the expected value of the model $M$ when restricting the features from $S$ to have the value dictated by entity $e$.\footnote{In some proof we may write the characteristic function as $\nu_{M,e,\Pr}$ to make the dependence on the distribution $\Pr$ explicit.} 
+Note that the properties that these values satisfy do not have an evident satisfactory meaning in the context of explainability \parencite{fryer2021shapley}. Furthermore, reasonable requisites for \textit{feature attribution} methods related to the theory of \textit{abductive explanations} are not entailed by these properties \parencite{huang2023inadequacy, marques2023logic}. Nonetheless, the Shapley values and the related SHAP-score are useful tools for explaining model behaviour in real scenarios \parencite{lundberg2020local}.
 
-PARRAFO SOBRE COMPLEJIDAD
+Depending on the family of ML models under consideration and the underlying distribution of the entities the computation of the Shapley values can be tractable or not. For example,
+it is well-known that for product distributions\footnote{A product distribution over $\entities{}(X)$ is a distribution that factorizes as $\Pr\left[e\right] = \prod_{x \in X}\Pr\left[ x = e(x) \right]$.} the complexity of computing these scores is equivalent to the complexity of computing the average 
+value of the model \parencite{van2022tractability}. In particular, this implies that there exists efficient algorithms for the case where the models are given, for example, by decision trees or by restricted families of circuits \parencite{arenas2023complexity}, while the problem is intractable whenever the models are more expressive, as in the case of neural nets. 
+For more general families of distributions the problem becomes much harder: for instance, when considering Naive Bayes distributions, the computation of this score is intractable already when considering trivial models that only depend on one feature \parencite{van2022tractability}. Even though there are particular distributions that generalize the product one for which efficient algorithms are known \parencite{marzouk2025computationaltractabilitymanyshapley}
+the general applicability of these tools seems to depend on heuristic approximations of the scores.
 
-DEFINIR FORMALMENTE ASV, ENMARCAR EN UNA DEFINICION
+Another problem of the Shapley values is that they may fail to distinguish features that are heavily correlated. For example, if some feature $j$ depends deterministically of some other feature $i$ it can happen that both features receive the same score, even though $i$ is intuitivelly more relevant
+for \textit{any} model (PONER EJEMPLO?). Note that the \textit{Symmetry} property essentially implies that this should always happen whenever two features share the same information relevant for a prediction. Thus, to avoid this problem it is somewhat necessary to relax that axiom and therefore define a different score.
+This is the idea underlying the \textit{Assymetric Shapley Values} (ASV from now on).
 
+\begin{definition}[Assymetric Shapley Values \parencite{frye2019asymmetric}]\label{def:asv}
+	Given a model $M$, an entity $e$, a feature $x$ and some weight function $w: perm(X) \to \R_{\geq 0}$ satisfying 
+	\begin{align*}
+		\sum_{\pi \in perm(X)} w(\pi) = 1,
+	\end{align*}
+	%
+	we define the Assymetric Shapley value of $x$ as
+	%
+	\begin{align*}
+		\phi^{ASV}_{M,e}(x) = \sum_{\pi \in perm(X)} w(\pi) \left[ \nu_{M,e}(\pi_{<i} \cup \{i\}) - \nu_{M,e}(\pi_{<i}) \right]
+	\end{align*}
+	%
+	where $\nu_{M,e}$ is defined in Eq.~\eqref{eq:char_fun_for_ML} 
+\end{definition}
+
+This definition is derived from the corresponding notion of assymetric shapley values from cooperative game theory. The function $w$ is useful for weighting some orderings above others. For example, if some feature $j$ is a function of $i$ it is possible to introduce this fact into the score by assigning weight zero to all orderings in which $i$
+comes after $j$. Note that the Shapley values are obtained by taking $w(\pi) = \frac{1}{|X|!}$, and we will refer to this particular case as $\phi^{Shap}_{M,e}$.
+
+\cite{frye2019asymmetric} proposes to define the weight function $w$ by considering a \textit{causal DAG} $C$ over the features. More precisely, $C$ is a directed acyclic graph whose nodes are the set of features $X$ and where an edge directed from $i$ to $j$ indicates that $j$ depends on $i$. Then, they define the weight function
+%
+\begin{align}\label{eq:w_in_ASV}
+	w_C(\pi) = \begin{cases}
+		\frac{1}{|topos(C)|} & \pi \text{ is a topological sort of } C\\
+		0 & \text{otherwise}
+	\end{cases}	
+\end{align}
+%
+This weight function generalizes the idea mentioned earlier of considering only those orderings consistent with the known causality of the features. In the rest of this paper we will be interested in developing efficient algorithms for computing the ASV from Def.~\ref{def:asv} whenever the weight function is given by 
+Eq.~\eqref{eq:w_in_ASV}. 
+
+Moreover, we will consider that the distribution of space of entites is described by Bayesian Network $N$. We refer to the reader to standard bibliography for the precise formal definitions of Bayesian Networks \parencite{pearl1986bayesianInference} while here we describe them conceptually: a bayesian network $N$
+defines a distribution for $\entities(X)$ with a DAG whose nodes are the features from $X$. Every node $x$ has a set of parents $p(x) \subseteq X$, and the network provides, for each way of assigning the features in $p(x)$, the conditional distribution of $x$. See (EJEMPLO) for an example. Given $N$ and any entity $e$ it is possible to compute
+the probability of $e$ by traversing the DAG of $N$ in any topological sort multiplying the corresponding conditional probabailities (EL EJEMPLO PODRIA MOSTRAR ESTO UN TOQUE?).
+
+One of the most simples types of Bayesian Networks is the Naive Bayes, which was already mentioned in regards to intractibility results for the Shapley values. This network has a particular structure, in which a single node is parent to all the others and no other pairs of nodes are connected. See () for an example.
+
+Sometimes we will identity the network itself as a causal graph. Thus, the network will provide both the distrubition necessary to compute the characteristic function $\nu_{M,e}$ as well as the causal graph necessary to define the weight function $w^C$. (AGREGAR DISCUSION DE CUANDO ESTO ESTA BIEN Y CUANDO NO)
+
+(Capaz podemos poner el cacho comentado abajo donde se describen formalmente las redes bayesianas. Pero veamos si podemos hacernos entender con solo esto.)
+
+\begin{comment}
 \subsection{Asymmetric Shapley Values y grafos causales}
 
 \echu{No hablamos mucho de la complejidad de Shap o de ASV, lo queremos hacer acá y contar los resultados previos o la idea es no contarlo y decirlo de una en los resultados teóricos?}
@@ -128,3 +175,4 @@ La segunda familia central en este trabajo es la de los \emph{polytrees}, es dec
 En síntesis, a lo largo de esta tesis trabajaremos principalmente con dos tipos de restricciones estructurales sobre la distribución de los datos: redes Naive Bayes, que sirven como caso base para nuestros resultados de tractabilidad, y polytrees, que constituyen la clase más general sobre la que desarrollamos algoritmos eficientes para inferencia y cómputo de explicaciones.
 
 \echu{¿Este parrafo juega o este de más?}
+\end{comment}

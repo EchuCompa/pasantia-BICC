@@ -1,139 +1,65 @@
-\subsection{Tratabilidad de ASV}
+In this Section we describe our theoretical insights.
 
-Como vimos en la sección anterior, la complejidad de la distribución de entrada no es el único factor que determina la dificultad de calcular explicaciones basadas en Shapley values. De hecho, aun para distribuciones estructuralmente simples como las redes Naive Bayes, el cálculo exacto de SHAP sigue siendo intratable \cite{van2022tractability}. En contraste, los Asymmetric Shapley Values (ASV) restringen las permutaciones consideradas a aquellas compatibles con el grafo causal. En esta sección mostramos que esta restricción permite obtener tractabilidad en casos donde SHAP no la tiene.
+\subsection{Tractability of ASV}
 
-\medskip
-
-Consideramos el caso en que la distribución de los datos está dada por una red bayesiana Naive Bayes, y tomamos su DAG subyacente como grafo causal para calcular ASV. Recordemos que, en este caso, toda permutación topológica válida debe ubicar a la variable raíz $X_1$ antes que cualquier otra variable.
-
-Esta observación permite caracterizar explícitamente el conjunto de órdenes topológicos y explotar la estructura de la distribución en el cálculo de ASV.
+As mentioned before, the computation of the Shapley Values is intractable (in particular, \#\textsc{P}-hard\footnote{\#\textsc{P} is a class of \textit{counting} problems. The \#\textsc{P}-hard problems are the hardest problems in this class, and it is known that if they can be solved in polynomial time then $\textsc{P} = \textsc{NP}$. Then, under the usual theoretical assumption, \#\textsc{P}-hard problems cannot be solved efficiently.}) even for trivial models
+if the underlying distribution is represented by a Naive Bayes network. We now show that this is not the case for the ASV whenever we use as causal graph the bayesian network itself.
 
 \begin{theorem}\label{the:asv_naive_bayes_tractable_clean}
-	Sea $\mathcal{F}$ una familia de modelos. Los Asymmetric Shapley Values pueden calcularse en tiempo polinomial para distribuciones Naive Bayes si y solo si los Shapley values pueden calcularse en tiempo polinomial para $\mathcal{F}$ bajo distribuciones producto.
+	Let $\mathcal{F}$ be any family of models. Then, the ASV can be computed in polynomial time for the family $\mathcal{F}$ under Naive Bayes distributions (where the causal graph is the network itself) if and only if the Shapley values can be computed in polynomial time for the family $\mathcal{F}$ under product distributions.
 \end{theorem}
 
-\echu{La demo es larga, la ponemos completa o damos una intuición la misma? Habría que ver el tema de si podemos mandar cosas al apéndice.}
 
 \begin{proof}
-	Primero, probamos la implicación de derecha a izquierda. Sea \(x_1\) el padre de todos los demás nodos en el DAG. Vamos a mostrar cómo calcular \(\assym_{M,e,\Pr}(x_j)\) para cualquier \(2 \leq j \leq n\) y \(\assym_{M,e,\Pr}(x_1)\) de forma independiente.
-	
-	Observemos que el DAG tiene \((n-1)!\) órdenes topológicos, uno para cada permutación de los features \(\{x_2, \ldots, x_n\}\), y \(\pi(x_1) = 1\) para todas ellas. Entonces,
-	
-	\[\label{eq:assymetric_for_naive_child}
-	\assym_{M,e,\Pr}(X_j) = \sum_{\pi \in \topo(G)} w(\pi) \left[ \charactheristicFunction_{M,e,\Pr}(\pi_{<j} \cup \{x_j\}) 
-	- \charactheristicFunction_{M,e,\Pr}(\pi_{<j}) \right]
-	\]
-	
-	es equivalente a:
-	
+	First, we show the right-to-left implication, which is the hard one. Let $x_1$ be the root node of the causal graph, and let $x_2,\ldots, x_n$ be the rest of the nodes. The DAG has $(n-1)!$ topological sorts, and in particular it holds that, for any $2 \leq j \leq n$,
+	%
+	\begin{align*}
+	\phi^{ASV}_{M,e,\Pr}(x_j) = \frac{1}{(n-1)!} \sum_{\pi \in \perm(\{x_2, \ldots, x_n\})} [ \charactheristicFunction_{M,e,\Pr}(\{x_1\} &\cup \pi_{<j} \cup \{x_j\}) \\
+	&- \charactheristicFunction_{M,e,\Pr}(\{x_1\} \cup \pi_{<j}) ]
+	\end{align*}
+	%
+	Thus, once $x_1$ is fixed the distribution over $x_2,\ldots, x_n$ is a product distribution with probabilities $\Pr\left( x_j = 1 | x_1 = e(x_1) \right)$ for $2 \leq i \leq n$.
+	For simplicity, let's assume $e(x_1) = 1$. Then, if we define the product distribution $\Pr'$ given by
 	\[
-	\assym_{M,e,\Pr}(X_j) = \frac{1}{(n-1)!} \sum_{\pi \in \perm(\{x_2, \ldots, x_n\})} \left[ \charactheristicFunction_{M,e,\Pr}(\{x_1\} \cup \pi_{<j} \cup \{x_j\}) - \charactheristicFunction_{M,e,\Pr}(\{x_1\} \cup \pi_{<j}) \right]
-	\]
-	
-	Así, una vez que \(x_1\) está fijado, la distribución para las variables \(x_2, \ldots, x_n\) es una distribución producto con \(p_{x_j} = P(X_j = 1 | X_1 = e(x_1))\). Para simplificar, asumamos que \(e(x_1) = 1\), y consideremos la distribución de producto \(\Pr'\) definida como:
-	
-	\[
-	\Pr\,'[X_i = 1] = p_i = 
+	\Pr\,'[X_i = 1] = 
 	\begin{cases}
 		1 & i = 1 \\
-		\Pr[X_i = 1 | X_1 = e(x_1)] & \text{en otro caso}
+		\Pr[X_i = 1 | X_1 = e(x_1)] & \text{otherwise}
 	\end{cases}
 	\]
-	
-	que intuitivamente se obtiene de \(\Pr\) fijando \(X_1 = 1\). Siempre que \(x_1\) esté fijo, ambas distribuciones \(\Pr\) y \(\Pr'\) se comportan de la misma forma:
-	
-	
-	\begin{lemma}\label{lemma:valuation_of_prob_function}
-		Para cualquier \(S \subseteq X \setminus \{x_1\}\), se cumple que:
-		\[
-		\charFunML_{M,e,\Pr}(\{x_1\} \cup S) = \charFunML_{M,e,\Pr'}(\{x_1\} \cup S) = \charFunML_{M,e,\Pr'}(S)
-		\]
-	\end{lemma}
-	
-	\begin{proof}
-		Esto se sigue de directamente manipulando la expresión:
-		
-		\begin{align}
-			\charFunML_{M,e,\Pr}(\{x_1\} \cup S) &= \sum_{e' \in \consistsWith(e,\{x_1\} \cup S)} \Pr[e' | S] M(e') \nonumber \\
-			&= \sum_{e' \in \consistsWith(e, \{x_1\} \cup S)} \left( \prod_{\substack{e'(y) = 1 \\ y \notin \{x_1\} \cup S}} p_y \prod_{\substack{e'(y) = 0 \\ y \notin \{x_1\} \cup S}} (1-p_y)\right) M(e')\\
-			&= \sum_{e' \in \consistsWith(e, S)} \left( \prod_{\substack{e'(y) = 1 \\ y \notin S}} p_y \prod_{\substack{e'(y) = 0 \\ y \notin S}} (1-p_y)\right) M(e') \nonumber\\
-			&= \sum_{e' \in \consistsWith(e, S)} \Pr\,'[e' | S] M(e') \nonumber\\
-			&= \charFunML_{M,e,\Pr'}(S) \nonumber
-		\end{align}
-		
-		donde la segunda igualdad viene de reemplazar $Pr$ por la distribución producto y la tercera igualdad se deduce al observar que para todas las entidades $e' \in \consistsWith(e, S)$ tales que $e'(x_1) = 0$ se cumple que 
-		
-		$$\prod_{\substack{e'(y) = 1 \\ y \notin S}} p_y \prod_{\substack{e'(y) = 0 \\ y \notin S}} (1-p_y) = 0$$
-		
-		Además, la segunda ecuación es igual a $\charFunML_{M,e,\Pr'}(\{x_1\} \cup S)$.
-	\end{proof}
-	
-	
-	%TODO: Seguir repasando esta demo y ver de entenderla bien de pi a pa
-	Usando este lema, ahora demostramos
-	
-	\begin{align}\label{eq:relation_between_assym_and_shap_naive_child}
-		\assym_{M,e,\Pr} (x_j) = \Shap_{M,e,\Pr'}(x_j)
+	it is easy to see that for any $S \subseteq X \setminus \{x_1\}$ it holds that
+	\begin{align}\label{eq:prob_prime_for_fixing_x1}
+		\nu_{M,e,\Pr}(\{x_1\} \cup S) = \nu_{M,e,\Pr'}(S) 
 	\end{align}
+	%
+	This is intuitive: the distribution $\Pr'$ is obtained by fixing the value of $x_1$ as $e(x_1)$, and thus having $x_1$ inside $\nu$ does not matter.
 	
-	Se cumple que %\sidesergio{Super menor, pero quizás en estas circunstancias siempre poner dos puntos:, o nunca}
-	
+	From Eq.~\eqref{eq:prob_prime_for_fixing_x1} it can be proven easily that
+	\begin{align}
+		\phi^{ASV}_{M,e,\Pr} (x_j) = \phi^{Shap}_{M,e,\Pr'}(x_j)
+	\end{align}
+	%
+	which implies that we effectively reduced the problem of computing the assymetric shapley values for any feature $x_j$ with $j\geq 2$ to computing the shapley values for some product distribution. Finally, for $x_1$ it can be seen that
+	%
 	\begin{align*}
-		\Shap_{M,e,\Pr'}(x_j) &= \frac{1}{n!} \sum_{\pi \in \perm(X)} \left[ \charFunML_{M,e,\Pr'}(\pi_{<j} \cup \{x_j\}) - \charFunML_{M,e,\Pr'}(\pi_{<j}) \right]\\
-		&= \frac{1}{n!} \sum_{\pi \in \perm(X)} \left[ \charFunML_{M,e,\Pr'}(\{x_1\} \cup \pi_{<j} \cup \{x_j\}) - \charFunML_{M,e,\Pr'}(\{x_1\} \cup \pi_{<j}) \right]\\
-		&= \frac{n}{n!} \sum_{\pi \in \perm(\{x_2,\ldots,x_n\})} \left[ \charFunML_{M,e,\Pr'}(\{x_1\} \cup \pi_{<j} \cup \{x_j\}) - \charFunML_{M,e,\Pr'}(\{x_1\} \cup \pi_{<j}) \right] \\
-		&= \frac{1}{n-1!} \sum_{\pi \in \perm(\{x_2,\ldots,x_n\})} \left[ \charFunML_{M,e,\Pr}(\{x_1\} \cup \pi_{<j} \cup \{x_j\}) - \charFunML_{M,e,\Pr}(\{x_1\} \cup \pi_{<j}) \right]\\
-		&= \assym_{M,e,\Pr}(x_j)
+		\phi^{ASV}_{M,e,\Pr}(x_1) = \nu_{M,e,\Pr{}}(\{x_1\}) - \nu_{M,e,\Pr{}}(\emptyset)
 	\end{align*}
+	%
+	because $\pi_{<i} = \emptyset$ for any permutation consistent with the DAG. Computing the values $\nu_{M,e,\Pr{}}(\{x_1\})$ and $\nu_{M,e,\Pr{}}(\emptyset)$ is equivalent to computing averages of the model $M$, and it is known that the capacity of computing 
+	the shapley values for any product distribution entails the capacity of computing averages \parencite{van2022tractability}.
 	
-	donde la segunda y cuarta igualdad se siguen del Lema~\ref{lemma:valuation_of_prob_function}, la última igualdad de la Ecuación~\ref{eq:assymetric_for_naive_child} y la tercera al observar que para cada permutación de $\perm(\{x_2,\ldots,x_n\})$ podemos construir $n$ permutaciones de $\perm(X)$ insertando $x_1$ en todos los lugares posibles, y que para cada una de estas permutaciones la expresión dentro de la suma es la misma. Así, la Ecuación~\ref{eq:relation_between_assym_and_shap_naive_child} muestra que calcular $\assym_{M,e,\Pr}(x_j)$ se reduce a calcular los valores Shapley habituales para una distribución independiente particular.
-	
-	Ahora consideramos $\assym_{M,e,\Pr}(x_1)$. Observemos que
-	
+	The left-to-right implication is immediate by observing that product distrubutions are a particular case of naive bayes distributions, and thus we can ``simulate'' them: one possible way to do this is
+	to consider, for each $1 \leq i \leq n$, the naive bayes distribution $\Pr_i$ given by placing $x_i$ as parent node with no conditioning on its childs (i.e. $\Pr_i\left[x_j=1 | x_i = 0\right] = \Pr_i\left[x_j=1 | x_i = 1\right]$). Then, it holds that
+	%
 	\begin{align*}
-		\assym_{M,e,\Pr}(x_1) &= \frac{1}{|\topo(G)|} \sum_{\pi \in \topo(G)} \left[ \charFunML_{M,e,\Pr}(\pi_{<1} \cup \{x_1\}) - \charFunML_{M,e,\Pr}(\pi_{<1}) \right]\\
-		&= \frac{1}{|\topo(G)|}( \charFunML_{M,e,\Pr}(\{x_1\}) - \charFunML_{M,e,\Pr}(\emptyset))
+		\phi^{Shap}_{M,e,\Pr}(x_j) = \frac{1}{n} \sum_{i=1}^n \phi^{ASV}_{M,e,\Pr_i}(x_j)
 	\end{align*}
-	
-	%\echu{¿En esta fórmula de Shap no falta el $\frac{1}{|\topo(G)|}$? Porque sino no se estaría normalizando el resultado.}
-	
-	ya que para todas las permutaciones el conjunto $\pi_{<1} = \emptyset$. Además, sabemos que $\charFunML_{M,e,\Pr}(\{x_1\}) = \charFunML_{M,e,\Pr'}(\emptyset)$ por el Lema~\ref{lemma:valuation_of_prob_function}, y que
-	
-	\begin{align*}
-		\charFunML_{M,e,\Pr}(\emptyset) &= \sum_{e' \in \entities(X)} \Pr[e] M(e)\\
-		&= \sum_{\substack{e' \in \entities(X) \
-				\ e'(x_1) = 1}} \Pr[e' | e'(x_1) = 1] \Pr[X_1 = 1] M (e') + \sum_{\substack{e' \in \entities(X) \\ e'(x_1) = 0}} \Pr[e' | e'(x_1) = 1] \Pr[X_1 = 0] M (e')\\
-		&= \Pr[X_1 = 1] \charFunML_{M,e,\Pr'}(\emptyset) + \Pr[X_1 = 0] \charFunML_{M,e,\Pr''}(\emptyset)
-	\end{align*}
-	
-	donde la distribución $\Pr''$ es la distribución producto obtenida al fijar $X_1 = 0$ como
-	
-	\begin{align*}
-		\Pr \, ''[X_i = 1] = \begin{cases}
-			0 & i = 0\\
-			Pr[X_i = 1 | X_1 = 0] & \text{de otro modo}
-		\end{cases}
-	\end{align*}
-	
-	Finalmente,
-	
-	\begin{align*}
-		\assym_{M,e,\Pr}(x_1) = \frac{1}{|\topo(G)|}( (1 - \Pr[X_1 = 1]) \charFunML_{M,e,\Pr'}(\emptyset) - \Pr[X_1 = 0] \charFunML_{M,e,\Pr''}(\emptyset))
-	\end{align*}
-	
-	y reducimos el problema de calcular $\assym_{M,e,\Pr}(x_1)$ al de calcular la predicción promedio del modelo $M$ para dos distribuciones independientes diferentes $\Pr'$ y $\Pr''$. Según \cite{van2022tractability}[Teorema 1], se cumple que estos promedios pueden ser calculados en tiempo polinomial si y sólo si los valores de Shapley pueden ser calculados en tiempo polinomial para una distribución de producto arbitraria.
-	
-	La demostración de izquierda a derecha sigue al observar que una distribución producto es un caso particular de una Distribución Naive Bayes en la cual, para cualquier valor del padre $X_1$, las distribuciones condicionales son las mismas.
-	
-	%\echu{ ¿Debería escribir la demo de izquierda a derecha? ¿O inecesario? No se si tiene mucho sentido, ya está muy pesada la tesis} Rta: No hace falta, con esto alcanza. 
-	
 \end{proof}
 
-El Teorema~\ref{the:asv_naive_bayes_tractable_clean} muestra que, a diferencia de SHAP, ASV puede ser tratable al explotar la estructura causal. En particular, esta tratabilidad depende de poder calcular eficientemente la predicción promedio. En la experimentación nos enfocamos en árboles de decisión, donde desarrollamos algoritmos polinomiales para esta tarea.
+Theorem~\ref{the:asv_naive_bayes_tractable_clean} shows that, in constrast to the Shapley values, the ASV can be computed under Naive Bayes distrubutions for simple models such as decision trees. Intuitively, the reason for this is that the causality imposed by the distribution is mimicked by the way that only certains permutations are considered,
+ and thus many symmetries arise in the final expression. We believe this motivates the idea of studying the complexity of computing the ASV in itself whenever the distribution is also used as the causal graph. 
 
-\echu{Tiene sentido el teaser de la experimentación? O saco esa oración?}
-
-\subsection{Clases de equivalencia y relación con los órdenes topológicos}
+\subsection{Equivalence classes of topological sorts}
 
 Recordemos la definición de ASV:
 \[
