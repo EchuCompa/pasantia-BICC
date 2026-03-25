@@ -1,5 +1,3 @@
-In this Section we describe our theoretical insights.
-
 \subsection{Tractability of ASV}
 
 As mentioned before, the computation of the Shapley Values is intractable (in particular, \#\textsc{P}-hard\footnote{\#\textsc{P} is a class of \textit{counting} problems. The \#\textsc{P}-hard problems are the hardest problems in this class, and it is known that if they can be solved in polynomial time then $\textsc{P} = \textsc{NP}$. Then, under the usual theoretical assumption, \#\textsc{P}-hard problems cannot be solved efficiently.}) even for trivial models
@@ -57,7 +55,7 @@ if the underlying distribution is represented by a Naive Bayes network. We now s
 \end{proof}
 
 Theorem~\ref{the:asv_naive_bayes_tractable_clean} shows that, in constrast to the Shapley values, the ASV can be computed under Naive Bayes distrubutions for simple models such as decision trees. Intuitively, the reason for this is that the causality imposed by the distribution is mimicked by the way that only certains permutations are considered,
- and thus many symmetries arise in the final expression. We believe this motivates the idea of studying the complexity of computing the ASV in itself whenever the distribution is also used as the causal graph. 
+ and thus many symmetries can be exploited. We believe this motivates the idea of studying the complexity of computing the ASV whenever the distribution is also used as the causal graph. 
 
 \subsection{Equivalence classes of topological sorts}
 
@@ -72,7 +70,7 @@ exponential on the number of features.
 
 We will follow a similar strategy to compute the ASV. We define a notion of equivalence between permutations.
 
-\begin{definition}\label{def:equiv_relation_left_right}
+\begin{definition}[Equivalence relation for permutations]\label{def:equiv_relation_left_right}
 	Let $C$ be a causal graph for features $X$ and fix some feature $x \in X$. We define an equivalence relation $\sim_x$ over $\topo(C)$ as
 	\[
 	\pi^1 \sim_x \pi^2
@@ -90,10 +88,10 @@ Let $\equivalenceClasses$ be the set of equivalence classes. It is immediate fro
 \end{align}
 %
 Therefore, instead of invoking $\nu_{M,e}$ $|topos(C)|$ times it is enough to compute it $|\equivalenceClasses|$ times. This last set can have size at most $2^{|X|}$, but the hope is that in pratical scenarios it is smaller. From now on, we will study this set in the context of causal graphs given 
-by \textit{rooted directed trees} (EJEMPLO? NOMBRAR ESTO ANTES). In this case, note that we can split the nodes in three groups with respect to $x$: those that are descendants of $x$, those that are ancestors of $x$, and the \textit{unrelated} ones. Observe that both descendant/ancestors are never/always in the set $\pi_{<x}$, for any $x$. Thus, the structure of the 
+by \textit{rooted directed trees} (EJEMPLO? NOMBRAR ESTO ANTES). In this case, note that we can split the nodes in three groups with respect to $x$: those that are descendants of $x$, those that are ancestors of $x$, and the \textit{unrelated} ones. Observe that descendant/ancestors are never/always in the set $\pi_{<x}$, for any $x$. Thus, the structure of the 
 equivalence classes depends only on the unrelated nodes. (FIGURA)  
 
-We have a general bound that allows to bound the size of $\equivalenceClasses$:
+We have a general bound on the size of $\equivalenceClasses$ depending only on the causal graph $C$:
 
 \begin{proposition}\label{prop:bound}
 	Let $C$ be a causal graph shaped as a rooted directed tree with $h$ leaves and depth $l$. Then, it holds that
@@ -107,7 +105,7 @@ We have a general bound that allows to bound the size of $\equivalenceClasses$:
 	For every unrelated feature $y$ (in the sense that $y$ is neither a descendendant or ancestor of $x$) let $C_y \subseteq C$ be the directed tree rooted at $y$ induced by those nodes reachable by $y$. Let $f(y)$ denote the number of ways that the features in $C_y$ can be arranged in the permutations, i.e.
 	%
 	\begin{align}\label{eq:equivalence_classes_subtree}
-		f(y) = \left| \{S \subseteq C_y : \exists \pi \in perm(C) \text{ such that } \pi_{<x} = S\} \right|	
+		f(y) = \left| \{S \subseteq C_y : \exists \pi \in perm(C) \text{ such that } \pi_{<x} \cap C_y = S\} \right|	
 	\end{align}
 	%
 	Note that
@@ -136,7 +134,7 @@ is polynomial on $|\equivalenceClasses|$.
 	The algorithm is recursive on its nature, and based on the ideas from the proof of Proposition~\ref{prop:bound}. (EXPLICAR)
 \end{proof}
 
-We note that once the set $\equivalenceClasses$ is computed it is possible to find any value $\phi_{M,e}^{ASV}(x)$ in time linear on $\equivalenceClasses$. Thus, even though this step can be costly
+We note that once the set $\equivalenceClasses$ is computed it is possible to find any value $\phi_{M,e}^{ASV}(x)$ in time linear on $|\equivalenceClasses|$. Thus, even though this step can be costly
 (because the bound from Proposition~\ref{prop:bound} implies that the algorithm take exponential time on the causal graph) is must be done only once. Moreover, it is independent of the model $M$, and thus it can be reused even
 when the AI model is updated.
 
@@ -379,133 +377,62 @@ Si bien $k$ puede ser exponencial en el peor caso, este enfoque evita depender d
 
 \end{comment}
 
-\subsection{Aproximación de ASV mediante sampleo}
+\subsection{Approximating ASV through sampling}
 
-En las secciones anteriores nos concentramos en algoritmos exactos para calcular $ASV$, ya sea enumerando todas las clases de equivalencia o explotando su estructura para reducir la cantidad de evaluaciones de la función característica. Sin embargo, cuando el número de clases o de órdenes topológicos es demasiado grande, incluso estos enfoques pueden volverse prohibitivamente costosos. Esto motiva la consideración de algoritmos aproximados basados en técnicas de muestreo.
+\newcommand{\subsetPerm}{K}
 
-Siguiendo la idea de las clases de equivalencia, proponemos reemplazar la suma exacta que define $ASV$ por un promedio empírico sobre una muestra aleatoria. Este enfoque permite estimar el valor de $ASV$ con buena precisión utilizando una cantidad moderada de muestras, ya que el error del estimador decrece con el tamaño de la muestra.
-
-Existen dos variantes naturales de esta estrategia. La primera consiste en samplear órdenes topológicos del DAG causal $G$ y estimar el valor de $ASV$ a partir de sus contribuciones marginales. La segunda consiste en samplear clases de equivalencia y utilizar un representante de cada clase para aproximar el promedio exacto.
-
-En ambos casos, el punto central es disponer de un mecanismo que permita generar muestras con la distribución correcta (uniforme en el caso de órdenes topológicos, o proporcional al tamaño en el caso de clases de equivalencia). Bajo esta condición, el cálculo de $ASV$ se reduce a promediar evaluaciones de la función característica sobre muestras i.i.d.
-
-Una ventaja fundamental de este enfoque es que desacopla el cálculo de $ASV$ de la estructura específica del grafo. En particular, mientras que los algoritmos exactos desarrollados anteriormente explotan propiedades estructurales como la de los \dtrees{} o polytrees, el enfoque basado en sampleo puede aplicarse a \emph{cualquier} DAG, siempre que se disponga de un procedimiento para generar muestras adecuadas. Esto amplía significativamente el alcance práctico del método.
-
-El caso de órdenes topológicos resulta especialmente natural, ya que
-\[
-\assym_{M,e,\Pr}(x_i)
-=
-\frac{1}{|\topo(G)|}
-\sum_{\pi \in \topo(G)}
-\left[
-\charFunML_{M,e,\Pr}(\pi_{<i}\cup\{x_i\})
--
-\charFunML_{M,e,\Pr}(\pi_{<i})
-\right]
-\]
-puede interpretarse como el valor esperado de la variable aleatoria
-\[
-Z_\pi =
-\charFunML_{M,e,\Pr}(\pi_{<i}\cup\{x_i\})
--
-\charFunML_{M,e,\Pr}(\pi_{<i}),
-\qquad \pi \sim \mathrm{Unif}(\topo(G)).
-\]
-Por lo tanto, si podemos samplear órdenes topológicos uniformemente, obtenemos un estimador insesgado de $ASV$ promediando copias i.i.d.\ de $Z_\pi$. Además al tener algoritmos de sampleo de órdenes topologicos para DAGs en general y no solo \dtrees este algoritmo logra ser más general. 
-
-También a partir de estos órdenes sampleados podemos dividirlos por sus clases de equivalencia al igual que el algoritmo naive con probabilidad proporcional a su tamaño y estimar el valor mediante el promedio de sus representantes. Veamos a continuación dos posibles estrategias de sampleo. 
-
-\subsubsection{Sampleo uniforme de órdenes topológicos}
-\label{subsubsection:toposort_sampling}
-
-Nos concentramos en el problema de samplear órdenes topológicos de un DAG de manera uniforme. Un primer enfoque consiste en generar todos los órdenes topológicos mediante un algoritmo determinístico, como el de Knuth \cite{algorithmForAllTopoSorts}, y devolverlos a medida que se producen. Sin embargo, este procedimiento no resulta adecuado para sampleo: al ser determinístico, no genera una distribución uniforme y puede sesgar la muestra cuando distintos nodos fuente aparecen con frecuencias muy diferentes como comienzo de un orden.
-
-La idea correcta consiste en construir el orden de manera recursiva. Sea $S$ el conjunto de nodos fuente de un DAG $D$. Para cada $s \in S$, definimos
-\[
-p(s)=\frac{\#\topo(D-\{s\})}{\#\topo(D)},
-\]
-donde $\#\topo(D-\{s\})$ es la cantidad de órdenes topológicos que comienzan con $s$. El algoritmo selecciona el primer nodo del orden según esta distribución y luego continúa recursivamente sobre el grafo restante.
-
-Este procedimiento garantiza que los órdenes topológicos se generan con la distribución uniforme deseada, siempre que se disponga de un método para contar la cantidad de órdenes de los subgrafos. En nuestro caso, esto se logra mediante el algoritmo de conteo desarrollado previamente para polytrees. La complejidad de este algoritmo es $O(k! \cdot n^k \cdot  n^{3k-1}) = O(k! n^{4k-1})$, siendo $k$ el grado máximo de un nodo.
-
-\echu{¿Agrego la imagen para ilustrar este algoritmo o al pedo? Me parece que no porque no le deberíamos dar mucha bola, no es tan relevante.}
-
-Aún así, el problema que tiene este algoritmo es que solo funciona para el caso de polytrees, y sabemos que además el conteo en DAGs generales es \sharpPhard, por lo que buscamos otra estrategía de sampleo distinta.
-
-Aún así, para el caso de DAGs generales utilizamos un método de sampleo basado en cadenas de Markov, siguiendo la idea de Huber \cite{HUBER2006420}. El algoritmo considera como estados a los distintos órdenes topológicos del grafo y parte de un orden válido cualquiera. Luego, en cada paso, elige uniformemente una posición $i$ y propone intercambiar los elementos ubicados en las posiciones consecutivas $i$ e $i+1$. Este intercambio se acepta con probabilidad $1/2$ únicamente si los dos nodos involucrados son incomparables en el DAG, es decir, si no existe un camino dirigido entre ellos; en caso contrario, el orden se mantiene. Para verificar esta condición de manera eficiente, se precomputa el cierre transitivo del grafo, de modo que cada chequeo de comparabilidad cuesta tiempo constante. Como la cadena siempre permanece dentro del conjunto de órdenes topológicos válidos y sus transiciones son simétricas, luego de una cantidad suficientemente grande de pasos de mezcla su distribución se aproxima a la uniforme sobre todos los órdenes topológicos. Su complejidad es de $O(n^3\log_n)$, y en la práctica, esto permite obtener muestras aproximadamente uniformes sin necesidad de resolver el problema de conteo exacto, que en DAGs generales es $\sharp P$-hard.
-
-\echu{Acá puedo contar lo que se vio en la experimentación. Primero, que para el caso de grado acotado nuestro algoritmo es más rápido y crece más lento el tiempo que tarda en el tamaño del grafo. Luego que al nuestro algoritmo reutilizar resultados también crece más lento el tiempo que tarda en base a la cantidad de sampleos, ya que el otro arranca de 0 cada vez. Pero que aún así el otro algoritmo es mejor porque para grafos de grado no acotado y grafos que no son polytrees funciona.  O tal vez esto lo puedo mover para la parte de resultados experimentales.}
-
-\subsubsection{Error del sampleo}
-
-El esquema de aproximación basado en sampleo depende de dos subrutinas: la capacidad de generar muestras y la de evaluar la función característica sobre cada una de ellas. En particular, el algoritmo consiste en samplear independientemente órdenes topológicos y promediar sus contribuciones marginales.
-
-Más precisamente, si $\pi^{(1)},\dots,\pi^{(m)}$ son órdenes topológicos sampleados uniformemente, el estimador viene dado por
-\[
-\widehat{ASV}
-=
-\frac{1}{m}\sum_{j=1}^{m}
-\left[
-\charFunML_{M,e,\Pr}(\pi^{(j)}_{<i}\cup\{x_i\})
--
-\charFunML_{M,e,\Pr}(\pi^{(j)}_{<i})
-\right].
-\]
-
-Cada muestra requiere generar un orden topológico y evaluar la función característica una cantidad constante de veces. La cantidad de muestras necesarias para obtener una buena aproximación depende de la precisión deseada y puede acotarse mediante resultados estándar de concentración, como se detalla en el apéndice.
-
-\echu{¿Hay apéndice? Si no hay apéndice, meto las demostraciones que tenemos sobre la estimación del error promedio acá? } 
-
-De manera análoga, este enfoque puede aplicarse utilizando clases de equivalencia en lugar de órdenes topológicos, siempre que se puedan samplear con la distribución adecuada.
-
-\echu{Queda medio raro meter esta sección acá, tal vez extraería la parte de la predicción promedio en una sección más y luego metería esto al final para poner algo de la experimentación. }
-
-\subsection{Instanciaciones particulares}
-\label{section:particular_instances}
-
-En nuestro caso, nos enfocamos en árboles de decisión como modelo $M$, y en distribuciones $\Pr$ representadas mediante redes bayesianas. En este contexto, desarrollamos un algoritmo para calcular
-\[
-\charFunML_{M,e,\Pr}(S)
-\]
-basado en recorrer el árbol de decisión y acumular las condiciones de camino inducidas por cada rama. Para cada hoja compatible con la evidencia, se computa su probabilidad mediante inferencia en la red bayesiana y se pondera por la predicción de la hoja. La predicción promedio se obtiene sumando estos aportes.
-
-Cuando la red bayesiana tiene estructura de polytree, la inferencia puede realizarse en tiempo polinomial, por lo que el costo de evaluar la función característica es también polinomial.
-
-Esto induce un esquema general para calcular $ASV$: siempre que el sampleo/generación exacta de órdenes topológicos o clases de equivalencia sea eficiente, se obtiene un algoritmo aproximado cuyo costo total es polinomial en el tamaño de la instancia y en los parámetros de precisión.
-
-Por el contrario, cuando la predicción promedio no puede calcularse eficientemente, este enfoque deja de ser aplicable. En particular, el Teorema~\ref{the:asv_naive_bayes_tractable_clean} sugiere que la tratabilidad de $ASV$ está intrínsecamente ligada al costo de computar dichas esperanzas, ya que cada muestra requiere evaluar una contribución marginal.
-
-En síntesis, los algoritmos propuestos resultan especialmente efectivos en escenarios donde:
-\begin{enumerate}
-	\item el sampleo/conteo puede realizarse eficientemente;
-	\item la predicción promedio es computable en tiempo polinomial;
-	\item el número de órdenes o clases es demasiado grande para un enfoque exacto.
-\end{enumerate}
-
-Este es precisamente el régimen considerado en la experimentación.
-
-\echu{Acá no mostre nada de la experimentación que queríamos contar en teoría, siento que para el flow debería venir acá. ¿Que experimentos metemos? Yo banco "Clases de equivalencia vs Órdenes Topológicos" y "ASV exacto sin EqClasses vs ASV aproximado"}
-
-\subsection{ASV exacto}
-
-Recordemos la fórmula introducida en la sección \ref{Section:HeuristicaASV} para ASV, utilizando nuestra heurística.
-
+A simple way to compute $\phi_{M,e}^{Shap}(x)$ consist on sampling a small subset $\subsetPerm \subseteq perm(X)$ at random and then approximating the score as
+%
 \begin{align*}
-	\phi_{i}^{assym}(\charactheristicFunction) = \sum_{\pi \in \perm(\players)} w(\pi) \left[ \charactheristicFunction(\pi_{<i} \cup {i}) - \charactheristicFunction(\pi_{<i}) \right] &= \\
-	\heuristicASVFormula
+	\phi^{Shap}_{M,e}(x) \sim \frac{1}{|\subsetPerm|} \sum_{\pi \in \subsetPerm} \left[ \nu_{M,e}(\pi_{<x} \cup \{x\}) - \nu_{M,e}(\pi_{<x}) \right]
 \end{align*}
 
-Dado un DAG $G$, un nodo $x_i \in V(G)$ y una función característica $\charactheristicFunction$. Nuestro algoritmo completo queda así entonces: 
+For the ASV the analogous procedure consists on sampling topological orderings at random. In the next statement we formalize this strategy. Moreover, we observe that the algorithm is robust to error both at the level of the sampling procedure and the computation of $\nu_{M,e}$.
 
-\begin{itemize}
-	\item Calculamos $eqClass$ a través de $\eqClassSizes(G,x_i)$, el algoritmo que introducimos en la sección~ \ref{alg:exact_algorithm_for_equivalence_classes}
-	\item Luego para cada clase de equivalencia vamos a calcular el promedio teniendo en cuenta los features previos a $x_i$. Para realizar el promedio vamos a utilizar el algoritmo de la sección \ref{section:particular_instances}. (En el caso de que el modelo no sea un árbol, podemos aproximarlo utilizando Monte Carlo u otro método)
-	\item Por último sumamos los resultados para obtener él $\assym$ para el feature $i$. 
-\end{itemize}
+\newcommand{\procedureSampling}{\mathcal{P}_{samp}}
+\newcommand{\procedureNu}{\mathcal{P}_{\nu}}
 
-Las modificaciones que introducimos son para mejorar la performance del mismo, sin modificar los resultados obtenidos a diferencia del enfoque aproximado. En la sección a continuación vamos a ver cuál es la mejora respecto al enfoque naive y el tiempo que tarda para distintas redes.  
+\begin{proposition}\label{prop:sampling_to_compute_ASV}
+	Assume access to a procedure $\procedureSampling$ that samples topological orderings from a DAG with a distribution $\varepsilon_{samp}$-close to the uniform one\footnote{To measure distance between distributions we use the $1$-norm, i.e. given two distributions $\mathcal{D}_1$ and $\mathcal{D}_2$ over a finite domain $\Omega$ we define the distance between $\mathcal{D}_1$ and $\mathcal{D}_2$ as $||\mathcal{D}_1 - \mathcal{D}_2||_1 = \sum_{o \in \Omega} |\mathcal{D}_1(o) - \mathcal{D}_2(o)|$.},
+	and to a procedure $\procedureNu$ that computes, given any subset of features $S \subseteq X$, a $\varepsilon_{\nu}$-approximation of the value $\nu_{M,e}(S)$. Then, it is possible to compute, with high probability, a $O(\varepsilon_{samp} + \varepsilon_{\nu})$-approximation of $\phi^{ASV}_{M,e}(x)$ using $O(1/\varepsilon_{samp}^2)$ calls to $\procedureSampling$ and $\procedureNu$. 
+\end{proposition}
 
-\subsection{ASV aproximado}
+\newcommand{\randomVar}{V^{M,e}}
 
-Este algoritmo es igual al anterior. La única diferencia que tiene es respecto a cómo se calculan las clases de equivalencia, $eqClass(G, x_i)$, puesto que ahora las vamos a aproximar. Además, vamos a tener que agregar un parámetro extra, para definir la cantidad de órdenes topológicos que queremos generar. 
-Primero utilizamos los algoritmos vistos en \ref{subsubsection:toposort_sampling} para samplear los órdenes topológicos. Esto nos va a permitir calcular él $ASV$ para polytrees o DAGs y no simplemente \dtrees. Luego procesamos estos órdenes al igual que en la sección \ref{alg:naiveAlgorithmEquivalenceClass}, para obtener las clases de equivalencia. Una vez obtenidas las clases de equivalencia, repetimos el mismo proceso del algoritmo exacto. 
+\begin{proof}
+	Consider the random variable $\randomVar$ over domain $topos(C)$ defined as $\randomVar(\pi) = \left[ \nu_{M,e}(\pi_{<x} \cup \{x\}) - \nu_{M,e}(\pi_{<x}) \right]$. It holds that
+	%
+	\begin{align*}
+		\mathbb{E}[\randomVar] = \phi^{ASV}_{M,e}(x)
+	\end{align*}
+	%
+	Now, if $\randomVar_{\varepsilon_{samp}}$ denotes the analogous random variable distributed according to the sampling procedure $\procedureSampling$,
+	%
+	\begin{align*}
+		|&\mathbb{E}[\randomVar] - \mathbb{E}[\randomVar_{\varepsilon_{samp}}]| = \\
+		&= \left|\sum_{\pi \in topos(C)} \left[\Pr\left( \randomVar = \pi \right) - \Pr\left( \randomVar_{\varepsilon_{samp}} = \pi \right) \right] \left[ \nu_{M,e}(\pi_{<x} \cup \{x\}) - \nu_{M,e}(\pi_{<x}) \right] \right|\\
+		&\leq \sum_{\pi \in topos(C)} \left|\Pr\left( \randomVar = \pi \right) - \Pr\left( \randomVar_{\varepsilon_{samp}} = \pi \right) \right| \leq \varepsilon_{samp}
+	\end{align*}
+	%
+	Then, to approximate $\mathbb{E}[\randomVar_{\varepsilon_{samp}}]$ we apply the procedure $\procedureSampling$ to compute a subset $\subsetPerm$ of the topological orderings and then use $\procedureNu$ to obtain
+	%
+	\begin{align*}
+		\mathbb{E}[\randomVar_{\varepsilon_{samp}}] \sim \frac{1}{|\subsetPerm|} \sum_{\pi \in \subsetPerm} \left[ \procedureNu(\pi_{<x} \cup \{x\}) - \procedureNu(\pi_{<x}) \right]
+	\end{align*}
+	%
+	Using Hoeffding's inequality \parencite{hoeffding1963probability} we can ensure that by taking $O(1/\varepsilon_{samp}^2)$ samples the set $\subsetPerm$ is a good representation of the average with high probability (i.e. with error bounded by $\varepsilon_{samp}$), and then using the $\varepsilon_{\nu}$-closeness of $\procedureNu$ we can show
+	that the error obtained by approximating all the $\nu_{M,e}$ invokations is bounded by $\varepsilon_{\nu}$.
+\end{proof}
+
+Proposition~\ref{prop:sampling_to_compute_ASV} states that we only need to be able to sample the topological orderings \textit{almost} uniformly to compute the ASV. Also, it shows that if we approximate $\nu_{M,e}$ the overall \textit{additive}-error of the estimation
+of $\phi^{ASV}_{M,e}(x)$ is also controlled. Note that implementing the procedure $\procedureNu$ is often easy: by definition $\nu_{M,e}(S)$ is the expected value of a random variable, and thus if we can sample from the set of entities after conditioning that $s = e(s)$ for every $s \in S$ we are 
+done. This is the case for the product distribution, but also for some bayesian networks such as a Naive Bayes distributiton. (AGREGAR ALGO. CREO QUE ESTE PROBLEMA TENIA QUE VER CON INFERENCIA BAYESIANA, NO? PONERLO)
+
+Now we describe two ways to implement the procedure $\procedureSampling$. The first one can be understood by looking at Figure (FIGURA DONDE MOSTRAMOS COMO SAMPLEAR SE REDUCE A CONTAR). The idea is that we can sample a topological ordering uniformly using a recursive a procedure in which at each step
+we pick left-most node of the ordering. In particular, in the beginning we must pick one of the sources of the causal graph (i.e. one of the nodes with in-degree 0). We should weight them according to the number of topological orderings that start with each respective node, and thus we effectively reduce the problem
+of sampling a topological ordering to the problem of counting the number of topological orderings. Even though this problem is intractable in general (REF), there are heuristic algorithms that can approximate this value or even exact algorithm for restricted cases (CITA). In particular, we develop a simple 
+algorithm applicable to polytrees whose complexity depends on (EN QUE? ERA ALGO ASI COMO EL MAXIMO GRADO?).(NO SE BIEN COMO HACER PARA EXPLICAR ESTE ALGORITMO XD. YA NO QUEDA TANTO ESPACIO)
+
+Alternatively, we consider known algorithms from the literature able to approximate uniform sampling of topological orderings from arbitrary DAGs. We implement an algorithm based on random walks \parencite{bubley1999faster}
+with a polynomial (although of high degree) complexity. We note that there are more modern and asimptotically better algorithms \parencite{huber2006fast}, but we believe that the hidden constants in them make them inefficient for the input sizes we consider. (PODEMOS PONER EL PSEUDO DEL SAMPLEO QUE IMPLEMENTAMOS, PERO PINTA QUE NO HAY ESPACIO)
+
