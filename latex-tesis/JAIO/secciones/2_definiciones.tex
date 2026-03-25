@@ -3,9 +3,9 @@
 %\subsection{Shapley values y feature attribution}
 
 Let $X$ be a finite set of features. A (binary) \textit{entity} over $X$ is a mapping $e:X \to \{0, 1\}$ assigning a value to every feature from $X$. We denote by $\entities{}(X)$ the set of all entities, and we will assume that some probability distribution is provided over this set.
-A (binary) classifier is a mapping $M: \entities{}(X) \to \{0, 1\}$. We restrict to both binary entities and classifiers only for simplicity: all the results and algorithms we obtain can be extended to more general cases straightforwardly (unless we say otherwise). 
+A (binary) classifier is a mapping $M: \entities{}(X) \to \{0, 1\}$. We restrict to both binary entities and classifiers only for simplicity: all the results and algorithms we obtain can be extended to more general cases straightforwardly. 
 
-Given a model $M$ and an entity $e$, a \textit{feature attribution score} is a mapping $\phi_{M,e}:X \to \R$. Intuitively, the value $\phi_{M,e}(x)$ indicates the relevance of feature $x$ with respect to prediction $M(e)$. One of the most 
+Given a model $M$ and an entity $e$, a \textit{feature attribution score} is a mapping $\phi_{M,e}:X \to \R$. Intuitively, the value $\phi_{M,e}(x)$ indicates the relevance of feature $x$ with respect to prediction $M(e)$. As mentioned before, one of the most 
 studied feature attribution schemes is the \SHAPscore{} \parencite{shapOriginalPaper}, which is theoretically grounded on the \emph{Shapley values} \parencite{shapley1953value} from cooperative game theory. In that context, the Shapley values
 come up as the ``most fair'' way to distribute some capital earned during a team game. More precisely, given a finite set of players $\players$ and a \emph{characteristic function} $\charactheristicFunction:\mathcal{P}(\players)\to\mathbb{R}$ describing, for each subset
 of the players, the reward that such coalition would obtain in some fixed game; the shapley values are the unique assignment $\varphi_\nu: \players \to \R$ of reward to each player $i$ satisfying the following desired properties:
@@ -32,18 +32,11 @@ In the context of machine learning explainability, the Shapley values are instan
 	\nu_{M,e}(S) = \mathbb{E}[M(e') | S, e] = \sum_{e'\in \entities(X)} M(e') \Pr[e'| \{e'(x) = e(x) : x \in S\}] 
 \end{align}
 %
-which represents the expected value of the model $M$ when restricting the features from $S$ to have the value dictated by entity $e$.\footnote{In some proof we may write the characteristic function as $\nu_{M,e,\Pr}$ to make the dependence on the distribution $\Pr$ explicit.} 
-Note that the properties that these values satisfy do not have an evident satisfactory meaning in the context of explainability \parencite{fryer2021shapley}. Furthermore, reasonable requisites for \textit{feature attribution} methods related to the theory of \textit{abductive explanations} are not entailed by these properties \parencite{huang2023inadequacy, marques2023logic}. Nonetheless, the Shapley values and the related SHAP-score are useful tools for explaining model behaviour in real scenarios \parencite{lundberg2020local}.
+which represents the expected value of the model $M$ when restricting the features from $S$ to have the value dictated by entity $e$.\footnote{In some proofs we may write the characteristic function as $\nu_{M,e,\Pr}$ to make the dependence on the distribution $\Pr$ explicit.} 
 
-Depending on the family of ML models under consideration and the underlying distribution of the entities the computation of the Shapley values can be tractable or not. For example,
-it is well-known that for product distributions\footnote{A product distribution over $\entities{}(X)$ is a distribution that factorizes as $\Pr\left[e\right] = \prod_{x \in X}\Pr\left[ x = e(x) \right]$.} the complexity of computing these scores is equivalent to the complexity of computing the average 
-value of the model \parencite{van2022tractability}. In particular, this implies that there exists efficient algorithms for the case where the models are given, for example, by decision trees or by restricted families of circuits \parencite{arenas2023complexity}, while the problem is intractable whenever the models are more expressive, as in the case of neural nets. 
-For more general families of distributions the problem becomes much harder: for instance, when considering Naive Bayes distributions, the computation of this score is intractable already when considering trivial models that only depend on one feature \parencite{van2022tractability}. Even though there are particular distributions that generalize the product one for which efficient algorithms are known \parencite{marzouk2025computationaltractabilitymanyshapley}
-the general applicability of these tools seems to depend on heuristic approximations of the scores.
-
-Another problem of the Shapley values is that they may fail to distinguish features that are heavily correlated. For example, if some feature $j$ depends deterministically of some other feature $i$ it can happen that both features receive the same score, even though $i$ is intuitivelly more relevant
-for \textit{any} model (PONER EJEMPLO?). Note that the \textit{Symmetry} property essentially implies that this should always happen whenever two features share the same information relevant for a prediction. Thus, to avoid this problem it is somewhat necessary to relax that axiom and therefore define a different score.
-This is the idea underlying the \textit{Assymetric Shapley Values} (ASV from now on).
+As mentioned in the introduction, the Shapley values may fail to distinguish features that are heavily correlated. For example, if some feature $j$ depends deterministically of some other feature $i$ it can happen that both features receive the same score, even though $i$ is intuitivelly more relevant
+for \textit{any} model. Note that the \textit{Symmetry} property essentially implies that this should always happen whenever two features share the same information relevant for a prediction. Thus, to avoid this problem it is somewhat necessary to relax that axiom and therefore define a different score.
+This is the idea underlying the \textit{Assymetric Shapley Values}.
 
 \begin{definition}[Assymetric Shapley Values \parencite{frye2019asymmetric}]\label{def:asv}
 	Given a model $M$, an entity $e$, a feature $x$ and some weight function $w: perm(X) \to \R_{\geq 0}$ satisfying 
@@ -75,7 +68,7 @@ comes after $j$. Note that the Shapley values are obtained by taking $w(\pi) = \
 This weight function generalizes the idea mentioned earlier of considering only those orderings consistent with the known causality of the features. In the rest of this paper we will be interested in developing efficient algorithms for computing the ASV from Def.~\ref{def:asv} whenever the weight function is given by 
 Eq.~\eqref{eq:w_in_ASV}. 
 
-Moreover, we will consider that the distribution of space of entites is described by Bayesian Network $N$. We refer to the reader to standard bibliography for the precise formal definitions of Bayesian Networks \parencite{pearl1986bayesianInference} while here we describe them conceptually: a bayesian network $N$
+Moreover, we will consider that the distribution of space of entites is described by a Bayesian Network $N$. We refer to the reader to standard bibliography for the precise formal definitions of Bayesian Networks \parencite{pearl1986bayesianInference} while here we describe them conceptually: a bayesian network $N$
 defines a distribution for $\entities(X)$ with a DAG whose nodes are the features from $X$. Every node $x$ has a set of parents $p(x) \subseteq X$, and the network provides, for each way of assigning the features in $p(x)$, the conditional distribution of $x$. See (EJEMPLO) for an example. Given $N$ and any entity $e$ it is possible to compute
 the probability of $e$ by traversing the DAG of $N$ in any topological sort multiplying the corresponding conditional probabailities (EL EJEMPLO PODRIA MOSTRAR ESTO UN TOQUE?).
 

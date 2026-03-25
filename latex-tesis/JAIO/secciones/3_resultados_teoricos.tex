@@ -4,7 +4,7 @@ As mentioned before, the computation of the Shapley Values is intractable (in pa
 if the underlying distribution is represented by a Naive Bayes network. We now show that this is not the case for the ASV whenever we use as causal graph the bayesian network itself.
 
 \begin{theorem}\label{the:asv_naive_bayes_tractable_clean}
-	Let $\mathcal{F}$ be any family of models. Then, the ASV can be computed in polynomial time for the family $\mathcal{F}$ under Naive Bayes distributions (where the causal graph is the network itself) if and only if the Shapley values can be computed in polynomial time for the family $\mathcal{F}$ under product distributions.
+	Let $\mathcal{F}$ be any family of models. Then, the ASV can be computed in polynomial time for the family $\mathcal{F}$ under Naive Bayes distributions (where the causal graph is the network itself) if and only if the Shapley values can be computed in polynomial time for the family $\mathcal{F}$ under product distributions\footnote{With our notation, a product distribution over $\entities{}(X)$ is a distribution that factorizes as $\Pr\left[e\right] = \prod_{x \in X}\Pr\left[ x = e(x) \right]$.}.
 \end{theorem}
 
 
@@ -43,7 +43,7 @@ if the underlying distribution is represented by a Naive Bayes network. We now s
 		\phi^{ASV}_{M,e,\Pr}(x_1) = \nu_{M,e,\Pr{}}(\{x_1\}) - \nu_{M,e,\Pr{}}(\emptyset)
 	\end{align*}
 	%
-	because $\pi_{<i} = \emptyset$ for any permutation consistent with the DAG. Computing the values $\nu_{M,e,\Pr{}}(\{x_1\})$ and $\nu_{M,e,\Pr{}}(\emptyset)$ is equivalent to computing averages of the model $M$, and it is known that the capacity of computing 
+	because $\pi_{<1} = \emptyset$ for any permutation consistent with the DAG. Computing the values $\nu_{M,e,\Pr{}}(\{x_1\})$ and $\nu_{M,e,\Pr{}}(\emptyset)$ is equivalent to computing averages of the model $M$, and it is known that the capacity of computing 
 	the shapley values for any product distribution entails the capacity of computing averages \parencite{van2022tractability}.
 	
 	The left-to-right implication is immediate by observing that product distrubutions are a particular case of naive bayes distributions, and thus we can ``simulate'' them: one possible way to do this is
@@ -87,7 +87,7 @@ Let $\equivalenceClasses$ be the set of equivalence classes. It is immediate fro
 	\phi^{ASV}_{M,e} (x) = \frac{1}{|topos(C)|} \sum_{[\pi] \in \equivalenceClasses} |[\pi]| \left[ \nu_{M,e}(\pi_{<x} \cup \{x\}) - \nu_{M,e}(\pi_{<x}) \right]
 \end{align}
 %
-Therefore, instead of invoking $\nu_{M,e}$ $|topos(C)|$ times it is enough to compute it $|\equivalenceClasses|$ times. This last set can have size at most $2^{|X|}$, but the hope is that in pratical scenarios it is smaller. From now on, we will study this set in the context of causal graphs given 
+Therefore, instead of invoking $\nu_{M,e}$ $|topos(C)|$ times it is enough to compute it $|\equivalenceClasses|$ times. This value can be at most $2^{|X|}$, but the hope is that in pratical scenarios it is smaller. From now on, we will restrict to the case in which causal graphs are given 
 by \textit{rooted directed trees} (EJEMPLO? NOMBRAR ESTO ANTES). In this case, note that we can split the nodes in three groups with respect to $x$: those that are descendants of $x$, those that are ancestors of $x$, and the \textit{unrelated} ones. Observe that descendant/ancestors are never/always in the set $\pi_{<x}$, for any $x$. Thus, the structure of the 
 equivalence classes depends only on the unrelated nodes. (FIGURA)  
 
@@ -127,7 +127,7 @@ For the case of directed trees we further develop an algorthm able to compute th
 is polynomial on $|\equivalenceClasses|$.
 
 \begin{proposition}
-	There is an algorithm able to compute $|\equivalenceClass|$ given the causal graph $C$ on time polynomial on $|C|$ and $|\equivalenceClasses|$. Moreover, the algorithm returns the size of each class $[\pi] \in \equivalenceClasses$.
+	There is an algorithm able to compute $|\equivalenceClass|$ given the causal graph $C$ (shaped as a rooted directed tree) on time polynomial on $|C|$ and $|\equivalenceClasses|$. Moreover, the algorithm returns the size of each class $[\pi] \in \equivalenceClasses$.
 \end{proposition}
 
 \begin{proof}
@@ -135,7 +135,7 @@ is polynomial on $|\equivalenceClasses|$.
 \end{proof}
 
 We note that once the set $\equivalenceClasses$ is computed it is possible to find any value $\phi_{M,e}^{ASV}(x)$ in time linear on $|\equivalenceClasses|$. Thus, even though this step can be costly
-(because the bound from Proposition~\ref{prop:bound} implies that the algorithm take exponential time on the causal graph) is must be done only once. Moreover, it is independent of the model $M$, and thus it can be reused even
+(because the bound from Proposition~\ref{prop:bound} implies that the algorithm may take exponential time on the size causal graph) is must be done only once. Moreover, it is independent of the model $M$, and thus it can be reused even
 when the AI model is updated.
 
 \begin{comment}
@@ -421,7 +421,7 @@ For the ASV the analogous procedure consists on sampling topological orderings a
 	\end{align*}
 	%
 	Using Hoeffding's inequality \parencite{hoeffding1963probability} we can ensure that by taking $O(1/\varepsilon_{samp}^2)$ samples the set $\subsetPerm$ is a good representation of the average with high probability (i.e. with error bounded by $\varepsilon_{samp}$), and then using the $\varepsilon_{\nu}$-closeness of $\procedureNu$ we can show
-	that the error obtained by approximating all the $\nu_{M,e}$ invokations is bounded by $\varepsilon_{\nu}$.
+	that the error obtained by approximating all the $\nu_{M,e}$ invokations is bounded by $O(\varepsilon_{\nu})$.
 \end{proof}
 
 Proposition~\ref{prop:sampling_to_compute_ASV} states that we only need to be able to sample the topological orderings \textit{almost} uniformly to compute the ASV. Also, it shows that if we approximate $\nu_{M,e}$ the overall \textit{additive}-error of the estimation
@@ -429,10 +429,10 @@ of $\phi^{ASV}_{M,e}(x)$ is also controlled. Note that implementing the procedur
 done. This is the case for the product distribution, but also for some bayesian networks such as a Naive Bayes distributiton. (AGREGAR ALGO. CREO QUE ESTE PROBLEMA TENIA QUE VER CON INFERENCIA BAYESIANA, NO? PONERLO)
 
 Now we describe two ways to implement the procedure $\procedureSampling$. The first one can be understood by looking at Figure (FIGURA DONDE MOSTRAMOS COMO SAMPLEAR SE REDUCE A CONTAR). The idea is that we can sample a topological ordering uniformly using a recursive a procedure in which at each step
-we pick left-most node of the ordering. In particular, in the beginning we must pick one of the sources of the causal graph (i.e. one of the nodes with in-degree 0). We should weight them according to the number of topological orderings that start with each respective node, and thus we effectively reduce the problem
+we pick the left-most node of the ordering. In particular, in the beginning we must pick one of the sources of the causal graph (i.e. one of the nodes with in-degree 0). We should weight them according to the number of topological orderings that start with each respective node, and thus we effectively reduce the problem
 of sampling a topological ordering to the problem of counting the number of topological orderings. Even though this problem is intractable in general (REF), there are heuristic algorithms that can approximate this value or even exact algorithm for restricted cases (CITA). In particular, we develop a simple 
 algorithm applicable to polytrees whose complexity depends on (EN QUE? ERA ALGO ASI COMO EL MAXIMO GRADO?).(NO SE BIEN COMO HACER PARA EXPLICAR ESTE ALGORITMO XD. YA NO QUEDA TANTO ESPACIO)
 
 Alternatively, we consider known algorithms from the literature able to approximate uniform sampling of topological orderings from arbitrary DAGs. We implement an algorithm based on random walks \parencite{bubley1999faster}
-with a polynomial (although of high degree) complexity. We note that there are more modern and asimptotically better algorithms \parencite{huber2006fast}, but we believe that the hidden constants in them make them inefficient for the input sizes we consider. (PODEMOS PONER EL PSEUDO DEL SAMPLEO QUE IMPLEMENTAMOS, PERO PINTA QUE NO HAY ESPACIO)
+with a polynomial (although of high degree) complexity. We note that there are more modern and asimptotically better algorithms \parencite{huber2006fast}, but we believe that the hidden constants in them make them inefficient for the input sizes we consider. (PODEMOS PONER EL PSEUDOCODIGO DEL SAMPLEO QUE IMPLEMENTAMOS, PERO PINTA QUE NO HAY ESPACIO)
 
