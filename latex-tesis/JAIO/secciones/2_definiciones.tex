@@ -70,13 +70,11 @@ Eq.~\eqref{eq:w_in_ASV}.
 
 Moreover, we will consider that the distribution of space of entites is described by a Bayesian Network $N$. We refer to the reader to standard bibliography for the precise formal definitions of Bayesian Networks \parencite{pearl1986bayesianInference} while here we describe them conceptually: a bayesian network $N$
 defines a distribution for $\entities(X)$ with a DAG whose nodes are the features from $X$. Every node $x$ has a set of parents $p(x) \subseteq X$, and the network provides, for each way of assigning the features in $p(x)$, the conditional distribution of $x$. See (EJEMPLO) for an example. Given $N$ and any entity $e$ it is possible to compute
-the probability of $e$ by traversing the DAG of $N$ in any topological sort multiplying the corresponding conditional probabailities (EL EJEMPLO PODRIA MOSTRAR ESTO UN TOQUE?).
+the probability of $e$ by traversing the DAG of $N$ in any topological sort multiplying the corresponding conditional probabilities.
 
-One of the most simples types of Bayesian Networks is the Naive Bayes, which was already mentioned in regards to intractibility results for the Shapley values. This network has a particular structure, in which a single node is parent to all the others and no other pairs of nodes are connected. See () for an example.
+One of the most simples types of Bayesian Networks is the Naive Bayes, which was already mentioned in regards to intractibility results for the Shapley values. This network has a particular structure, in which a single node is parent to all the others and no other pairs of nodes are connected. See (FIGURA) for an example.
 
 Sometimes we will identity the network itself as a causal graph. Thus, the network will provide both the distrubition necessary to compute the characteristic function $\nu_{M,e}$ as well as the causal graph necessary to define the weight function $w^C$. (AGREGAR DISCUSION DE CUANDO ESTO ESTA BIEN Y CUANDO NO)
-
-(Capaz podemos poner el cacho comentado abajo donde se describen formalmente las redes bayesianas. Pero veamos si podemos hacernos entender con solo esto.)
 
 \begin{comment}
 \subsection{Asymmetric Shapley Values y grafos causales}
