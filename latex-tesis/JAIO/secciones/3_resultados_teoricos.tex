@@ -37,24 +37,24 @@ if the underlying distribution is represented by a Naive Bayes network. We now s
 		\phi^{ASV}_{M,e,\Pr} (x_j) = \phi^{Shap}_{M,e,\Pr'}(x_j)
 	\end{align}
 	%
-	which implies that we effectively reduced the problem of computing the assymetric shapley values for any feature $x_j$ with $j\geq 2$ to computing the shapley values for some product distribution. Finally, for $x_1$ it can be seen that
+	which implies that we effectively reduced the problem of computing the asymmetric Shapley values for any feature $x_j$ with $j\geq 2$ to computing the Shapley values for some product distribution. Finally, for $x_1$ it can be seen that
 	%
 	\begin{align*}
 		\phi^{ASV}_{M,e,\Pr}(x_1) = \nu_{M,e,\Pr{}}(\{x_1\}) - \nu_{M,e,\Pr{}}(\emptyset)
 	\end{align*}
 	%
 	because $\pi_{<1} = \emptyset$ for any permutation consistent with the DAG. Computing the values $\nu_{M,e,\Pr{}}(\{x_1\})$ and $\nu_{M,e,\Pr{}}(\emptyset)$ is equivalent to computing averages of the model $M$, and it is known that the capacity of computing 
-	the shapley values for any product distribution entails the capacity of computing averages \parencite{van2022tractability}.
+	the Shapley values for any product distribution entails the capacity of computing averages \parencite{van2022tractability}.
 	
-	The left-to-right implication is immediate by observing that product distrubutions are a particular case of naive bayes distributions, and thus we can ``simulate'' them: one possible way to do this is
-	to consider, for each $1 \leq i \leq n$, the naive bayes distribution $\Pr_i$ given by placing $x_i$ as parent node with no conditioning on its childs (i.e. $\Pr_i\left[x_j=1 | x_i = 0\right] = \Pr_i\left[x_j=1 | x_i = 1\right]$). Then, it holds that
+	The left-to-right implication is immediate by observing that product distributions are a particular case of Naive Bayes distribution, and thus we can ``simulate'' them: one possible way to do this is
+	to consider, for each $1 \leq i \leq n$, the Naive Bayes distribution $\Pr_i$ given by placing $x_i$ as parent node with no conditioning on its children (i.e. $\Pr_i\left[x_j=1 | x_i = 0\right] = \Pr_i\left[x_j=1 | x_i = 1\right]$). Then, it holds that
 	%
 	\begin{align*}
 		\phi^{Shap}_{M,e,\Pr}(x_j) = \frac{1}{n} \sum_{i=1}^n \phi^{ASV}_{M,e,\Pr_i}(x_j)
 	\end{align*}
 \end{proof}
 
-Theorem~\ref{the:asv_naive_bayes_tractable_clean} shows that, in constrast to the Shapley values, the ASV can be computed under Naive Bayes distrubutions for simple models such as decision trees. Intuitively, the reason for this is that the causality imposed by the distribution is mimicked by the way that only certains permutations are considered,
+Theorem~\ref{the:asv_naive_bayes_tractable_clean} shows that, in contrast to the Shapley values, the ASV can be computed under Naive Bayes distributions for simple models such as decision trees. Intuitively, the reason for this is that the causality imposed by the distribution is mimicked by the way that only certain permutations are considered,
  and thus many symmetries can be exploited. We believe this motivates the idea of studying the complexity of computing the ASV whenever the distribution is also used as the causal graph. 
 
 \subsection{Equivalence classes of topological sorts}
@@ -65,7 +65,7 @@ The Shapley values can also be written in closed form as
 	\phi^{Shap}_{M,e}(x) = \sum_{S \subseteq X \setminus \{x\}} \frac{|S|!(|X|-|S|-1)!}{|X|!}\left[\nu_{M,e}(S \cup \{x\}) - \nu_{M,e}(S)\right] 
 \end{align*}
 %
-This rewritting is obtained by observing that many permutations give raise to the same set $\pi_{<x}$: more precisely, if $|\pi_{<x}| = s$ there are $\frac{s!(n-s-1)!}{n!}$ permutations $\pi'$ satisfying $\pi'_{<x} = \pi_{<x}$, where $n = |X|$. Computing the shapley values using this formula reduces the number of times that $\nu_{M,e}$ has to be computed, although the number of calls remains
+This rewriting is obtained by observing that many permutations give raise to the same set $\pi_{<x}$: more precisely, if $|\pi_{<x}| = s$ there are $\frac{s!(n-s-1)!}{n!}$ permutations $\pi'$ satisfying $\pi'_{<x} = \pi_{<x}$, where $n = |X|$. Computing the Shapley values using this formula reduces the number of times that $\nu_{M,e}$ has to be computed, although the number of calls remains
 exponential on the number of features.
 
 We will follow a similar strategy to compute the ASV. We define a notion of equivalence between permutations.
@@ -87,7 +87,7 @@ Let $\equivalenceClasses$ be the set of equivalence classes. It is immediate fro
 	\phi^{ASV}_{M,e} (x) = \frac{1}{|topos(C)|} \sum_{[\pi] \in \equivalenceClasses} |[\pi]| \left[ \nu_{M,e}(\pi_{<x} \cup \{x\}) - \nu_{M,e}(\pi_{<x}) \right]
 \end{align}
 %
-Therefore, instead of invoking $\nu_{M,e}$ $|topos(C)|$ times it is enough to compute it $|\equivalenceClasses|$ times. This value can be at most $2^{|X|}$, but the hope is that in pratical scenarios it is smaller. From now on, we will restrict to the case in which causal graphs are given 
+Therefore, instead of invoking $\nu_{M,e}$ $|topos(C)|$ times it is enough to compute it $|\equivalenceClasses|$ times. This value can be at most $2^{|X|}$, but the hope is that in practical scenarios it is smaller. From now on, we will restrict to the case in which causal graphs are given 
 by \textit{rooted directed trees} (EJEMPLO? NOMBRAR ESTO ANTES). In this case, note that we can split the nodes in three groups with respect to $x$: those that are descendants of $x$, those that are ancestors of $x$, and the \textit{unrelated} ones. Observe that descendant/ancestors are never/always in the set $\pi_{<x}$, for any $x$. Thus, the structure of the 
 equivalence classes depends only on the unrelated nodes. (FIGURA)  
 
@@ -102,7 +102,7 @@ We have a general bound on the size of $\equivalenceClasses$ depending only on t
 \end{proposition}
 
 \begin{proof}
-	For every unrelated feature $y$ (in the sense that $y$ is neither a descendendant or ancestor of $x$) let $C_y \subseteq C$ be the directed tree rooted at $y$ induced by those nodes reachable by $y$. Let $f(y)$ denote the number of ways that the features in $C_y$ can be arranged in the permutations, i.e.
+	For every unrelated feature $y$ (in the sense that $y$ is neither a descendant or ancestor of $x$) let $C_y \subseteq C$ be the directed tree rooted at $y$ induced by those nodes reachable by $y$. Let $f(y)$ denote the number of ways that the features in $C_y$ can be arranged in the permutations, i.e.
 	%
 	\begin{align}\label{eq:equivalence_classes_subtree}
 		f(y) = \left| \{S \subseteq C_y : \exists \pi \in perm(C) \text{ such that } \pi_{<x} \cap C_y = S\} \right|	
@@ -118,10 +118,10 @@ We have a general bound on the size of $\equivalenceClasses$ depending only on t
 	\end{align}
 	%
 	In the base case the set of Eq.~\eqref{eq:equivalence_classes_subtree} is $\{\emptyset, \{y\}\}$. For the recursive case the reasoning is the following: either we do not put $y$ in the set (and then all other features reachable from $y$ won't be in the set as well) or rather 
-	we put $y$ and have complete freedom to decide which features to put from the subtrees of $y$. The bound from the statement of the proposition can be derived using Eq.~\eqref{eq:fun_for_equi_classes} (FIGURA DE COMO MERGEAR CLASES DE EQUIVALENCIAS DE UNRELATED). 
+	we put $y$ and have complete freedom to decide which features to put from the sub-trees of $y$. The bound from the statement of the proposition can be derived using Eq.~\eqref{eq:fun_for_equi_classes} (FIGURA DE COMO MERGEAR CLASES DE EQUIVALENCIAS DE UNRELATED). 
 \end{proof}
 
-Proposition~\ref{prop:bound} indicates that the number of equivalence classes will be small when the tree is shallow. From the point of the view of the causal graph, this corresponds to the case in which there aren't long causal dependences between the features. In particular, there will be many features that are mutually independent. (NOMBRAR EJEMPLOS DE ARBOLES PUNTUALES QUE DESPUES VEMOS EN LA EXPERIMENTACION)  
+Proposition~\ref{prop:bound} indicates that the number of equivalence classes will be small when the tree is shallow. From the point of the view of the causal graph, this corresponds to the case in which there aren't long causal dependencies between the features. In particular, there will be many features that are mutually independent. (NOMBRAR EJEMPLOS DE ARBOLES PUNTUALES QUE DESPUES VEMOS EN LA EXPERIMENTACION)  
 
 For the case of directed trees we further develop an algorthm able to compute the set $\equivalenceClasses$ as well as the number of permutations inside each class (which is required to compute Eq.~\eqref{eq:equivalence_classes_into_shap}). The complexity of the algorithm
 is polynomial on $|\equivalenceClasses|$.
@@ -421,12 +421,12 @@ For the ASV the analogous procedure consists on sampling topological orderings a
 	\end{align*}
 	%
 	Using Hoeffding's inequality \parencite{hoeffding1963probability} we can ensure that by taking $O(1/\varepsilon_{samp}^2)$ samples the set $\subsetPerm$ is a good representation of the average with high probability (i.e. with error bounded by $\varepsilon_{samp}$), and then using the $\varepsilon_{\nu}$-closeness of $\procedureNu$ we can show
-	that the error obtained by approximating all the $\nu_{M,e}$ invokations is bounded by $O(\varepsilon_{\nu})$.
+	that the error obtained by approximating all the $\nu_{M,e}$ invocations is bounded by $O(\varepsilon_{\nu})$.
 \end{proof}
 
 Proposition~\ref{prop:sampling_to_compute_ASV} states that we only need to be able to sample the topological orderings \textit{almost} uniformly to compute the ASV. Also, it shows that if we approximate $\nu_{M,e}$ the overall \textit{additive}-error of the estimation
 of $\phi^{ASV}_{M,e}(x)$ is also controlled. Note that implementing the procedure $\procedureNu$ is often easy: by definition $\nu_{M,e}(S)$ is the expected value of a random variable, and thus if we can sample from the set of entities after conditioning that $s = e(s)$ for every $s \in S$ we are 
-done. This is the case for the product distribution, but also for some bayesian networks such as a Naive Bayes distributiton. (AGREGAR ALGO. CREO QUE ESTE PROBLEMA TENIA QUE VER CON INFERENCIA BAYESIANA, NO? PONERLO)
+done. This is the case for the product distribution, but also for some bayesian networks such as a Naive Bayes distribution. (AGREGAR ALGO. CREO QUE ESTE PROBLEMA TENIA QUE VER CON INFERENCIA BAYESIANA, NO? PONERLO)
 
 Now we describe two ways to implement the procedure $\procedureSampling$. The first one can be understood by looking at Figure (FIGURA DONDE MOSTRAMOS COMO SAMPLEAR SE REDUCE A CONTAR). The idea is that we can sample a topological ordering uniformly using a recursive a procedure in which at each step
 we pick the left-most node of the ordering. In particular, in the beginning we must pick one of the sources of the causal graph (i.e. one of the nodes with in-degree 0). We should weight them according to the number of topological orderings that start with each respective node, and thus we effectively reduce the problem
@@ -434,5 +434,5 @@ of sampling a topological ordering to the problem of counting the number of topo
 algorithm applicable to polytrees whose complexity depends on (EN QUE? ERA ALGO ASI COMO EL MAXIMO GRADO?).(NO SE BIEN COMO HACER PARA EXPLICAR ESTE ALGORITMO XD. YA NO QUEDA TANTO ESPACIO)
 
 Alternatively, we consider known algorithms from the literature able to approximate uniform sampling of topological orderings from arbitrary DAGs. We implement an algorithm based on random walks \parencite{bubley1999faster}
-with a polynomial (although of high degree) complexity. We note that there are more modern and asimptotically better algorithms \parencite{huber2006fast}, but we believe that the hidden constants in them make them inefficient for the input sizes we consider.
+with a polynomial (although of high degree) complexity. We note that there are more modern and asymptotically better algorithms \parencite{huber2006fast}, but we believe that the hidden constants in them make them inefficient for the input sizes we consider.
 
