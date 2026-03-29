@@ -88,8 +88,67 @@ Let $\equivalenceClasses$ be the set of equivalence classes. It is immediate fro
 \end{align}
 %
 Therefore, instead of invoking $\nu_{M,e}$ $|topos(C)|$ times it is enough to compute it $|\equivalenceClasses|$ times. This value can be at most $2^{|X|}$, but the hope is that in practical scenarios it is smaller. From now on, we will restrict to the case in which causal graphs are given 
-by \textit{rooted directed trees} (EJEMPLO? NOMBRAR ESTO ANTES). In this case, note that we can split the nodes in three groups with respect to $x$: those that are descendants of $x$, those that are ancestors of $x$, and the \textit{unrelated} ones. Observe that descendant/ancestors are never/always in the set $\pi_{<x}$, for any $x$. Thus, the structure of the 
-equivalence classes depends only on the unrelated nodes. (FIGURA)  
+by \textit{rooted directed trees}, polytrees with nodes that have one or less parents. In this case, note that we can split the nodes in three groups with respect to $x$: those that are descendants of $x$, those that are ancestors of $x$, and the \textit{unrelated} ones. Observe that descendant/ancestors are never/always in the set $\pi_{<x}$, for any $x$. Thus, the structure of the equivalence classes depends only on the unrelated nodes, you can see them in Figure \ref{fig:ASV_forest_example}.
+
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[scale=.65, transform shape, 
+		unrelated/.style={circle, draw=red},
+		ancestor/.style={circle, draw=blue},
+		mergebox/.style={draw=purple!70!black, rounded corners, fill=purple!8, align=center, inner sep=6pt},
+		wiggly/.style={decorate, decoration={snake, amplitude=.2mm, segment length=2mm}}
+		]
+		\node[text=blue] at (-5, 0) {Ancestors};
+		\node[text=teal] at (-5, -0.5) {Descendants};
+		\node[text=red] at (-5, -1) {Unrelated};        
+		
+		\node[ancestor] (a1) at (0, 0) {$a_1$};
+		\node[unrelated] (u1) at (-1, -2) {$u_1$};
+		\node[ancestor] (a2) at (1, -2) {$a_2$};
+		
+		\drawUnrelatedTree{u2}{-1}{-4}{$u_2$}
+		\node[ancestor] (a3) at (1, -4) {$a_3$};
+		\node[unrelated] (u3) at (3, -4) {$u_3$};
+		
+		\drawUnrelatedTree{u4}{0}{-7}{$u_4$}
+		\node[ancestor] (a4) at (3, -6) {$a_4$};
+		
+		\node[nodo] (xi) at (3, -8) {$x_i$};
+		
+		\drawUnrelatedTree{r1}{6}{0}{$u_5$} 
+		\drawUnrelatedTree{r2}{10}{0}{$u_6$} 
+		
+		\node[draw=none, fill=none] (hi) at (3, -10) {};
+		
+		\path [->] (a1) edge (u1);
+		\path [->] (a1) edge (a2);
+		\path [->] (a2) edge (u2);
+		\path [->] (a2) edge (a3);
+		\path [->] (a2) edge (u3);
+		\path [->] (a3) edge (u4);
+		\path [->] (a3) edge (a4);
+		\path [->] (a4) edge (xi);      
+		\path [->, teal] (xi) edge[decorate, decoration={snake}] (hi);
+		
+		% Merge box
+		\node[mergebox] (merge) at (9,-5) {
+			Merge unrelated\\
+			equivalence classes
+		};
+		
+		% Dashed arrows from unrelated roots
+		\draw[->, dashed, purple!70!black, thick] (u1) -- (merge.west);
+		\draw[->, dashed, purple!70!black, thick] (u2) -- (merge.west);
+		\draw[->, dashed, purple!70!black, thick] (u3) -- (merge.west);
+		\draw[->, dashed, purple!70!black, thick] (u4) -- (merge.west);
+		\draw[->, dashed, purple!70!black, thick] (r1) -- (merge.west);
+		\draw[->, dashed, purple!70!black, thick] (r2) -- (merge.west);
+		
+	\end{tikzpicture}
+	\caption{Graph partition into ancestors, descendants and unrelated nodes respect to $x_i$, the feature for which we want to calculate the ASV. The unrelated rooted subtrees can be processed independently and then merged to construct the full equivalence classes.}
+	\label{fig:ASV_forest_example}
+\end{figure}
 
 We have a general bound on the size of $\equivalenceClasses$ depending only on the causal graph $C$:
 
@@ -118,20 +177,28 @@ We have a general bound on the size of $\equivalenceClasses$ depending only on t
 	\end{align}
 	%
 	In the base case the set of Eq.~\eqref{eq:equivalence_classes_subtree} is $\{\emptyset, \{y\}\}$. For the recursive case the reasoning is the following: either we do not put $y$ in the set (and then all other features reachable from $y$ won't be in the set as well) or rather 
-	we put $y$ and have complete freedom to decide which features to put from the sub-trees of $y$. The bound from the statement of the proposition can be derived using Eq.~\eqref{eq:fun_for_equi_classes} (FIGURA DE COMO MERGEAR CLASES DE EQUIVALENCIAS DE UNRELATED). 
+	we put $y$ and have complete freedom to decide which features to put from the sub-trees of $y$. The bound from the statement of the proposition can be derived using Eq.~\eqref{eq:fun_for_equi_classes}.
 \end{proof}
 
-Proposition~\ref{prop:bound} indicates that the number of equivalence classes will be small when the tree is shallow. From the point of the view of the causal graph, this corresponds to the case in which there aren't long causal dependencies between the features. In particular, there will be many features that are mutually independent. (NOMBRAR EJEMPLOS DE ARBOLES PUNTUALES QUE DESPUES VEMOS EN LA EXPERIMENTACION)  
+Proposition~\ref{prop:bound} indicates that the number of equivalence classes will be small when the tree is shallow. From the point of view of the causal graph, this corresponds to the case in which there aren't long causal dependencies between the features. In particular, there will be many features that are mutually independent. In our experimentation we used balanced trees, multiple path graphs, Naive Bayes and other classes of graphs which don't have a very long causal dependencies. 
 
-For the case of directed trees we further develop an algorthm able to compute the set $\equivalenceClasses$ as well as the number of permutations inside each class (which is required to compute Eq.~\eqref{eq:equivalence_classes_into_shap}). The complexity of the algorithm
+For the case of directed trees we further develop an algorithm able to compute the set $\equivalenceClasses$ as well as the number of permutations inside each class (which is required to compute Eq.~\eqref{eq:equivalence_classes_into_shap}). The complexity of the algorithm
 is polynomial on $|\equivalenceClasses|$.
 
 \begin{proposition}
 	There is an algorithm able to compute $|\equivalenceClass|$ given the causal graph $C$ (shaped as a rooted directed tree) on time polynomial on $|C|$ and $|\equivalenceClasses|$. Moreover, the algorithm returns the size of each class $[\pi] \in \equivalenceClasses$.
 \end{proposition}
 
+\echu{Ofrezco dos opciones, una más por arriba y otra que entra más en detalle. Choose your posion. PD: No puse nada de la complejidad pero no se cómo poner algo sin que sea humo, porque no estoy explicando nada.}
+
 \begin{proof}
-	The algorithm is recursive on its nature, and based on the ideas from the proof of Proposition~\ref{prop:bound}. (EXPLICAR)
+	The algorithm is recursive on its nature, and based on the ideas from the proof of Proposition~\ref{prop:bound}. 
+	OPCION 1:
+	First we recursively compute the equivalence classes of each unrelated subtree. We then combine these classes with one another, and finally integrate them with the ancestors and descendants while respecting the precedence constraints imposed by the DAG. In particular, descendants are added as a block on the right of $x_i$, while ancestors require counting the valid interleavings with the nodes placed to its left. This yields all equivalence classes and their sizes without explicitly enumerating topological orders.
+	OPCION 2:
+	We first focus on the unrelated part: for each subtree rooted at a node in $UR$, we recursively compute its equivalence classes. This is done by combining the classes of its children and deciding whether each node appears to the left or to the right of $x_i$, which fully determines its contribution. As a result, each unrelated subtree can be processed independently, yielding a set of partial equivalence classes together with their associated counts.
+	
+	We then combine these classes across all unrelated subtrees and integrate them with the ancestors and descendants. Descendants are always placed to the right of $x_i$ and can therefore be treated as a block, whose contribution is given by the number of topological orders of the corresponding subtree. In contrast, ancestors impose precedence constraints, so we must count the valid interleavings between them and the nodes placed to the left. Altogether, this construction yields all equivalence classes and their sizes without explicitly enumerating topological orders.
 \end{proof}
 
 We note that once the set $\equivalenceClasses$ is computed it is possible to find any value $\phi_{M,e}^{ASV}(x)$ in time linear on $|\equivalenceClasses|$. Thus, even though this step can be costly

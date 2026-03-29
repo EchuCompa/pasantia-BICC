@@ -41,7 +41,7 @@
   >
 ]>
 <requests version="1.0">
-  <internal package="biblatex" priority="9" active="1">
+  <internal package="biblatex" priority="9" active="0">
     <generic>latex</generic>
     <provides type="dynamic">
       <file>jaio_paper.bcf</file>
@@ -58,8 +58,10 @@
       <file>apa.bbx</file>
       <file>apa.cbx</file>
       <file>biblatex.cfg</file>
-      <file>spanish.lbx</file>
-      <file>spanish-apa.lbx</file>
+      <file>english.lbx</file>
+      <file>american.lbx</file>
+      <file>american-apa.lbx</file>
+      <file>english-apa.lbx</file>
     </requires>
   </internal>
   <external package="biblatex" priority="5" active="0">

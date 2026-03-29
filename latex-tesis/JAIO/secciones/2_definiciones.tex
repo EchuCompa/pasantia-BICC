@@ -69,13 +69,55 @@ This weight function generalizes the idea mentioned earlier of considering only 
 Eq.~\eqref{eq:w_in_ASV}. 
 
 Moreover, we will consider that the distribution of space of entities is described by a Bayesian Network $N$. We refer to the reader to standard bibliography for the precise formal definitions of Bayesian Networks \parencite{pearl1986bayesianInference} while here we describe them conceptually: a bayesian network $N$
-defines a distribution for $\entities(X)$ with a DAG whose nodes are the features from $X$. Every node $x$ has a set of parents $p(x) \subseteq X$, and the network provides, for each way of assigning the features in $p(x)$, the conditional distribution of $x$. See (EJEMPLO) for an example. Given $N$ and any entity $e$ it is possible to compute
+defines a distribution for $\entities(X)$ with a DAG whose nodes are the features from $X$. Every node $x$ has a set of parents $p(x) \subseteq X$, and the network provides, for each way of assigning the features in $p(x)$, the conditional distribution of $x$. See Figure \ref{fig:cancer_bn_with_cpts} for an example. Given $N$ and any entity $e$ it is possible to compute
 the probability of $e$ by traversing the DAG of $N$ in any topological sort multiplying the corresponding conditional probabilities.
 
-One of the most simplest types of Bayesian Networks is the Naive Bayes, which was already mentioned in regards to intractability results for the Shapley values. This network has a particular structure, in which a single node is parent to all the others and no other pairs of nodes are connected. See (FIGURA) for an example.
+One of the most simplest types of Bayesian Networks is the Naive Bayes, which was already mentioned in regards to intractability results for the Shapley values. This network has a particular structure, in which a single node is parent to all the others and no other pairs of nodes are connected. See Figure \ref{fig:naive_bayes_network} for an example.
 
-Sometimes we will identity the network itself as a causal graph. Thus, the network will provide both the distribution necessary to compute the characteristic function $\nu_{M,e}$ as well as the causal graph necessary to define the weight function $w^C$. (AGREGAR DISCUSION DE CUANDO ESTO ESTA BIEN Y CUANDO NO)
+\begin{figure}[ht]
+	\centering
+	
+	\begin{subfigure}[b]{0.48\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{img/cancerNetworkWithCPTs.png}
+		\caption{Example of a cancer prediction Bayesian network with its CPTs.}
+		\label{fig:cancer_bn_with_cpts}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.48\textwidth}
+		\centering
+		\begin{tikzpicture}[scale=1, transform shape,
+			nodo/.style={circle, draw, minimum size=8mm, inner sep=0pt}
+			]
+			% Root
+			\node[nodo] (C) at (0,2) {$C$};
+			
+			% Features
+			\node[nodo] (X1) at (-3,0) {$X_1$};
+			\node[nodo] (X2) at (-1.5,0) {$X_2$};
+			\node[draw=none] (dots) at (0,0) {$\cdots$};
+			\node[nodo] (Xn1) at (1.5,0) {$X_{n-1}$};
+			\node[nodo] (Xn) at (3,0) {$X_n$};
+			
+			% Edges
+			\draw[->] (C) -- (X1);
+			\draw[->] (C) -- (X2);
+			\draw[->] (C) -- (Xn1);
+			\draw[->] (C) -- (Xn);
+		\end{tikzpicture}
+		\caption{A Naive Bayes network.}
+		\label{fig:naive_bayes_network}
+	\end{subfigure}
+	
+	\caption{Examples of Bayesian network structures.}
+	\label{fig:bayesian_network_examples}
+\end{figure}
 
+A key point for our purposes is that computing the characteristic function under a Bayesian network distribution requires probabilistic inference. Since exact inference in Bayesian networks is $\sharpPhard$ in general \cite{Cooper1990}, we focus on restricted structures such as polytrees, where inference can be performed in polynomial time.
+
+Sometimes we will identify the network itself as a causal graph. Thus, the network will provide both the distribution necessary to compute the characteristic function $\nu_{M,e}$ as well as the causal graph necessary to define the weight function $w^C$.
+
+This identification is not always appropriate. In general, a Bayesian network represents a joint probability distribution and its conditional independencies, but its directed edges do not necessarily encode causal relations. Therefore, using the same graph as both a probabilistic model and a causal graph is only justified when the network is assumed to reflect the underlying causal structure. Otherwise, this should be understood merely as a modeling simplification.
 \begin{comment}
 \subsection{Asymmetric Shapley Values y grafos causales}
 
