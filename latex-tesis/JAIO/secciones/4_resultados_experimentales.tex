@@ -36,7 +36,7 @@ We compare the naive ASV computation based on all topological orders with our ap
 	\label{fig:eq_vs_topo_combined}
 \end{figure}
 
-Figure~\ref{fig:eq_vs_topo_combined} shows that the number of equivalence classes grows significantly slower than the number of topological orders. For instance, in \childNetwork{}, the graph has $7.41\times10^{11}$ topological orders but only around $2003$ equivalence classes on average. Similar gaps are observed in balanced trees, where the difference can reach several orders of magnitude.
+Figure~\ref{fig:equivalenceClassesVsToposortsNumberPlot} shows that the number of equivalence classes grows significantly slower than the number of topological orders. For instance, in \childNetwork{}, the graph has $7.41\times10^{11}$ topological orders but only around $2003$ equivalence classes on average. Similar gaps are observed in balanced trees, where the difference can reach several orders of magnitude.
 
 At the same time, the cost of computing equivalence classes remains moderate for graphs of practical size, typically under a few seconds. For example, in \childNetwork{}, all equivalence classes are computed in less than one second.
 
@@ -50,7 +50,7 @@ As shown in Figure~\ref{fig:equivalenceClassesTimePlot}, the computation remains
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=1\linewidth]{img/equivalentClassesVsAllToposorts_time.png}
+	\includegraphics[width=0.9\linewidth]{img/equivalentClassesVsAllToposorts_time.png}
 	\caption{Runtime comparison between computing equivalence classes and enumerating all topological orders.}
 	\label{fig:equivalenceClassesVsToposortsTimePlot}
 \end{figure}
@@ -61,35 +61,47 @@ Figure~\ref{fig:equivalenceClassesVsToposortsTimePlot} highlights the main advan
 
 For graphs where equivalence classes are not directly available, we evaluate the sampling-based approach.
 
-\begin{table}[h]
+\begin{figure}[H]
 	\centering
-	\begin{tabular}{|l|c|}
-		\hline
-		\textbf{Number of sampled orders} & \textbf{Sampling time (s)}\\
-		\hline
-		100 & 0.9270 \\
-		1000 & 1.1170 \\
-		10000 & 4.7170 \\
-		20000 & 7.7170 \\
-		30000 & 10.8387 \\
-		\hline
-	\end{tabular}
-	\caption{Sampling times for topological orders in \childNetwork{}.}
-	\label{table:exactVsApproximateTopoSorts}
-\end{table}
-
-Table~\ref{table:exactVsApproximateTopoSorts} shows that sampling remains efficient even for large numbers of samples. Moreover, the runtime is not linear in the number of samples, as multiple candidates are generated simultaneously during recursive calls.
-
-Finally, we evaluate the approximation error of ASV using sampled orders.
-
-\begin{figure}[ht]
-	\centering
-	\includegraphics[width=0.8\linewidth]{img/asvResults/ChildAllSeedsASVBoxplot.png}
-	\caption{Relative error between approximate and exact ASV values.}
-	\label{fig:boxplotASVApproximateDifferences}
+	
+	\begin{subfigure}[t]{0.32\linewidth}
+		\vspace{0pt}
+		\centering
+		\small
+		\setlength{\tabcolsep}{4pt}
+		\renewcommand{\arraystretch}{1.1}
+		\begin{tabular}{|r|r|}
+			\hline
+			\textbf{\# Samples} & \textbf{Time (s)}\\
+			\hline
+			100   & 0.9270 \\
+			1000  & 1.1170 \\
+			10000 & 4.7170 \\
+			20000 & 7.7170 \\
+			30000 & 10.8387 \\
+			\hline
+		\end{tabular}
+		\caption{Sampling times for topological orders in \childNetwork{}.}
+		\label{fig:samplingTimesTopoSorts}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.64\linewidth}
+		\vspace{0pt}
+		\centering
+		\includegraphics[width=0.80\linewidth]{img/asvResults/ChildAllSeedsASVBoxplot.png}
+		\caption{Relative error between approximate and exact ASV values.}
+		\label{fig:boxplotASVApproximateDifferences}
+	\end{subfigure}
+	
+	\caption{Efficiency and accuracy of the sampling-based approximation.}
+	\label{fig:sampling_results_combined}
 \end{figure}
 
-Figure~\ref{fig:boxplotASVApproximateDifferences} shows that using 1000 samples yields an average error of around $8\%$. Larger ASV values exhibit smaller relative error, while larger deviations correspond to very small true values.
+Table~\ref{fig:samplingTimesTopoSorts} shows that sampling remains efficient even for large numbers of samples. Moreover, the runtime is not linear in the number of samples, as multiple candidates are generated simultaneously during recursive calls.
+
+In the bounded-degree setting considered here, this makes it more efficient than the alternative recursive sampling approach based on repeatedly selecting a source according to the number of topological orderings that begin with it \cite{HUBER2006420}. In particular, our runtime grows more slowly both with the size of the graph and with the number of requested samples, since the alternative method essentially restarts the counting process from scratch at each step. Nevertheless, that approach remains more general, as it applies beyond polytrees and can also be used on DAGs with unbounded degree, in which it performs better than our algorithm.
+
+Finally, we evaluate the approximation error of ASV using sampled orders. Figure~\ref{fig:boxplotASVApproximateDifferences} shows that using 1000 samples yields an average error of around $8\%$. Larger ASV values exhibit smaller relative error, while larger deviations correspond to very small true values.
 
 These results indicate that sampling provides a practical trade-off between accuracy and computational cost.
 
