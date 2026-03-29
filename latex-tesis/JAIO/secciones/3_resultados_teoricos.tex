@@ -192,9 +192,11 @@ is polynomial on $|\equivalenceClasses|$.
 \echu{Ofrezco dos opciones, una más por arriba y otra que entra más en detalle. Choose your posion. PD: No puse nada de la complejidad pero no se cómo poner algo sin que sea humo, porque no estoy explicando nada.}
 
 \begin{proof}
-	The algorithm is recursive on its nature, and based on the ideas from the proof of Proposition~\ref{prop:bound}. 
+	The algorithm is recursive on its nature, and based on the ideas from the proof of Proposition~\ref{prop:bound}.
+	 
 	OPCION 1:
 	First we recursively compute the equivalence classes of each unrelated subtree. We then combine these classes with one another, and finally integrate them with the ancestors and descendants while respecting the precedence constraints imposed by the DAG. In particular, descendants are added as a block on the right of $x_i$, while ancestors require counting the valid interleavings with the nodes placed to its left. This yields all equivalence classes and their sizes without explicitly enumerating topological orders.
+	
 	OPCION 2:
 	We first focus on the unrelated part: for each subtree rooted at a node in $UR$, we recursively compute its equivalence classes. This is done by combining the classes of its children and deciding whether each node appears to the left or to the right of $x_i$, which fully determines its contribution. As a result, each unrelated subtree can be processed independently, yielding a set of partial equivalence classes together with their associated counts.
 	
@@ -492,14 +494,57 @@ For the ASV the analogous procedure consists on sampling topological orderings a
 \end{proof}
 
 Proposition~\ref{prop:sampling_to_compute_ASV} states that we only need to be able to sample the topological orderings \textit{almost} uniformly to compute the ASV. Also, it shows that if we approximate $\nu_{M,e}$ the overall \textit{additive}-error of the estimation
-of $\phi^{ASV}_{M,e}(x)$ is also controlled. Note that implementing the procedure $\procedureNu$ is often easy: by definition $\nu_{M,e}(S)$ is the expected value of a random variable, and thus if we can sample from the set of entities after conditioning that $s = e(s)$ for every $s \in S$ we are 
-done. This is the case for the product distribution, but also for some bayesian networks such as a Naive Bayes distribution. (AGREGAR ALGO. CREO QUE ESTE PROBLEMA TENIA QUE VER CON INFERENCIA BAYESIANA, NO? PONERLO)
+of $\phi^{ASV}_{M,e}(x)$ is also controlled. Note that implementing the procedure $\procedureNu$ is often easy: by definition $\nu_{M,e}(S)$ is the expected value of a random variable, and thus if we can sample from the set of entities after conditioning that $s = e(s)$ for every $s \in S$ we are done. This is the case for the product distribution, but also for some bayesian networks such with an underlying graph which is a polytree, because the inference can be done in polynomial time. 
 
-Now we describe two ways to implement the procedure $\procedureSampling$. The first one can be understood by looking at Figure (FIGURA DONDE MOSTRAMOS COMO SAMPLEAR SE REDUCE A CONTAR). The idea is that we can sample a topological ordering uniformly using a recursive a procedure in which at each step
-we pick the left-most node of the ordering. In particular, in the beginning we must pick one of the sources of the causal graph (i.e. one of the nodes with in-degree 0). We should weight them according to the number of topological orderings that start with each respective node, and thus we effectively reduce the problem
-of sampling a topological ordering to the problem of counting the number of topological orderings. Even though this problem is intractable in general (REF), there are heuristic algorithms that can approximate this value or even exact algorithm for restricted cases (CITA). In particular, we develop a simple 
-algorithm applicable to polytrees whose complexity depends on (EN QUE? ERA ALGO ASI COMO EL MAXIMO GRADO?).(NO SE BIEN COMO HACER PARA EXPLICAR ESTE ALGORITMO XD. YA NO QUEDA TANTO ESPACIO)
+Now we describe two ways to implement the procedure $\procedureSampling$. The first one can be understood by looking at Figure \ref{fig:topoSortSamplingExample}. The idea is that we can sample a topological ordering uniformly using a recursive a procedure in which at each step we pick the left-most node of the ordering. In particular, in the beginning we must pick one of the sources of the causal graph (i.e. one of the nodes with in-degree 0). We should weight them according to the number of topological orderings that start with each respective node, and thus we effectively reduce the problem of sampling a topological ordering to the problem of counting the number of topological orderings. Even though this problem is intractable in general \cite{countingLinearExtensions}, there are heuristic algorithms that can approximate this value or even exact algorithm for restricted cases \cite{efficientCountingOfToposorts, HUBER2006420}. 
 
-Alternatively, we consider known algorithms from the literature able to approximate uniform sampling of topological orderings from arbitrary DAGs. We implement an algorithm based on random walks \parencite{bubley1999faster}
-with a polynomial (although of high degree) complexity. We note that there are more modern and asymptotically better algorithms \parencite{huber2006fast}, but we believe that the hidden constants in them make them inefficient for the input sizes we consider.
+In particular, we develop a simple algorithm applicable to polytrees whose complexity depends on the maximum degree of a node. 
+\echu{Acá también dejo dos opciones, la opción más por arriba y la opción más descriptiva.}
+
+OPCION 1:
+This algorithm computes the number of topological orderings of a polytree by performing a DFS over its underlying undirected graph and recursively combining the results of each node’s unvisited neighbors. Instead of only counting the number of orderings of each subtree, the algorithm keeps track of the positions in which a node may appear, together with how many topological orderings realize each position. This additional information is necessary to correctly handle nodes with multiple parents, where simple multinomial interleavings are no longer sufficient. At each step, the algorithm enumerates the valid relative orders of the current node and its unvisited neighbors, combines the recursive results of those neighbors, and merges equal positions. In this way, it computes all possible placements of the node and the corresponding number of topological orderings, yielding an exact counting algorithm for arbitrary polytrees.
+
+OPCION 2:
+
+The algorithm computes the number of topological orderings of a polytree by performing a DFS over its underlying graph and recursively combining the results of each node’s unvisited neighbors. At each step, it considers all valid relative orders of the node and its neighbors, combines their contributions, and merges equal positions. This yields an exact counting algorithm for polytrees without explicitly enumerating all topological orders.
+
+\begin{figure}[ht]
+	\centering
+	\begin{tikzpicture}
+		% Define the rigth set of nodes
+		\foreach \i in {1,2,3,4,5}
+		\node[draw=none, circle, minimum size=5mm, inner sep=0pt] (L\i) at (4, -\i) {};
+		
+		% Define the left set of nodes
+		\foreach \j in {1,2,3}
+		\node[draw, circle, red, minimum size=5mm, inner sep=0pt] (source\j) at (0, -\j*2) {\scalebox{0.6}{$Source_\j$}};
+		
+		% Draw edges between nodes (example edges)
+		\foreach \i in {1,2}
+		\foreach \j in {1,2}
+		\draw[->]  (source\j) -- (L\i); 
+		
+		\foreach \i in {4,5}
+		\foreach \j in {2,3}
+		\draw[->]  (source\j) -- (L\i); 
+		
+		\draw[->]  (source2) -- (L3);
+		
+		
+		\draw [decorate, blue, decoration={random steps, segment length=10pt, amplitude=2pt}, thick]
+		(4,-3) circle (2.4);
+		
+		%Number of órdenes topológicos for each node
+		
+		\node[draw=none,minimum size=3mm, inner sep=0pt] () at (0, -1) {\small \textcolor{orange}{$n_1$=100}};
+		
+		\node[draw=none,minimum size=3mm, inner sep=0pt] () at (0, -3) {\small \textcolor{orange}{$n_2$=300}};
+		
+		\node[draw=none,minimum size=3mm, inner sep=0pt] () at (0, -5) {\small \textcolor{orange}{$n_3$=200}};
+	\end{tikzpicture}
+	\caption{Illustration of the first step of the sampling algorithm. The candidate source nodes that may appear first in the ordering are shown in red, while the rest of the graph is shown in blue. Each source node is annotated with the number of topological orderings in which it appears first.}
+	\label{fig:topoSortSamplingExample}
+\end{figure}
+
+Alternatively, we consider known algorithms from the literature able to approximate uniform sampling of topological orderings from arbitrary DAGs. We implement an algorithm based on random walks \parencite{bubley1999faster} with a polynomial (although of high degree) complexity. We note that there are more modern and asymptotically better algorithms \parencite{huber2006fast}, but we believe that the hidden constants in them make them inefficient for the input sizes we consider.
 
