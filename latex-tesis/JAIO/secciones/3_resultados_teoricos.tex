@@ -1,7 +1,7 @@
 \subsection{Tractability of ASV}
 
-As mentioned before, the computation of the Shapley Values is intractable (in particular, \#\textsc{P}-hard\footnote{\#\textsc{P} is a class of \textit{counting} problems. The \#\textsc{P}-hard problems are the hardest problems in this class, and it is known that if they can be solved in polynomial time then $\textsc{P} = \textsc{NP}$. Then, under the usual theoretical assumption, \#\textsc{P}-hard problems cannot be solved efficiently.}) even for trivial models
-if the underlying distribution is represented by a Naive Bayes network. We now show that this is not the case for the ASV whenever we use as causal graph the bayesian network itself.
+As mentioned before, the computation of the Shapley Values is intractable (in particular, $\sharpPhard$) even for trivial models
+if the underlying distribution is represented by a Naive Bayes network. We now show that this is not the case for the ASV whenever we use the bayesian network as the causal graph.
 
 \begin{theorem}\label{the:asv_naive_bayes_tractable_clean}
 	Let $\mathcal{F}$ be any family of models. Then, the ASV can be computed in polynomial time for the family $\mathcal{F}$ under Naive Bayes distributions (where the causal graph is the network itself) if and only if the Shapley values can be computed in polynomial time for the family $\mathcal{F}$ under product distributions\footnote{With our notation, a product distribution over $\entities{}(X)$ is a distribution that factorizes as $\Pr\left[e\right] = \prod_{x \in X}\Pr\left[ x = e(x) \right]$.}.

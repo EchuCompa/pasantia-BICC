@@ -112,10 +112,11 @@ One of the most simplest types of Bayesian Networks is the Naive Bayes, which wa
 	\caption{Examples of Bayesian network structures.}
 	\label{fig:bayesian_network_examples}
 \end{figure}
+\enlargethispage{2\baselineskip} % This is done so that the footnote can fit.
 
-A key point for our purposes is that computing the characteristic function under a Bayesian network distribution requires probabilistic inference. Since exact inference in Bayesian networks is $\sharpPhard$ in general \cite{Cooper1990}, we focus on restricted structures such as polytrees, where inference can be performed in polynomial time.
+A key point for our purposes is that computing the characteristic function under a Bayesian network distribution requires probabilistic inference. Since exact inference in Bayesian networks is $\sharpPhard$ \footnote{\#\textsc{P} is a class of \textit{counting} problems. The \#\textsc{P}-hard problems are the hardest problems in this class, and it is known that if they can be solved in polynomial time then $\textsc{P} = \textsc{NP}$. Then, under the usual theoretical assumption, \#\textsc{P}-hard problems cannot be solved efficiently.} in general \parencite{Cooper1990}, we focus on restricted structures such as polytrees, where inference can be performed in polynomial time.
 
-Sometimes we will identify the network itself as a causal graph. Thus, the network will provide both the distribution necessary to compute the characteristic function $\nu_{M,e}$ as well as the causal graph necessary to define the weight function $w^C$.
+Sometimes we will identify the network itself as a causal graph. Thus, the network will provide both the distribution necessary to compute the characteristic function $\nu_{M,e}$, as well as the causal graph necessary to define the weight function $w^C$.
 
 This identification is not always appropriate. In general, a Bayesian network represents a joint probability distribution and its conditional independencies, but its directed edges do not necessarily encode causal relations. Therefore, using the same graph as both a probabilistic model and a causal graph is only justified when the network is assumed to reflect the underlying causal structure. Otherwise, this should be understood merely as a modeling simplification.
 \begin{comment}
