@@ -189,18 +189,11 @@ is polynomial on $|\equivalenceClasses|$.
 	There is an algorithm able to compute $|\equivalenceClass|$ given the causal graph $C$ (shaped as a rooted directed tree) on time polynomial on $|C|$ and $|\equivalenceClasses|$. Moreover, the algorithm returns the size of each class $[\pi] \in \equivalenceClasses$.
 \end{proposition}
 
-\echu{Ofrezco dos opciones, una más por arriba y otra que entra más en detalle. Choose your posion. PD: No puse nada de la complejidad pero no se cómo poner algo sin que sea humo, porque no estoy explicando nada.}
-
 \begin{proof}
 	The algorithm is recursive on its nature, and based on the ideas from the proof of Proposition~\ref{prop:bound}.
 	 
-	OPCION 1:
 	First we recursively compute the equivalence classes of each unrelated subtree. We then combine these classes with one another, and finally integrate them with the ancestors and descendants while respecting the precedence constraints imposed by the DAG. In particular, descendants are added as a block on the right of $x_i$, while ancestors require counting the valid interleavings with the nodes placed to its left. This yields all equivalence classes and their sizes without explicitly enumerating topological orders.
 	
-	OPCION 2:
-	We first focus on the unrelated part: for each subtree rooted at a node in $UR$, we recursively compute its equivalence classes. This is done by combining the classes of its children and deciding whether each node appears to the left or to the right of $x_i$, which fully determines its contribution. As a result, each unrelated subtree can be processed independently, yielding a set of partial equivalence classes together with their associated counts.
-	
-	We then combine these classes across all unrelated subtrees and integrate them with the ancestors and descendants. Descendants are always placed to the right of $x_i$ and can therefore be treated as a block, whose contribution is given by the number of topological orders of the corresponding subtree. In contrast, ancestors impose precedence constraints, so we must count the valid interleavings between them and the nodes placed to the left. Altogether, this construction yields all equivalence classes and their sizes without explicitly enumerating topological orders.
 \end{proof}
 
 We note that once the set $\equivalenceClasses$ is computed it is possible to find any value $\phi_{M,e}^{ASV}(x)$ in time linear on $|\equivalenceClasses|$. Thus, even though this step can be costly
@@ -499,14 +492,9 @@ of $\phi^{ASV}_{M,e}(x)$ is also controlled. Note that implementing the procedur
 Now we describe two ways to implement the procedure $\procedureSampling$. The first one can be understood by looking at Figure \ref{fig:topoSortSamplingExample}. The idea is that we can sample a topological ordering uniformly using a recursive a procedure in which at each step we pick the left-most node of the ordering. In particular, in the beginning we must pick one of the sources of the causal graph (i.e. one of the nodes with in-degree 0). We should weight them according to the number of topological orderings that start with each respective node, and thus we effectively reduce the problem of sampling a topological ordering to the problem of counting the number of topological orderings. Even though this problem is intractable in general \cite{countingLinearExtensions}, there are heuristic algorithms that can approximate this value or even exact algorithm for restricted cases \cite{efficientCountingOfToposorts, HUBER2006420}. 
 
 In particular, we develop a simple algorithm to count topological orders applicable to polytrees whose complexity depends on the maximum degree of a node. 
-\echu{Acá también dejo dos opciones, una más en detalle y otra más por arriba. }
 
-OPCION 1:
 This algorithm computes the number of topological orderings of a polytree by performing a DFS over its underlying undirected graph and recursively combining the results of each node’s unvisited neighbors. Instead of only counting the number of orderings of each subtree, the algorithm keeps track of the positions in which a node may appear, together with how many topological orderings realize each position. This additional information is necessary to correctly handle nodes with multiple parents, where simple multinomial interleavings are no longer sufficient. At each step, the algorithm enumerates the valid relative orders of the current node and its unvisited neighbors, combines the recursive results of those neighbors, and merges equal positions. In this way, it computes all possible placements of the node and the corresponding number of topological orderings, yielding an exact counting algorithm for arbitrary polytrees.
 
-OPCION 2:
-
-The algorithm computes the number of topological orderings of a polytree by performing a DFS over its underlying graph and recursively combining the results of each node’s unvisited neighbors. At each step, it considers all valid relative orders of the node and its neighbors, combines their contributions, and merges equal positions. This yields an exact counting algorithm for polytrees without explicitly enumerating all topological orders.
 
 \begin{figure}[ht]
 	\centering
@@ -542,9 +530,9 @@ The algorithm computes the number of topological orderings of a polytree by perf
 		
 		\node[draw=none,minimum size=3mm, inner sep=0pt] () at (0, -5) {\small \textcolor{orange}{$n_3$=200}};
 	\end{tikzpicture}
-	\caption{Illustration of the first step of the sampling algorithm. The candidate source nodes that may appear first in the ordering are shown in red, while the rest of the graph is shown in blue. Each source node is annotated with the number of topological orderings in which it appears first.}
+	\caption{Illustration of the first step of the sampling algorithm. The candidate source nodes that may appear first in the ordering are shown in red, while the rest of the graph is shown in blue. Each source node is annotated with the number of topological orderings in which it appears first. Then we will assign a probability to each node based on $\frac{appearsFirst}{allOrders}$ and sample them based on that distribution.}
 	\label{fig:topoSortSamplingExample}
 \end{figure}
 
-Alternatively, we consider known algorithms from the literature able to approximate uniform sampling of topological orderings from arbitrary DAGs. We implement an algorithm based on random walks \parencite{bubley1999faster} with a polynomial (although of high degree) complexity. We note that there are more modern and asymptotically better algorithms \parencite{huber2006fast}, but we believe that the hidden constants in them make them inefficient for the input sizes we consider.
+Alternatively, we consider known algorithms from the literature able to approximate uniform sampling of topological orderings from arbitrary DAGs. We implement an algorithm based on random walks \parencite{bubley1999faster} with a polynomial (although of high degree) complexity. We note that there are more modern and asymptotically better algorithms \parencite{HUBER2006420}, but we believe that the hidden constants in them make them inefficient for the input sizes we consider.
 

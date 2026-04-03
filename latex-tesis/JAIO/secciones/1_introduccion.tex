@@ -23,9 +23,7 @@ Moreover, although ASV was primarily proposed to improve explanatory quality, it
 
 In this paper we address therefore the problem of efficiently computing the ASV scores, which was not explored thoroughly in previous literature. We will prove that for some families of models for which
 computing the Shapley values is intractable there are still polynomial time algorithms for computing the ASV. Inspired by this initial result, we develop an algorithm to compute the ASV exactly in more general contexts
-by exploiting the fact that many permutations of the features can be grouped in an unique equivalence class to simplify computations. Finally, we also propose a flexible approximation scheme that allows to approximate the ASV as long as it is possible to 
-\echu{Me parece raro lo de (1) y (2), si es algo estandar lo dejamos, np. Sino banco ponero en dos oracions o de otra forma.}
-(1) Sample a topological order of the causal graph uniformly at random, and (2) Sample a data point with respect to the data distribution after conditioning a subset of the features to have specific values. We instantiate all these general algorithms with particular 
+by exploiting the fact that many permutations of the features can be grouped in an unique equivalence class to simplify computations. Finally, we also propose a flexible approximation scheme that allows to approximate the ASV as long as it is possible to (1) Sample a topological order of the causal graph uniformly at random, and (2) Sample a data point with respect to the data distribution after conditioning a subset of the features to have specific values. We instantiate all these general algorithms with particular 
 examples of causal graphs and ML models and show experimentally that they are efficient.
 
 \begin{comment}

@@ -60,7 +60,7 @@ def timeOfAllTopologicalSorts(dag, printTime = 500000, maxTopoSorts = 10000000):
             break
     return timing_dict, allTopoSorts
 
-def timeRecursiveFunctionParts(dag : nx.DiGraph, unr_roots : List[Any], hasher : TopoSortHasher, feature_node, nodes_classification : Dict[Any, NodeState]) -> List[EquivalenceClass]:
+def timeRecursiveFunctionParts(dag : nx.DiGraph, unr_roots : List[Any], hasher : TopoSortHasher, feature_node, nodes_classification : Dict[Any, NodeState]) -> Dict[str, float]:
     run_data = {}
 
     start_time = time.time()

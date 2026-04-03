@@ -1,7 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 from enum import Enum
-from typing import Dict, List
+from typing import Dict, List, Set
 from asvFormula import Node
 
 class NodeState(Enum):
@@ -36,7 +36,7 @@ def classifyNodes(dag: nx.DiGraph, x_i : Node, nodes_classification : Dict[Node,
 
 #They need to be ordered in the same way that the nodes are ordered in the graph, because in the possibleLeftOrders we are putting them assuming they have the same order as in the graph
 
-def orderedNodes(dag : nx.DiGraph, nodesToOrder : List[Node]) -> List[Node]:
+def orderedNodes(dag : nx.DiGraph, nodesToOrder : Set[Node]) -> List[Node]:
     topo_sorted_nodes = list(nx.topological_sort(dag))
     ordered_ancestors = [n for n in topo_sorted_nodes if n in nodesToOrder]
     

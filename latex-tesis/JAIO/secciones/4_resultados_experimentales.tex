@@ -23,7 +23,6 @@ We compare the naive ASV computation based on all topological orders with our ap
 		\caption{Runtime for computing equivalence classes.}
 		\label{fig:equivalenceClassesTimePlot}
 	\end{subfigure}
-	\caption{Comparison between equivalence classes and topological orders in terms of size and computation time.}
 	\label{fig:eq_vs_topo_combined}
 \end{figure}
 
@@ -37,16 +36,33 @@ This reduction directly decreases the number of evaluations of the characteristi
 
 We now analyze the cost of computing equivalence classes.
 
-As shown in Figure~\ref{fig:equivalenceClassesTimePlot}, the computation remains efficient for moderate graph sizes, typically under a few seconds. For example, in \childNetwork{}, all equivalence classes are computed in less than one second. However, as graph size increases, the runtime grows alongside the number of equivalence classes.
+As shown in Figure~\ref{fig:equivalenceClassesTimePlot}, the computation remains efficient for moderate graph sizes, typically under a few seconds. However, as graph size increases, the runtime grows alongside the number of equivalence classes.
+
+We can see in Figure~\ref{fig:timeVsEquivClasses} that the runtime is strongly correlated with the number of equivalence classes. This is useful not only for explaining the observed growth, but also from a practical point of view. Since we also have a procedure to count the number of equivalence classes beforehand, we can use it as a rough predictor of the computational cost of the exact algorithm before actually running it.
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=0.9\linewidth]{img/equivalentClassesVsAllToposorts_time.png}
-	\caption{Runtime comparison between computing equivalence classes and enumerating all topological orders.}
-	\label{fig:equivalenceClassesVsToposortsTimePlot}
+	
+	\begin{subfigure}[t]{0.48\linewidth}
+		\vspace{0pt}
+		\centering
+		\includegraphics[width=\linewidth]{img/equivalentClassesVsAllToposorts_time.png}
+		\caption{Runtime comparison between computing equivalence classes and enumerating all topological orders. \footnotemark}
+		\label{fig:equivalenceClassesVsToposortsTimePlot}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.48\linewidth}
+		\vspace{0pt}
+		\centering
+		\includegraphics[width=\linewidth]{img/time_vs_equiv_classes.png}
+		\caption{Runtime as a function of the number of equivalence classes.}
+		\label{fig:timeVsEquivClasses}
+	\end{subfigure}
+	\label{fig:runtime_experiments}
 \end{figure}
+\footnotetext{To estimate runtime, we measured the time required to generate the first 1000 topological orders and extrapolated using the total number of orders in each graph, since full execution was not computationally feasible.}
 
-Figure~\ref{fig:equivalenceClassesVsToposortsTimePlot} highlights the main advantage of our approach. While enumerating all topological orders quickly becomes infeasible (e.g., requiring days for large graphs), computing equivalence classes remains tractable. This is because the number of equivalence classes depends on the graph structure rather than on the total number of topological orders.
+Figure~\ref{fig:equivalenceClassesVsToposortsTimePlot} highlights the main advantage of our approach. While enumerating all topological orders quickly becomes infeasible (e.g., requiring days for large graphs), computing equivalence classes remains tractable.
 
 \subsubsection{Sampling-Based Approximation of Topological Orders}
 
@@ -80,11 +96,9 @@ For graphs where equivalence classes are not directly available, we evaluate the
 		\vspace{0pt}
 		\centering
 		\includegraphics[width=0.80\linewidth]{img/asvResults/ChildAllSeedsASVBoxplot.png}
-		\caption{Relative error between approximate and exact ASV values.}
+		\caption{Relative error between approximate and exact ASV values in \childNetwork{}.}
 		\label{fig:boxplotASVApproximateDifferences}
 	\end{subfigure}
-	
-	\caption{Efficiency and accuracy of the sampling-based approximation.}
 	\label{fig:sampling_results_combined}
 \end{figure}
 
@@ -98,4 +112,4 @@ These results indicate that sampling provides a practical trade-off between accu
 
 \subsubsection{Remarks on Mean Prediction Computation}
 
-In our experiments, the cost of evaluating the characteristic function is not the dominant factor. For decision trees under Bayesian Networks distributions with an underlying polytree, mean prediction can be computed efficiently, and thus does not limit the performance of the overall approach. Also we compared our algorithm to the brute force approach and it was a 100 times faster, you can see the experiments in the code repository.
+In our experiments, the cost of evaluating the characteristic function is not the dominant factor. For decision trees under Bayesian Network distributions with a polytree structure, mean prediction can be computed efficiently, so it does not limit overall performance. However, for more general models, the mean prediction could be approximated, yielding an approximate variant of the method.
