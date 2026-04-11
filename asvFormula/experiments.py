@@ -118,7 +118,7 @@ def plotValuesFromDF(ax, df, valueToPlot, hueValue, seed, paletteValue='Set2'):
     desired_order = ["Xray", "Pollution", "Dyspnoea", "Cancer"] if bayesianNetwork == 'Cancer' else childFeatureOrder
     sns.barplot(x="Feature", y=valueToPlot, hue=hueValue, data=df, palette=paletteValue, ax=ax, order=desired_order, errorbar=None)
     ax.axhline(0, color="black", linewidth=1)
-    ax.set_title(f"Valores de {valueToPlot}, con seed: {seed} en Red {bayesianNetwork}")
+    ax.set_title(f"Values of {valueToPlot}, with seed: {seed} in network {bayesianNetwork}")
     ax.set_ylabel(valueToPlot)
     ax.set_xlabel("Feature")
     if bayesianNetwork == 'Child':
