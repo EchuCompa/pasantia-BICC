@@ -17,14 +17,14 @@ For more general families of distributions the problem becomes much harder: for 
 On the other hand, there are also concerns about the quality of the explanations it produces. In particular, it is not always clear how to interpret, in the context of AI models, the axioms inherited from game theory, and several works point out that these explanations may fail to adequately capture relationships 
 such as dependence, relevance, or causality between variables \parencite{fryer2021shapley, marques2023logic, huang2023inadequacy}. More generally, there is no absolute consensus on what should be considered an “explanation” in AI: many current techniques are pragmatic approximations to a much broader problem related to understanding, causality, and human interpretability \parencite{MILLER20191, lipton2017mythosmodelinterpretability}.
 
-The Asymmetric Shapley Values (ASV from now on) are a proposal introduced by \cite{frye2019asymmetric} to overcome these limitations. This variant incorporates causal information into the computation of attribution scores by restricting attention to permutations of variables that respect a causal graph. 
+The Asymmetric Shapley Values (ASV from now on) are a proposal introduced by \cite{frye2019asymmetric} to overcome some of these limitations. This variant incorporates causal information into the computation of attribution scores by restricting attention to permutations of variables that respect a causal graph. 
 In this way, instead of treating all features symmetrically, priority is given to the more fine-grained ones (in the sense that the information they provide is not present in the other variables). This can produce explanations that are more faithful to the data-generating process and can help better detect phenomena such as bias or discrimination. 
 Moreover, although ASV was primarily proposed to improve explanatory quality, it naturally raises the question of whether this additional restriction may also provide computational benefits.
 
 In this paper we address therefore the problem of efficiently computing the ASV scores, which was not explored thoroughly in previous literature. We will prove that for some families of models for which
 computing the Shapley values is intractable there are still polynomial time algorithms for computing the ASV. Inspired by this initial result, we develop an algorithm to compute the ASV exactly in more general contexts
 by exploiting the fact that many permutations of the features can be grouped in an unique equivalence class to simplify computations. Finally, we also propose a flexible approximation scheme that allows to approximate the ASV as long as it is possible to (1) Sample a topological order of the causal graph uniformly at random, and (2) Sample a data point with respect to the data distribution after conditioning a subset of the features to have specific values. We instantiate all these general algorithms with particular 
-examples of causal graphs and ML models and show experimentally that they are efficient.
+examples of causal graphs and machine learning models and show experimentally that they are efficient.
 
 \begin{comment}
 

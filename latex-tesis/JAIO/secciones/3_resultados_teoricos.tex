@@ -7,7 +7,7 @@ if the underlying distribution is represented by a Naive Bayes network. We now s
 	Let $\mathcal{F}$ be any family of models. Then, the ASV can be computed in polynomial time for the family $\mathcal{F}$ under Naive Bayes distributions (where the causal graph is the network itself) if and only if the Shapley values can be computed in polynomial time for the family $\mathcal{F}$ under product distributions\footnote{With our notation, a product distribution over $\entities{}(X)$ is a distribution that factorizes as $\Pr\left[e\right] = \prod_{x \in X}\Pr\left[ x = e(x) \right]$.}.
 \end{theorem}
 
-
+\begin{comment}
 \begin{proof}
 	First, we show the right-to-left implication, which is the hard one. Let $x_1$ be the root node of the causal graph, and let $x_2,\ldots, x_n$ be the rest of the nodes. The DAG has $(n-1)!$ topological sorts, and in particular it holds that, for any $2 \leq j \leq n$,
 	%
@@ -30,7 +30,7 @@ if the underlying distribution is represented by a Naive Bayes network. We now s
 		\nu_{M,e,\Pr}(\{x_1\} \cup S) = \nu_{M,e,\Pr'}(S) 
 	\end{align}
 	%
-	This is intuitive: the distribution $\Pr'$ is obtained by fixing the value of $x_1$ as $e(x_1)$, and thus having $x_1$ inside $\nu$ does not matter.
+	This is intuitive: the distribution $\Pr'$ is obtained by fixing the value of $x_1$ as $e(x_1)$, and thus having $x_1$ inside $\nu$ is equivalent to using the distribution $\Pr'$.
 	
 	From Eq.~\eqref{eq:prob_prime_for_fixing_x1} it can be proven easily that
 	\begin{align}
@@ -43,7 +43,7 @@ if the underlying distribution is represented by a Naive Bayes network. We now s
 		\phi^{ASV}_{M,e,\Pr}(x_1) = \nu_{M,e,\Pr{}}(\{x_1\}) - \nu_{M,e,\Pr{}}(\emptyset)
 	\end{align*}
 	%
-	because $\pi_{<1} = \emptyset$ for any permutation consistent with the DAG. Computing the values $\nu_{M,e,\Pr{}}(\{x_1\})$ and $\nu_{M,e,\Pr{}}(\emptyset)$ is equivalent to computing averages of the model $M$, and it is known that the capacity of computing 
+	because $\pi_{<1} = \emptyset$ for any permutation consistent with the DAG. Computing the values $\nu_{M,e,\Pr{}}(\{x_1\})$ and $\nu_{M,e,\Pr{}}(\emptyset)$ reduces to computing averages of the model $M$ with some product distributions, and it is known that the capacity of computing 
 	the Shapley values for any product distribution entails the capacity of computing averages \parencite{van2022tractability}.
 	
 	The left-to-right implication is immediate by observing that product distributions are a particular case of Naive Bayes distribution, and thus we can ``simulate'' them: one possible way to do this is
@@ -53,6 +53,7 @@ if the underlying distribution is represented by a Naive Bayes network. We now s
 		\phi^{Shap}_{M,e,\Pr}(x_j) = \frac{1}{n} \sum_{i=1}^n \phi^{ASV}_{M,e,\Pr_i}(x_j)
 	\end{align*}
 \end{proof}
+\end{comment}
 
 Theorem~\ref{the:asv_naive_bayes_tractable_clean} shows that, in contrast to the Shapley values, the ASV can be computed under Naive Bayes distributions for simple models such as decision trees. Intuitively, the reason for this is that the causality imposed by the distribution is mimicked by the way that only certain permutations are considered,
  and thus many symmetries can be exploited. We believe this motivates the idea of studying the complexity of computing the ASV whenever the distribution is also used as the causal graph. 
@@ -75,7 +76,7 @@ We will follow a similar strategy to compute the ASV. We define a notion of equi
 	\[
 	\pi^1 \sim_x \pi^2
 	\iff
-	\{\pi^1_{<x}\}=\{\pi^2_{<x}\}.
+	\pi^1_{<x}=\pi^2_{<x}.
 	\]
 \end{definition}
 
@@ -88,12 +89,12 @@ Let $\equivalenceClasses$ be the set of equivalence classes. It is immediate fro
 \end{align}
 %
 Therefore, instead of invoking $\nu_{M,e}$ $|topos(C)|$ times it is enough to compute it $|\equivalenceClasses|$ times. This value can be at most $2^{|X|}$, but the hope is that in practical scenarios it is smaller. From now on, we will restrict to the case in which causal graphs are given 
-by \textit{rooted directed trees}, polytrees with nodes that have one or less parents. In this case, note that we can split the nodes in three groups with respect to $x$: those that are descendants of $x$, those that are ancestors of $x$, and the \textit{unrelated} ones. Observe that descendant/ancestors are never/always in the set $\pi_{<x}$, for any $x$. Thus, the structure of the equivalence classes depends only on the unrelated nodes, you can see them in Figure \ref{fig:ASV_forest_example}.
+by \textit{rooted directed trees}, polytrees with nodes that have one or less parents. In this case, note that we can split the nodes in three groups with respect to $x$: those that are descendants of $x$, those that are ancestors of $x$, and the \textit{unrelated} ones. Observe that descendant/ancestors are never/always in the set $\pi_{<x}$, for any $x$. Thus, the structure of the equivalence classes depends only on the unrelated nodes. See Figure~\ref{fig:ASV_forest_example} for a visual explanation.
 
 
 \begin{figure}[H]
 	\centering
-	\begin{tikzpicture}[scale=.65, transform shape, 
+	\begin{tikzpicture}[scale=.55, transform shape, 
 		unrelated/.style={circle, draw=red},
 		ancestor/.style={circle, draw=blue},
 		mergebox/.style={draw=purple!70!black, rounded corners, fill=purple!8, align=center, inner sep=6pt},
@@ -180,7 +181,7 @@ We have a general bound on the size of $\equivalenceClasses$ depending only on t
 	we put $y$ and have complete freedom to decide which features to put from the sub-trees of $y$. The bound from the statement of the proposition can be derived using Eq.~\eqref{eq:fun_for_equi_classes}.
 \end{proof}
 
-Proposition~\ref{prop:bound} indicates that the number of equivalence classes will be small when the tree is shallow. From the point of view of the causal graph, this corresponds to the case in which there aren't long causal dependencies between the features. In particular, there will be many features that are mutually independent. In our experimentation we used balanced trees, multiple path graphs, Naive Bayes and other classes of graphs which don't have a very long causal dependencies. 
+Proposition~\ref{prop:bound} indicates that the number of equivalence classes will be small when the tree is shallow. From the point of view of the causal graph, this corresponds to the case in which there aren't long causal dependencies between the features. In particular, there will be many features that are mutually independent. In our experimentation we will consider trees with different structure (such as balances trees or Naive Bayes-style trees) and different depth, and we will verify how the depth impacts heavily on the performance of our algorithms. 
 
 For the case of directed trees we further develop an algorithm able to compute the set $\equivalenceClasses$ as well as the number of permutations inside each class (which is required to compute Eq.~\eqref{eq:equivalence_classes_into_shap}). The complexity of the algorithm
 is polynomial on $|\equivalenceClasses|$.
@@ -198,7 +199,7 @@ is polynomial on $|\equivalenceClasses|$.
 
 We note that once the set $\equivalenceClasses$ is computed it is possible to find any value $\phi_{M,e}^{ASV}(x)$ in time linear on $|\equivalenceClasses|$. Thus, even though this step can be costly
 (because the bound from Proposition~\ref{prop:bound} implies that the algorithm may take exponential time on the size causal graph) is must be done only once. Moreover, it is independent of the model $M$, and thus it can be reused even
-when the AI model is updated.
+when the model is updated.
 
 \begin{comment}
 \begin{figure}[ht]
@@ -461,6 +462,8 @@ For the ASV the analogous procedure consists on sampling topological orderings a
 
 \newcommand{\randomVar}{V^{M,e}}
 
+\begin{comment}
+
 \begin{proof}
 	Consider the random variable $\randomVar$ over domain $topos(C)$ defined as $\randomVar(\pi) = \left[ \nu_{M,e}(\pi_{<x} \cup \{x\}) - \nu_{M,e}(\pi_{<x}) \right]$. It holds that
 	%
@@ -486,19 +489,20 @@ For the ASV the analogous procedure consists on sampling topological orderings a
 	that the error obtained by approximating all the $\nu_{M,e}$ invocations is bounded by $O(\varepsilon_{\nu})$.
 \end{proof}
 
-Proposition~\ref{prop:sampling_to_compute_ASV} states that we only need to be able to sample the topological orderings \textit{almost} uniformly to compute the ASV. Also, it shows that if we approximate $\nu_{M,e}$ the overall \textit{additive}-error of the estimation
-of $\phi^{ASV}_{M,e}(x)$ is also controlled. Note that implementing the procedure $\procedureNu$ is often easy: by definition $\nu_{M,e}(S)$ is the expected value of a random variable, and thus if we can sample from the set of entities after conditioning that $s = e(s)$ for every $s \in S$ we are done. This is the case for the product distribution, but also for some bayesian networks such with an underlying graph which is a polytree, because the inference can be done in polynomial time. 
+\end{comment}
 
-Now we describe two ways to implement the procedure $\procedureSampling$. The first one can be understood by looking at Figure \ref{fig:topoSortSamplingExample}. The idea is that we can sample a topological ordering uniformly using a recursive a procedure in which at each step we pick the left-most node of the ordering. In particular, in the beginning we must pick one of the sources of the causal graph (i.e. one of the nodes with in-degree 0). We should weight them according to the number of topological orderings that start with each respective node, and thus we effectively reduce the problem of sampling a topological ordering to the problem of counting the number of topological orderings. Even though this problem is intractable in general \cite{countingLinearExtensions}, there are heuristic algorithms that can approximate this value or even exact algorithm for restricted cases \cite{efficientCountingOfToposorts, HUBER2006420}. 
+Proposition~\ref{prop:sampling_to_compute_ASV} states that we only need to be able to sample the topological orderings \textit{almost} uniformly to compute the ASV. Also, it shows that if we approximate $\nu_{M,e}$ the overall \textit{additive}-error of the estimation
+of $\phi^{ASV}_{M,e}(x)$ is also controlled. Note that implementing the procedure $\procedureNu$ is often easy: by definition $\nu_{M,e}(S)$ is the expected value of a random variable, and thus if we can sample from the set of entities after conditioning that $s = e(s)$ for every $s \in S$ we are done. This is the case for the product distribution, but also for any bayesian networks whose underlying graph is a polytree, because then the inference process can be implemented in polynomial time. 
+
+Now we describe two ways to implement the procedure $\procedureSampling$. The first one can be understood by looking at Figure \ref{fig:topoSortSamplingExample}. The idea is that we can sample a topological ordering uniformly using a recursive a procedure in which at each step we pick the left-most node of the ordering. In particular, in the beginning we must pick one of the sources of the causal graph (i.e. one of the nodes with in-degree 0). We should weight them according to the number of topological orderings that start with each respective node, and thus we effectively reduce the problem of sampling a topological ordering to the problem of counting the number of topological orderings. Even though this problem is intractable in general \parencite{countingLinearExtensions}, there are heuristic algorithms that can approximate this value or even exact algorithm for restricted cases \parencite{efficientCountingOfToposorts}. 
 
 In particular, we develop a simple algorithm to count topological orders applicable to polytrees whose complexity depends on the maximum degree of a node. 
-
 This algorithm computes the number of topological orderings of a polytree by performing a DFS over its underlying undirected graph and recursively combining the results of each node’s unvisited neighbors. Instead of only counting the number of orderings of each subtree, the algorithm keeps track of the positions in which a node may appear, together with how many topological orderings realize each position. This additional information is necessary to correctly handle nodes with multiple parents, where simple multinomial interleavings are no longer sufficient. At each step, the algorithm enumerates the valid relative orders of the current node and its unvisited neighbors, combines the recursive results of those neighbors, and merges equal positions. In this way, it computes all possible placements of the node and the corresponding number of topological orderings, yielding an exact counting algorithm for arbitrary polytrees.
 
 
 \begin{figure}[ht]
 	\centering
-	\begin{tikzpicture}
+	\begin{tikzpicture}[scale=.7]
 		% Define the rigth set of nodes
 		\foreach \i in {1,2,3,4,5}
 		\node[draw=none, circle, minimum size=5mm, inner sep=0pt] (L\i) at (4, -\i) {};

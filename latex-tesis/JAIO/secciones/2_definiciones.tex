@@ -24,7 +24,7 @@ Moreover, the Shapley values have an exact closed form: if we refer to players w
 \end{align}
 %
 where $perm(\players)$ denotes the set of all permutations of the number from 1 to $n$ and $\pi_{<i}$ denotes the set of indices before $i$ in the permutation $\pi$ (i.e. $\pi_{<i} = \{j : \pi(j) < i\}$). Fundamentally, Eq.~\eqref{eq:shapley} is summing across all possible ways
-of ordering the features, considering the impact of the inclusion of player $i$ to the reward of the game when adding the players according to each of these orderings.
+of ordering the players, considering the impact of the inclusion of player $i$ to the reward of the game when adding the players according to each of these orderings.
 
 In the context of machine learning explainability, the Shapley values are instantiated by thinking of the features as players and considering the characteristic function
 %
@@ -32,7 +32,9 @@ In the context of machine learning explainability, the Shapley values are instan
 	\nu_{M,e}(S) = \mathbb{E}[M(e') | S, e] = \sum_{e'\in \entities(X)} M(e') \Pr[e'| \{e'(x) = e(x) : x \in S\}] 
 \end{align}
 %
-which represents the expected value of the model $M$ when restricting the features from $S$ to have the value dictated by entity $e$.\footnote{In some proofs we may write the characteristic function as $\nu_{M,e,\Pr}$ to make the dependence on the distribution $\Pr$ explicit.} 
+which represents the expected value of the model $M$ when restricting the features from $S$ to have the value dictated by entity $e$\footnote{In some proofs we may write the characteristic function as $\nu_{M,e,\Pr}$ to make the dependence on the distribution $\Pr$ explicit.}.
+Intuitively, if some prediction $M(e) = 1$ depends strongly on the fact that some feature $x$ has value $e(x) = 1$, then it will hold that $\nu_{M,e}(S)$ is close to 1 if $x \in S$ and far from 1 otherwise. For example, if the model $M$ merely outputs the value of $x$ (i.e. $M(e) = e(x)$) and 
+we assume that the value of $x$ is independent of the other features and uniformly distributed between $0$ and $1$, then $\nu_{M,e}(S) = 1$ if $x\in S$ while $\nu_{M,e}(S) = \frac{1}{2}$ otherwise. Thus, it is expected that $\nu_{M,e,\Pr}$ will give a bigger value to those features more relevant for the prediction.
 
 As mentioned in the introduction, the Shapley values may fail to distinguish features that are heavily correlated. For example, if some feature $j$ depends deterministically of some other feature $i$ it can happen that both features receive the same score, even though $i$ is intuitively more relevant
 for \textit{any} model. Note that the \textit{Symmetry} property essentially implies that this should always happen whenever two features share the same information relevant for a prediction. Thus, to avoid this problem it is somewhat necessary to relax that axiom and therefore define a different score.
@@ -114,10 +116,9 @@ One of the most simplest types of Bayesian Networks is the Naive Bayes, which wa
 \end{figure}
 \enlargethispage{2\baselineskip} % This is done so that the footnote can fit.
 
-A key point for our purposes is that computing the characteristic function under a Bayesian network distribution requires probabilistic inference. Since exact inference in Bayesian networks is $\sharpPhard$ \footnote{\#\textsc{P} is a class of \textit{counting} problems. The \#\textsc{P}-hard problems are the hardest problems in this class, and it is known that if they can be solved in polynomial time then $\textsc{P} = \textsc{NP}$. Then, under the usual theoretical assumption, \#\textsc{P}-hard problems cannot be solved efficiently.} in general \parencite{Cooper1990}, we focus on restricted structures such as polytrees, where inference can be performed in polynomial time.
+A key point for our purposes is that computing the characteristic function (from Eq.~\ref{eq:char_fun_for_ML}) under a Bayesian network distribution requires probabilistic inference. Since exact inference in Bayesian networks is $\sharpPhard$ \footnote{\#\textsc{P} is a class of \textit{counting} problems. The \#\textsc{P}-hard problems are the hardest problems in this class, and it is known that if they can be solved in polynomial time then $\textsc{P} = \textsc{NP}$. Then, under the usual theoretical assumption, \#\textsc{P}-hard problems cannot be solved efficiently.} in general \parencite{Cooper1990}, we focus on restricted networks such as polytrees, where inference can be performed in polynomial time.
 
 Sometimes we will identify the network itself as a causal graph. Thus, the network will provide both the distribution necessary to compute the characteristic function $\nu_{M,e}$, as well as the causal graph necessary to define the weight function $w^C$.
-
 This identification is not always appropriate. In general, a Bayesian network represents a joint probability distribution and its conditional independencies, but its directed edges do not necessarily encode causal relations. Therefore, using the same graph as both a probabilistic model and a causal graph is only justified when the network is assumed to reflect the underlying causal structure. Otherwise, this should be understood merely as a modeling simplification.
 \begin{comment}
 \subsection{Asymmetric Shapley Values y grafos causales}
