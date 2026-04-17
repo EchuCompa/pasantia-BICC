@@ -1,7 +1,7 @@
 \subsection{Tractability of ASV}
 
 As mentioned before, the computation of the Shapley Values is intractable (in particular, $\sharpPhard$) even for trivial models
-if the underlying distribution is represented by a Naive Bayes network. We now show that this is not the case for the ASV whenever we use the bayesian network as the causal graph.
+if the underlying distribution is represented by a Naive Bayes network. We show that this is not the case for the ASV whenever we use the bayesian network as the causal graph\footnote{Due to space limitations, we omit several proofs and defer the complete arguments to the supplementary material.}.
 
 \begin{theorem}\label{the:asv_naive_bayes_tractable_clean}
 	Let $\mathcal{F}$ be any family of models. Then, the ASV can be computed in polynomial time for the family $\mathcal{F}$ under Naive Bayes distributions (where the causal graph is the network itself) if and only if the Shapley values can be computed in polynomial time for the family $\mathcal{F}$ under product distributions\footnote{With our notation, a product distribution over $\entities{}(X)$ is a distribution that factorizes as $\Pr\left[e\right] = \prod_{x \in X}\Pr\left[ x = e(x) \right]$.}.
@@ -66,7 +66,7 @@ The Shapley values can also be written in closed form as
 	\phi^{Shap}_{M,e}(x) = \sum_{S \subseteq X \setminus \{x\}} \frac{|S|!(|X|-|S|-1)!}{|X|!}\left[\nu_{M,e}(S \cup \{x\}) - \nu_{M,e}(S)\right] 
 \end{align*}
 %
-This rewriting is obtained by observing that many permutations give raise to the same set $\pi_{<x}$: more precisely, if $|\pi_{<x}| = s$ there are $\frac{s!(n-s-1)!}{n!}$ permutations $\pi'$ satisfying $\pi'_{<x} = \pi_{<x}$, where $n = |X|$. Computing the Shapley values using this formula reduces the number of times that $\nu_{M,e}$ has to be computed, although the number of calls remains
+This rewriting is obtained by observing that many permutations give raise to the same set $\pi_{<x}$: more precisely, if $|\pi_{<x}| = s$ there are $s!(|X|-s-1)!$ permutations $\pi'$ satisfying $\pi'_{<x} = \pi_{<x}$. Computing the Shapley values using this formula reduces the number of times that $\nu_{M,e}$ has to be computed, although the number of calls remains
 exponential on the number of features.
 
 We will follow a similar strategy to compute the ASV. We define a notion of equivalence between permutations.
@@ -89,7 +89,7 @@ Let $\equivalenceClasses$ be the set of equivalence classes. It is immediate fro
 \end{align}
 %
 Therefore, instead of invoking $\nu_{M,e}$ $|topos(C)|$ times it is enough to compute it $|\equivalenceClasses|$ times. This value can be at most $2^{|X|}$, but the hope is that in practical scenarios it is smaller. From now on, we will restrict to the case in which causal graphs are given 
-by \textit{rooted directed trees}, polytrees with nodes that have one or less parents. In this case, note that we can split the nodes in three groups with respect to $x$: those that are descendants of $x$, those that are ancestors of $x$, and the \textit{unrelated} ones. Observe that descendant/ancestors are never/always in the set $\pi_{<x}$, for any $x$. Thus, the structure of the equivalence classes depends only on the unrelated nodes. See Figure~\ref{fig:ASV_forest_example} for a visual explanation.
+by \textit{rooted directed trees}, polytrees with nodes that have one or fewer parents. In this case, note that we can split the nodes in three groups with respect to $x$: those that are descendants of $x$, those that are ancestors of $x$, and the \textit{unrelated} ones. Observe that descendant/ancestors are never/always in the set $\pi_{<x}$, for any $x$. Thus, the structure of the equivalence classes depends only on the unrelated nodes. See Figure~\ref{fig:ASV_forest_example} for a visual explanation.
 
 
 \begin{figure}[H]
@@ -154,21 +154,11 @@ by \textit{rooted directed trees}, polytrees with nodes that have one or less pa
 We have a general bound on the size of $\equivalenceClasses$ depending only on the causal graph $C$:
 
 \begin{proposition}\label{prop:bound}
-	Let $C$ be a causal graph shaped as a rooted directed tree with $h$ leaves and depth $l$. Then, it holds that
-	%
-	\begin{align*}
-		|\equivalenceClasses|\leq h^l + 1
-	\end{align*}
+	Let $C$ be a causal graph shaped as a rooted directed tree with $h$ leaves and depth $l$. Then, it holds that $|\equivalenceClasses|\leq h^l + 1$	
 \end{proposition}
 
 \begin{proof}
-	For every unrelated feature $y$ (in the sense that $y$ is neither a descendant or ancestor of $x$) let $C_y \subseteq C$ be the directed tree rooted at $y$ induced by those nodes reachable by $y$. Let $f(y)$ denote the number of ways that the features in $C_y$ can be arranged in the permutations, i.e.
-	%
-	\begin{align}\label{eq:equivalence_classes_subtree}
-		f(y) = \left| \{S \subseteq C_y : \exists \pi \in perm(C) \text{ such that } \pi_{<x} \cap C_y = S\} \right|	
-	\end{align}
-	%
-	Note that
+	For every unrelated feature $y$ (in the sense that $y$ is neither a descendant nor ancestor of $x$) let $C_y \subseteq C$ be the directed tree rooted at $y$ induced by the nodes reachable by $y$. Let $f(y)$ denote the number of ways that the features in $C_y$ can be arranged in the permutations, i.e. $f(y) = \big| \{S \subseteq C_y : \exists \pi \in perm(C)$ such that $ \pi_{<x} \cap C_y = S\} \big|$. Note that
 	%
 	\begin{align}\label{eq:fun_for_equi_classes}
 		f(y) = \begin{cases}
@@ -177,268 +167,26 @@ We have a general bound on the size of $\equivalenceClasses$ depending only on t
 		\end{cases}
 	\end{align}
 	%
-	In the base case the set of Eq.~\eqref{eq:equivalence_classes_subtree} is $\{\emptyset, \{y\}\}$. For the recursive case the reasoning is the following: either we do not put $y$ in the set (and then all other features reachable from $y$ won't be in the set as well) or rather 
-	we put $y$ and have complete freedom to decide which features to put from the sub-trees of $y$. The bound from the statement of the proposition can be derived using Eq.~\eqref{eq:fun_for_equi_classes}.
+	In the base case the set of Eq.~\eqref{eq:fun_for_equi_classes} is $\{\emptyset, \{y\}\}$. For the recursive case the reasoning is the following: either we do not put $y$ in the set (and then all other features reachable from $y$ won't be in the set as well) or rather 
+	we put $y$ and have complete freedom to dfecide which features to put from the subtrees of $y$. The bound from the statement of the proposition can be derived using Eq.~\eqref{eq:fun_for_equi_classes}.
 \end{proof}
 
-Proposition~\ref{prop:bound} indicates that the number of equivalence classes will be small when the tree is shallow. From the point of view of the causal graph, this corresponds to the case in which there aren't long causal dependencies between the features. In particular, there will be many features that are mutually independent. In our experimentation we will consider trees with different structure (such as balances trees or Naive Bayes-style trees) and different depth, and we will verify how the depth impacts heavily on the performance of our algorithms. 
+Proposition~\ref{prop:bound} indicates that the number of equivalence classes will be small when the tree is shallow. From the point of view of the causal graph, this corresponds to the case in which there aren't long causal dependencies between the features. In particular, there will be many features that are mutually independent.
 
 For the case of directed trees we further develop an algorithm able to compute the set $\equivalenceClasses$ as well as the number of permutations inside each class (which is required to compute Eq.~\eqref{eq:equivalence_classes_into_shap}). The complexity of the algorithm
 is polynomial on $|\equivalenceClasses|$.
 
 \begin{proposition}
-	There is an algorithm able to compute $|\equivalenceClass|$ given the causal graph $C$ (shaped as a rooted directed tree) on time polynomial on $|C|$ and $|\equivalenceClasses|$. Moreover, the algorithm returns the size of each class $[\pi] \in \equivalenceClasses$.
+	There is an algorithm able to compute $|[\pi]|$ for each $[\pi] \in \Lambda^x_C$ given feature $x$ and the causal graph $C$ (shaped as a rooted directed tree) on time polynomial on $|C|$ and $|\equivalenceClasses|$. Moreover, the algorithm returns the size of each class $[\pi] \in \equivalenceClasses$.
 \end{proposition}
 
 \begin{proof}
-	The algorithm is recursive on its nature, and based on the ideas from the proof of Proposition~\ref{prop:bound}.
-	 
-	First we recursively compute the equivalence classes of each unrelated subtree. We then combine these classes with one another, and finally integrate them with the ancestors and descendants while respecting the precedence constraints imposed by the DAG. In particular, descendants are added as a block on the right of $x_i$, while ancestors require counting the valid interleavings with the nodes placed to its left. This yields all equivalence classes and their sizes without explicitly enumerating topological orders.
-	
+	The algorithm implements a recursion inspired on Eq.~\eqref{eq:fun_for_equi_classes}. First we recursively compute the equivalence classes of each unrelated subtree. We then combine these classes with one another, and finally integrate them with the ancestors and descendants while respecting the precedence constraints imposed by the DAG. In particular, descendants are added as a block on the right of $x_i$, while including ancestors requires counting the valid interleavings with the nodes placed to its left. This yields all equivalence classes and their sizes without explicitly enumerating topological orders.
 \end{proof}
 
 We note that once the set $\equivalenceClasses$ is computed it is possible to find any value $\phi_{M,e}^{ASV}(x)$ in time linear on $|\equivalenceClasses|$. Thus, even though this step can be costly
-(because the bound from Proposition~\ref{prop:bound} implies that the algorithm may take exponential time on the size causal graph) is must be done only once. Moreover, it is independent of the model $M$, and thus it can be reused even
+(because the bound from Proposition~\ref{prop:bound} implies that the algorithm may take exponential time on the size of the causal graph) is must be done only once. Moreover, it is independent of the model $M$, and thus it can be reused even
 when the model is updated.
-
-\begin{comment}
-\begin{figure}[ht]
-	\centering 
-	\begin{tikzpicture}[scale=.95, transform shape]
-		
-		% ---- NODOS ----
-		\node[nodo] (a1) at (0, 0) {$a_1$};
-		\node[nodo] (a2) at (2.5, 2) {$a_2$};
-		\node[nodo] (a3) at (2.5, -2) {$a_3$};
-		\node[nodo] (xi) at (5, 0) {$x_i$};
-		\node[nodo] (d_1) at (7.5, 2) {$d_1$};
-		\node[nodo] (d_2) at (10, -2) {$d_2$};
-		\node[nodo] (d_3) at (10, 0) {$d_3$};
-		
-		\node[draw=none, fill=none] (hijo_a3) at (3.5, -3) {};
-		\node[draw=none, fill=none] (hijo_d2) at (9, -3) {};
-		
-		% ---- ARISTAS ----
-		\path [->] (a1) edge[arista, mySnake]  (xi);
-		\path [->] (a2) edge[arista, mySnake]  (xi);
-		\path [->] (a3) edge[arista, mySnake]  (xi);
-		\path [->] (xi) edge[arista, mySnake]  (d_1);
-		\path [->] (xi) edge[arista, mySnake]  (d_2);
-		\path [->] (xi) edge[arista, mySnake]  (d_3);
-		\path [->] (a3) edge[arista, mySnake] node[above right] {} (hijo_a3);
-		\path [->] (hijo_d2) edge[arista, mySnake] node[below right] {} (d_2);
-		
-	\end{tikzpicture}
-	\caption{Al fijar un nodo $x_i$, dividimos el resto en tres grupos: ancestros ($a$), descendientes ($d$) y nodos no relacionados. Los ancestros siempre quedan a la izquierda de $x_i$, los descendientes siempre a la derecha, y solo los nodos no relacionados no tienen una posición fija respecto de $x_i$ entre distintos órdenes topológicos.}
-	\label{fig:unrelatedNodesDefinition_paper}
-\end{figure}
-\begin{comment}
-\begin{definition}\label{def:equivalence_class}
-	Sea $G=(V,E)$ un DAG y $x_i\in V$. Una clase de equivalencia $\equivalenceClass$ queda determinada por una función
-	\[
-	f_{\pi}:V\setminus\{x_i\}\to \{\textit{left},\textit{right}\},
-	\]
-	donde $f_{\pi}(v)$ indica si el nodo $v$ aparece a la izquierda o a la derecha de $x_i$ en un orden topológico $\pi$. Denotamos por $L(\equivalenceClass)$ y $R(\equivalenceClass)$ a los conjuntos de nodos etiquetados con \textit{left} y \textit{right}, respectivamente.
-\end{definition}
-
-\begin{proposition}\label{prop:grouping_asv_by_eq_classes}
-	Sea $eqCl(G,x_i)$ el conjunto de clases de equivalencia inducidas por $\rel$. Entonces
-	\[
-	\assym_{M,e,\Pr}(x_i)
-	=
-	\frac{1}{|\topo(G)|}
-	\sum_{\equivalenceClass \in eqCl(G,x_i)}
-	|\equivalenceClass|
-	\left[
-	\charactheristicFunction(L(\equivalenceClass)\cup\{x_i\})
-	-
-	\charactheristicFunction(L(\equivalenceClass))
-	\right].
-	\]
-\end{proposition}
-
-\begin{proof}
-	Basta particionar la suma original de ASV por clases de equivalencia. Dentro de una misma clase, todos los órdenes topológicos inducen el mismo conjunto de nodos antes de $x_i$, y por lo tanto la expresión entre corchetes es constante.
-\end{proof}
-
-\echu{¿Es muy vende humo ponerle demostración? Sino lo escribo cómo un parrafo y le pongo que es la intuición.}
-
-La ventaja de estas clases es que no requiere evaluar $\charactheristicFunction$ para decidir si dos órdenes pertenecen a la misma. La Proposición~\ref{prop:grouping_asv_by_eq_classes} muestra que, si podemos calcular eficientemente las clases de equivalencia y sus tamaños, entonces podemos computar ASV sin enumerar todos los órdenes topológicos.
-\subsection{Algoritmo exacto para el cálculo de clases de equivalencia}
-\label{alg:exact_algorithm_for_equivalence_classes}
-
-Nuestro objetivo es computar $\assym_{M,e,\Pr}(x_i)$ dado un grafo causal $G$, el cual puede expresarse como una suma sobre clases de equivalencia de órdenes topológicos respecto de $x_i$. En consecuencia, el problema se reduce a calcular el conjunto $\eqClassSizes(G,x_i)$, es decir, las clases de equivalencia junto con sus tamaños.
-
-\subsubsection{Enfoque naive}
-\label{alg:naiveAlgorithmEquivalenceClass}
-
-Un enfoque directo consiste en generar todos los órdenes topológicos de $G$ \cite{algorithmForAllTopoSorts} y luego agruparlos en clases de equivalencia según qué nodos no relacionados aparecen antes de $x_i$. A partir de esta agrupación, se obtiene un representante por clase y su tamaño.
-
-Si bien este procedimiento es correcto, resulta computacionalmente ineficiente. En el peor caso, el número de órdenes topológicos crece factorialmente en el tamaño del grafo, es decir, $O(n!)$, lo cual vuelve impracticable este enfoque incluso para instancias moderadas. Esto motiva la necesidad de un algoritmo exacto que evite enumerar explícitamente todos los órdenes.
-
-\subsubsection{Estructura del \textit{dtree} y estrategia general}
-
-Proponemos un algoritmo recursivo que explota la estructura del \dtree{} inducido por el DAG alrededor del nodo $x_i$. Particionamos los nodos en tres conjuntos: ancestros $A$, descendientes $D$ y nodos no relacionados. Dentro de estos últimos, consideramos los subárboles cuyas raíces pertenecen al conjunto $UR$ (unrelated roots).
-
-La idea central es descomponer el problema en dos etapas:
-\begin{enumerate}
-	\item calcular las clases de equivalencia de cada árbol no relacionado de manera independiente;
-	\item combinar dichas clases con los ancestros y descendientes para obtener las clases completas.
-\end{enumerate}
-
-Cada clase de equivalencia se representa mediante una tupla
-\[
-(\equivalenceClassRep, leftTopos, rightTopos),
-\]
-donde $leftTopos$ y $rightTopos$ representan la cantidad de órdenes topológicos posibles a la izquierda y derecha de $x_i$, respectivamente. El tamaño de la clase es entonces $leftTopos \cdot rightTopos$.
-
-La Figura~\ref{fig:ASV_forest_example} ilustra esta partición.
-
-\begin{figure}[H]
-	\centering
-	\begin{tikzpicture}[scale=.65, transform shape, 
-		unrelated/.style={circle, draw=red},
-		ancestor/.style={circle, draw=blue},
-		wiggly/.style={decorate, decoration={snake, amplitude=.2mm, segment length=2mm}}
-		]
-		\node[text=blue] at (-5, 0) {Ancestors};
-		\node[text=teal] at (-5, -0.5) {Descendants};
-		\node[text=red] at (-5, -1) {Unrelated};        
-		
-		\node[ancestor] (a1) at (0, 0) {$a_1$};
-		\node[unrelated] (u1) at (-1, -2) {$u_1$};
-		\node[ancestor] (a2) at (1, -2) {$a_2$};
-		
-		\drawUnrelatedTree{u2}{-1}{-4}{$u_2$}
-		\node[ancestor] (a3) at (1, -4) {$a_3$};
-		\node[unrelated] (u3) at (3, -4) {$u_3$};
-		
-		\drawUnrelatedTree{u4}{0}{-7}{$u_4$}
-		\node[ancestor] (a4) at (3, -6) {$a_4$};
-		
-		\node[nodo] (xi) at (3, -8) {$x_i$};
-		
-		\drawUnrelatedTree{r1}{6}{0}{$u_5$} 
-		\drawUnrelatedTree{r2}{10}{0}{$u_6$} 
-		
-		\node[draw=none, fill=none] (hi) at (3, -10) {};
-		
-		\path [->] (a1) edge (u1);
-		\path [->] (a1) edge (a2);
-		\path [->] (a2) edge (u2);
-		\path [->] (a2) edge (a3);
-		\path [->] (a2) edge (u3);
-		\path [->] (a3) edge (u4);
-		\path [->] (a3) edge (a4);
-		\path [->] (a4) edge (xi);      
-		\path [->, teal] (xi) edge[decorate, decoration={snake}] (hi);
-	\end{tikzpicture}
-	\caption{Partición del grafo en ancestros, descendientes y árboles no relacionados respecto de $x_i$.}
-	\label{fig:ASV_forest_example}
-\end{figure}
-
-\subsubsection{Clases de equivalencia de árboles no relacionados}
-
-Sea $UR$ el conjunto de raíces de árboles no relacionados. Para cada $ur \in UR$, calculamos recursivamente sus clases de equivalencia mediante la función $\unrEqCl$.
-
-El caso base ocurre cuando $n$ es una hoja:
-\[
-\unrEqCl(n)=\{(\{n_l\},1,1),(\{n_r\},1,1)\}.
-\]
-
-Para un nodo interno, combinamos las clases de equivalencia de sus hijos y consideramos dos posibilidades: ubicar $n$ a la izquierda o a la derecha de $x_i$. Esto da lugar a la siguiente recurrencia:
-
-\begin{align}
-	\unrEqCl(n) = 
-	\begin{cases} 
-		\{(\{n_l\},1,1),(\{n_r\},1,1)\} & \text{si $n$ es hoja} \\[1ex]
-		\bigcup_{\forall mix} \union(mix,n_{left}) \;\cup\; \union(right,n_{right}) & \text{en otro caso}
-	\end{cases}
-\end{align}
-
-Existe una correspondencia biyectiva entre las clases de equivalencia de un nodo y las combinaciones de clases de sus hijos, lo cual garantiza la correctitud del esquema recursivo.
-
-\subsubsection{Combinación con descendientes}
-
-Los descendientes de $x_i$ siempre aparecen a la derecha, por lo que pueden tratarse como un bloque independiente. El número de órdenes topológicos de un \dtree{} enraizado en $n$ está dado por:
-
-\begin{align}
-	topoSorts(n)=
-	\binom{\sum_{j} |T_{n_j}|}{|T_{n_1}|,\dots,|T_{n_{|n|}}|}
-	\prod_{j} topoSorts(n_j),
-\end{align}
-
-lo cual refleja la intercalación de los órdenes de los subárboles hijos.
-
-\subsubsection{Combinación con ancestros}
-
-\echu{¿Debería explicar un poco menos en esta sección y meter menos fórmulas? La puedo escribir más por arriba.}
-
-A diferencia de los descendientes, los ancestros imponen restricciones de precedencia. No es posible intercalar libremente nodos no relacionados con ancestros mediante coeficientes multinomiales.
-
-Para resolver este problema definimos la función $leftOrders$, que contabiliza cuántas formas válidas existen de intercalar los nodos no relacionados (ubicados a la izquierda) con los ancestros, respetando las dependencias del DAG.
-
-La Figura~\ref{fig:order_of_ancestors} ilustra una posible disposición de los ancestros.
-
-\begin{figure}[ht]
-	\centering
-	\begin{tikzpicture}
-		\draw[thick] (0,0) -- (10,0);
-		\foreach \x/\label in {2/$a_1$, 4/$a_2$, 6/$a_3$, 8/$a_4$} {
-			\node at (\x-1,0.2) {$\cdots$};
-			\draw (\x,0.2) -- (\x,-0.2);
-			\node[below] at (\x,-0.2) {\label};
-		};
-		\node at (9,0.2) {$\cdots$};
-	\end{tikzpicture}
-	\caption{Orden relativo de los ancestros.}
-	\label{fig:order_of_ancestors}
-\end{figure}
-
-\begin{algorithm}
-	\caption{leftOrders}
-	\begin{enumerate}
-		\item Determinar la posición del siguiente ancestro.
-		\item Elegir nodos disponibles para ubicar antes de dicha posición.
-		\item Actualizar el conjunto de nodos restantes.
-		\item Continuar recursivamente.
-	\end{enumerate}
-\end{algorithm}
-
-\subsubsection{Fórmula final}
-
-Integrando ambos componentes, obtenemos que el conjunto completo de clases de equivalencia puede construirse a partir del producto cartesiano de las clases de equivalencia de los árboles no relacionados. Formalmente,
-
-\begin{align}
-	\eqClassSizes(G, x_i) = 
-	\bigcup_{\forall mix \in \unrEqCl(ur_1)\times\dots\times\unrEqCl(ur_{|UR|})}
-	\left(eqCl(A,D,mix),\eqClassSize(A,D,mix)\right).
-\end{align}
-
-Aquí, cada $mix$ representa una elección de clases de equivalencia para cada árbol no relacionado. A partir de dicha elección, la función $eqCl(A,D,mix)$ construye la representación completa de la clase, mientras que $\eqClassSize(A,D,mix)$ calcula su tamaño combinando:
-
-\begin{itemize}
-	\item la cantidad de intercalaciones válidas con los ancestros, dada por $leftOrders$;
-	\item la cantidad de órdenes topológicos de los descendientes;
-	\item y las contribuciones internas de los árboles no relacionados.
-\end{itemize}
-
-De este modo, la expresión anterior no solo enumera todas las clases de equivalencia, sino que también computa exactamente su cardinalidad, sin necesidad de generar explícitamente los órdenes topológicos.
-
-\subsubsection{Complejidad}
-
-La complejidad total del algoritmo está dominada por dos componentes principales:
-
-\begin{itemize}
-	\item el cálculo de $\unrEqCl$, que recorre recursivamente los árboles no relacionados y combina las clases de sus hijos;
-	\item la combinación global de clases, que requiere procesar el producto cartesiano de dichas clases y, para cada combinación, computar $leftOrders$ y las contribuciones de los descendientes.
-\end{itemize}
-
-En consecuencia, el costo total puede expresarse como proporcional al número de combinaciones de clases de equivalencia generadas, multiplicado por el costo de combinarlas con ancestros y descendientes. En particular, si denotamos por $k$ el número total de clases de equivalencia resultantes, el algoritmo tiene complejidad del orden de $O(k^3 \cdot \text{poly}(n))$.
-
-Si bien $k$ puede ser exponencial en el peor caso, este enfoque evita depender del número total de órdenes topológicos del grafo, que puede ser factorial. Por lo tanto, el algoritmo representa una mejora sustancial respecto del enfoque naive, especialmente en grafos donde el número de clases de equivalencia es significativamente menor que el número de órdenes topológicos.
-
-\end{comment}
 
 \subsection{Approximating ASV through sampling}
 
@@ -457,7 +205,7 @@ For the ASV the analogous procedure consists on sampling topological orderings a
 
 \begin{proposition}\label{prop:sampling_to_compute_ASV}
 	Assume access to a procedure $\procedureSampling$ that samples topological orderings from a DAG with a distribution $\varepsilon_{samp}$-close to the uniform one\footnote{To measure distance between distributions we use the $1$-norm, i.e. given two distributions $\mathcal{D}_1$ and $\mathcal{D}_2$ over a finite domain $\Omega$ we define the distance between $\mathcal{D}_1$ and $\mathcal{D}_2$ as $||\mathcal{D}_1 - \mathcal{D}_2||_1 = \sum_{o \in \Omega} |\mathcal{D}_1(o) - \mathcal{D}_2(o)|$.},
-	and to a procedure $\procedureNu$ that computes, given any subset of features $S \subseteq X$, a $\varepsilon_{\nu}$-approximation of the value $\nu_{M,e}(S)$. Then, it is possible to compute, with high probability, a $O(\varepsilon_{samp} + \varepsilon_{\nu})$-approximation of $\phi^{ASV}_{M,e}(x)$ using $O(1/\varepsilon_{samp}^2)$ calls to $\procedureSampling$ and $\procedureNu$. 
+	and to a procedure $\procedureNu$ that computes, given any subset of features $S \subseteq X$, a $\varepsilon_{\nu}$-approximation of the value $\nu_{M,e}(S)$. Then, it is possible to compute, with high probability, a $O(\varepsilon_{samp} + \varepsilon_{\nu})$-approximation of $\phi^{ASV}_{M,e}(x)$ using $O(1/\varepsilon_{\nu}^2)$ calls to $\procedureSampling$ and $\procedureNu$. 
 \end{proposition}
 
 \newcommand{\randomVar}{V^{M,e}}
@@ -497,7 +245,7 @@ of $\phi^{ASV}_{M,e}(x)$ is also controlled. Note that implementing the procedur
 Now we describe two ways to implement the procedure $\procedureSampling$. The first one can be understood by looking at Figure \ref{fig:topoSortSamplingExample}. The idea is that we can sample a topological ordering uniformly using a recursive a procedure in which at each step we pick the left-most node of the ordering. In particular, in the beginning we must pick one of the sources of the causal graph (i.e. one of the nodes with in-degree 0). We should weight them according to the number of topological orderings that start with each respective node, and thus we effectively reduce the problem of sampling a topological ordering to the problem of counting the number of topological orderings. Even though this problem is intractable in general \parencite{countingLinearExtensions}, there are heuristic algorithms that can approximate this value or even exact algorithm for restricted cases \parencite{efficientCountingOfToposorts}. 
 
 In particular, we develop a simple algorithm to count topological orders applicable to polytrees whose complexity depends on the maximum degree of a node. 
-This algorithm computes the number of topological orderings of a polytree by performing a DFS over its underlying undirected graph and recursively combining the results of each node’s unvisited neighbors. Instead of only counting the number of orderings of each subtree, the algorithm keeps track of the positions in which a node may appear, together with how many topological orderings realize each position. This additional information is necessary to correctly handle nodes with multiple parents, where simple multinomial interleavings are no longer sufficient. At each step, the algorithm enumerates the valid relative orders of the current node and its unvisited neighbors, combines the recursive results of those neighbors, and merges equal positions. In this way, it computes all possible placements of the node and the corresponding number of topological orderings, yielding an exact counting algorithm for arbitrary polytrees.
+This algorithm computes the number of topological orderings of a polytree by performing a DFS over its underlying undirected graph and recursively combining the results of each node’s unvisited neighbors. Instead of only counting the number of orderings of each subtree, the algorithm keeps track of the positions in which a node may appear, together with how many topological orderings realize each position (this additional information is necessary to correctly handle nodes with multiple parents). At each step, the algorithm enumerates the valid relative orders of the current node and its unvisited neighbors, combines the recursive results of those neighbors, and merges equal positions. In this way, it computes all possible placements of the node and the corresponding number of topological orderings, yielding an exact counting algorithm for arbitrary polytrees.
 
 
 \begin{figure}[ht]
@@ -534,9 +282,8 @@ This algorithm computes the number of topological orderings of a polytree by per
 		
 		\node[draw=none,minimum size=3mm, inner sep=0pt] () at (0, -5) {\small \textcolor{orange}{$n_3$=200}};
 	\end{tikzpicture}
-	\caption{Illustration of the first step of the sampling algorithm. The candidate source nodes that may appear first in the ordering are shown in red, while the rest of the graph is shown in blue. Each source node is annotated with the number of topological orderings in which it appears first. Then we will assign a probability to each node based on $\frac{appearsFirst}{allOrders}$ and sample them based on that distribution.}
+	\caption{Illustration of the first step of the sampling algorithm. The candidate source nodes that may appear first in the ordering are shown in red, while the rest of the graph is shown in blue. Each source node $s$ is annotated with the number of topological orderings $n_s$ in which it appears first. Then we will assign a probability to each $s$ as $n_s / topos(C)$.}
 	\label{fig:topoSortSamplingExample}
 \end{figure}
 
 Alternatively, we consider known algorithms from the literature able to approximate uniform sampling of topological orderings from arbitrary DAGs. We implement an algorithm based on random walks \parencite{bubley1999faster} with a polynomial (although of high degree) complexity. We note that there are more modern and asymptotically better algorithms \parencite{HUBER2006420}, but we believe that the hidden constants in them make them inefficient for the input sizes we consider.
-

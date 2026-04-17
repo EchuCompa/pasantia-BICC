@@ -1,8 +1,7 @@
 In recent years, the capabilities of artificial intelligence models have grown rapidly, along with the complexity of their architectures. 
-This progress has enabled the solution of tasks that once seemed unattainable, such as solving complex mathematical problems using language models \parencite{frontierMath}. 
+This progress has enabled the solution of tasks that once appeared unattainable, such as the use of language models to solve complex mathematical problems \parencite{frontierMath}. 
 At the same time, current systems have reached scales far beyond those of a few years ago, both in terms of the number of parameters and structural complexity \parencite{EpochLargeScaleModels2024}. 
-This lack of transparency is particularly problematic in sensitive contexts, such as medical diagnosis or high-stakes decision-making, where obtaining a correct prediction is not sufficient: it is also crucial to understand how that prediction was reached. 
-In this context, the field of Explainable Artificial Intelligence (XAI) has emerged, with the goal of developing methods that can explain model decisions.
+This lack of transparency is especially problematic in sensitive settings, such as medical diagnosis or high-stakes decision-making, where producing an accurate prediction is not enough: it is equally important to understand how that prediction was made. In response to this challenge, the field of Explainable Artificial Intelligence (XAI) has emerged \parencite{mersha2024explainable}, aiming to develop methods capable of making model decisions more interpretable.
 
 Within the field of explainability, one of the most influential approaches is feature attribution, where each input variable is assigned a score reflecting its contribution to the prediction. 
 In this line of work, SHAP is one of the most well-known methods \parencite{shapOriginalPaper}. It is based on the Shapley values, a concept originating in cooperative game theory \parencite{shapley1953value}. 
@@ -21,56 +20,7 @@ The Asymmetric Shapley Values (ASV from now on) are a proposal introduced by \ci
 In this way, instead of treating all features symmetrically, priority is given to the more fine-grained ones (in the sense that the information they provide is not present in the other variables). This can produce explanations that are more faithful to the data-generating process and can help better detect phenomena such as bias or discrimination. 
 Moreover, although ASV was primarily proposed to improve explanatory quality, it naturally raises the question of whether this additional restriction may also provide computational benefits.
 
-In this paper we address therefore the problem of efficiently computing the ASV scores, which was not explored thoroughly in previous literature. We will prove that for some families of models for which
+Therefore, in this paper we address the problem of efficiently computing the ASV scores, which was not explored thoroughly in previous literature. We will prove that for some families of models for which
 computing the Shapley values is intractable there are still polynomial time algorithms for computing the ASV. Inspired by this initial result, we develop an algorithm to compute the ASV exactly in more general contexts
-by exploiting the fact that many permutations of the features can be grouped in an unique equivalence class to simplify computations. Finally, we also propose a flexible approximation scheme that allows to approximate the ASV as long as it is possible to (1) Sample a topological order of the causal graph uniformly at random, and (2) Sample a data point with respect to the data distribution after conditioning a subset of the features to have specific values. We instantiate all these general algorithms with particular 
+by exploiting the fact that many permutations of the features can be grouped in a unique equivalence class to simplify computations. Finally, we also propose a flexible approximation scheme that allows to approximate the ASV as long as it is possible to (1) Sample a topological order of the causal graph uniformly at random, and (2) Sample a data point with respect to the data distribution after conditioning a subset of the features to have specific values. We instantiate all these general algorithms with particular 
 examples of causal graphs and machine learning models and show experimentally that they are efficient.
-
-\begin{comment}
-
-\subsection{Explicaciones basadas en causalidad: un ejemplo con la red Cancer} \label{asvCaseExample}
-
-Para ilustrar cómo la información causal puede afectar las explicaciones de un modelo, consideramos la red bayesiana \cancerNetwork{}, mostrada en la Figura~\ref{fig:cancer_network_example}. En esta red, las variables \variableNetwork{Pollution} y \variableNetwork{Smoker} influyen sobre \variableNetwork{Cancer}, mientras que \variableNetwork{Xray} y \variableNetwork{Dyspnoea} son consecuencias de esta última.
-
-\begin{figure}[ht]
-	\centering
-	
-	\begin{subfigure}[b]{0.35\textwidth}
-		\centering
-		\includegraphics[width=\textwidth]{img/bayesianNetworks/cancerNetwork.png}
-		\caption{Red bayesiana \cancerNetwork{}.}
-		\label{fig:cancer_network_example}
-	\end{subfigure}
-	\hfill
-	\begin{subfigure}[b]{0.6\textwidth}
-		\centering
-		\includegraphics[width=\textwidth]{img/asvResults/cancerASVAndShapleyExactASVAndShapley.png}
-		\caption{Comparación entre SHAP y ASV.}
-		\label{fig:cancer_asv_shap_comparison}
-	\end{subfigure}
-	
-	\caption{Ejemplo en la red \cancerNetwork{}. SHAP puede asignar relevancia a variables que son consecuencias de otras (como \variableNetwork{Xray} o \variableNetwork{Dyspnoea}), mientras que ASV prioriza variables causalmente más cercanas al fenómeno.}
-	\label{fig:cancer_example_combined}
-	
-\end{figure}
-
-A partir de datos sampleados de esta red entrenamos un árbol de decisión para predecir la variable \variableNetwork{Smoker}. En este contexto podemos comparar dos formas de explicar una predicción: los valores de SHAP, que consideran todas las permutaciones posibles de features, y los Asymmetric Shapley Values (ASV), que restringen el cálculo a órdenes topológicos compatibles con la estructura causal del grafo.
-
-La Figura~\ref{fig:cancer_asv_shap_comparison} muestra un ejemplo de esta comparación. Se observa que SHAP asigna relevancia considerable a variables como \variableNetwork{Xray} y \variableNetwork{Dyspnoea}, que en la red son consecuencias de \variableNetwork{Cancer}. Esto ocurre porque dichas variables pueden estar fuertemente correlacionadas con la predicción, aun cuando no sean causas directas del fenómeno. En cambio, ASV tiende a priorizar variables más cercanas a las causas del proceso generador de los datos, reduciendo la importancia de variables descendientes.
-
-Este ejemplo ilustra cómo incorporar información causal puede producir explicaciones más alineadas con la estructura del problema. En redes donde se conoce (o se asume) una relación causal entre las variables, los ASVs permiten distinguir mejor entre variables que originan información relevante para la predicción y variables que simplemente reflejan efectos de otras.
-
-\subsection{Código fuente}
-
-Todos los algoritmos presentados en este trabajo fueron implementados. El código fuente puede ser encontrado online en el siguiente repositorio: 
-
-\begin{table}[H]
-	\centering
-	\begin{tabular}{ll}
-		\toprule
-		\textbf{Repository} & \textbf{Repository} \\
-		\midrule
-		Source code & \url{https://github.com/EchuCompa/pasantia-BICC} \\
-	\end{tabular}
-\end{table}
-\end{comment}

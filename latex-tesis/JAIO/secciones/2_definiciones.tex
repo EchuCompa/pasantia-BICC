@@ -37,16 +37,11 @@ Intuitively, if some prediction $M(e) = 1$ depends strongly on the fact that som
 we assume that the value of $x$ is independent of the other features and uniformly distributed between $0$ and $1$, then $\nu_{M,e}(S) = 1$ if $x\in S$ while $\nu_{M,e}(S) = \frac{1}{2}$ otherwise. Thus, it is expected that $\nu_{M,e,\Pr}$ will give a bigger value to those features more relevant for the prediction.
 
 As mentioned in the introduction, the Shapley values may fail to distinguish features that are heavily correlated. For example, if some feature $j$ depends deterministically of some other feature $i$ it can happen that both features receive the same score, even though $i$ is intuitively more relevant
-for \textit{any} model. Note that the \textit{Symmetry} property essentially implies that this should always happen whenever two features share the same information relevant for a prediction. Thus, to avoid this problem it is somewhat necessary to relax that axiom and therefore define a different score.
-This is the idea underlying the \textit{Assymetric Shapley Values}.
+for \textit{any} model and prediction. Note that the \textit{Symmetry} property essentially implies that this should always happen whenever two features share the same information. Thus, to avoid this problem it is somewhat necessary to relax that axiom and define a different score.
+This is the idea underlying the \textit{Asymmetric Shapley Values}.
 
-\begin{definition}[Assymetric Shapley Values \parencite{frye2019asymmetric}]\label{def:asv}
-	Given a model $M$, an entity $e$, a feature $x$ and some weight function $w: perm(X) \to \R_{\geq 0}$ satisfying 
-	\begin{align*}
-		\sum_{\pi \in perm(X)} w(\pi) = 1,
-	\end{align*}
-	%
-	we define the Assymetric Shapley value of $x$ as
+\begin{definition}[Asymmetric Shapley Values \parencite{frye2019asymmetric}]\label{def:asv}
+	Given a model $M$, an entity $e$, a feature $x$ and some weight function $w: perm(X) \to \R_{\geq 0}$ satisfying $\sum_{\pi \in perm(X)} w(\pi) = 1$, we define the Asymmetric Shapley Value of $x$ as
 	%
 	\begin{align*}
 		\phi^{ASV}_{M,e}(x) = \sum_{\pi \in perm(X)} w(\pi) \left[ \nu_{M,e}(\pi_{<i} \cup \{i\}) - \nu_{M,e}(\pi_{<i}) \right]
@@ -67,14 +62,14 @@ comes after $j$. Note that the Shapley values are obtained by taking $w(\pi) = \
 	\end{cases}	
 \end{align}
 %
-This weight function generalizes the idea mentioned earlier of considering only those orderings consistent with the known causality of the features. In the rest of this paper we will be interested in developing efficient algorithms for computing the ASV from Def.~\ref{def:asv} whenever the weight function is given by 
+where $topos(C)$ is the set of all topological orderings of $C$. This weight function generalizes the idea mentioned earlier of considering only those orderings consistent with the known causality of the features. In the rest of this paper we will be interested in developing efficient algorithms for computing the ASV from Def.~\ref{def:asv} whenever the weight function is given by 
 Eq.~\eqref{eq:w_in_ASV}. 
 
-Moreover, we will consider that the distribution of space of entities is described by a Bayesian Network $N$. We refer to the reader to standard bibliography for the precise formal definitions of Bayesian Networks \parencite{pearl1986bayesianInference} while here we describe them conceptually: a bayesian network $N$
+Moreover, we will consider that the distribution of the space of entities is described by a Bayesian Network $N$. We refer to the reader to standard bibliography for their precise formal definitions \parencite{pearl1986bayesianInference} while here we describe them conceptually: a bayesian network $N$
 defines a distribution for $\entities(X)$ with a DAG whose nodes are the features from $X$. Every node $x$ has a set of parents $p(x) \subseteq X$, and the network provides, for each way of assigning the features in $p(x)$, the conditional distribution of $x$. See Figure \ref{fig:cancer_bn_with_cpts} for an example. Given $N$ and any entity $e$ it is possible to compute
 the probability of $e$ by traversing the DAG of $N$ in any topological sort multiplying the corresponding conditional probabilities.
 
-One of the most simplest types of Bayesian Networks is the Naive Bayes, which was already mentioned in regards to intractability results for the Shapley values. This network has a particular structure, in which a single node is parent to all the others and no other pairs of nodes are connected. See Figure \ref{fig:naive_bayes_network} for an example.
+One of the simplest types of Bayesian Networks is the Naive Bayes, which was already mentioned in regard to intractability results for the Shapley values. This network has a particular structure, in which a single node is parent to all the others and no other pairs of nodes are connected. See Figure \ref{fig:naive_bayes_network} for an example.
 
 \begin{figure}[ht]
 	\centering
@@ -82,7 +77,7 @@ One of the most simplest types of Bayesian Networks is the Naive Bayes, which wa
 	\begin{subfigure}[b]{0.48\textwidth}
 		\centering
 		\includegraphics[width=\linewidth]{img/cancerNetworkWithCPTs.png}
-		\caption{Example of a cancer prediction Bayesian network with its CPTs.}
+		\caption{Example of a cancer prediction Bayesian network.}
 		\label{fig:cancer_bn_with_cpts}
 	\end{subfigure}
 	\hfill
@@ -116,98 +111,7 @@ One of the most simplest types of Bayesian Networks is the Naive Bayes, which wa
 \end{figure}
 \enlargethispage{2\baselineskip} % This is done so that the footnote can fit.
 
-A key point for our purposes is that computing the characteristic function (from Eq.~\ref{eq:char_fun_for_ML}) under a Bayesian network distribution requires probabilistic inference. Since exact inference in Bayesian networks is $\sharpPhard$ \footnote{\#\textsc{P} is a class of \textit{counting} problems. The \#\textsc{P}-hard problems are the hardest problems in this class, and it is known that if they can be solved in polynomial time then $\textsc{P} = \textsc{NP}$. Then, under the usual theoretical assumption, \#\textsc{P}-hard problems cannot be solved efficiently.} in general \parencite{Cooper1990}, we focus on restricted networks such as polytrees, where inference can be performed in polynomial time.
+A key point for our purposes is that computing the characteristic function (from Eq.~\eqref{eq:char_fun_for_ML}) under a Bayesian network distribution requires probabilistic inference. Since exact inference in Bayesian networks is $\sharpPhard$ \footnote{\#\textsc{P} is a class of \textit{counting} problems. The \#\textsc{P}-hard problems are the hardest problems in this class, and it is known that if they can be solved in polynomial time then $\textsc{P} = \textsc{NP}$. Then, under the usual theoretical assumption, \#\textsc{P}-hard problems cannot be solved efficiently.} in general \parencite{Cooper1990}, we focus on restricted networks such as polytrees, where inference can be performed in polynomial time.
 
-Sometimes we will identify the network itself as a causal graph. Thus, the network will provide both the distribution necessary to compute the characteristic function $\nu_{M,e}$, as well as the causal graph necessary to define the weight function $w^C$.
+Sometimes we will identify the network itself as a causal graph. Thus, the network will provide both the distribution necessary to compute the characteristic function $\nu_{M,e}$ and the causal graph necessary to define the weight function $w^C$.
 This identification is not always appropriate. In general, a Bayesian network represents a joint probability distribution and its conditional independencies, but its directed edges do not necessarily encode causal relations. Therefore, using the same graph as both a probabilistic model and a causal graph is only justified when the network is assumed to reflect the underlying causal structure. Otherwise, this should be understood merely as a modeling simplification.
-\begin{comment}
-\subsection{Asymmetric Shapley Values y grafos causales}
-
-\echu{No hablamos mucho de la complejidad de Shap o de ASV, lo queremos hacer acá y contar los resultados previos o la idea es no contarlo y decirlo de una en los resultados teóricos?}
-
-La definición anterior trata a todas las permutaciones de features de manera uniforme. Sin embargo, si se dispone de un grafo causal sobre las variables, resulta natural restringir la atención a aquellas permutaciones compatibles con dicha estructura.
-
-La generalización más simple consiste en reemplazar el promedio uniforme por una función de pesos arbitraria sobre las permutaciones.
-
-\begin{definition}[Shapley values ponderados]
-	Sea $w:\perm(\players)\to\mathbb{R}$ una función tal que $\sum_{\pi\in\perm(\players)} w(\pi)=1$. Definimos
-	\begin{align}
-		\phi_i^{assym}(\charactheristicFunction)
-		=
-		\sum_{\pi\in\perm(\players)}
-		w(\pi)
-		\left[
-		\charactheristicFunction(\pi_{<i}\cup\{i\})-
-		\charactheristicFunction(\pi_{<i})
-		\right].
-		\label{eq:assymetric_shap_def_definitions}
-	\end{align}
-\end{definition}
-
-La familia de \emph{Asymmetric Shapley Values} propuesta en \cite{frye2019asymmetric} surge al elegir la función de pesos a partir de un DAG que codifica relaciones causales entre las features.
-
-\begin{definition}[Asymmetric Shapley Values]
-	Sea $G=(X,E)$ un DAG cuyos nodos son los features. Denotemos por $\topo(G)$ al conjunto de órdenes topológicos de $G$. Definimos la función de pesos
-	\[
-	w(\pi)=
-	\begin{cases}
-		\frac{1}{|\topo(G)|} & \text{si }\pi\in\topo(G),\\
-		0 & \text{en otro caso}.
-	\end{cases}
-	\]
-	Entonces, dado un modelo $M$, una entidad $e$ y una distribución $\Pr$, el valor ASV de un feature $x_i\in X$ se define como
-	\[
-	\assym_{M,e,\Pr}(x_i)
-	=
-	\frac{1}{|\topo(G)|}
-	\sum_{\pi\in\topo(G)}
-	\left[
-	\charFunML_{M,e,\Pr}(\pi_{<i}\cup\{x_i\})-
-	\charFunML_{M,e,\Pr}(\pi_{<i})
-	\right].
-	\]
-\end{definition}
-
-La intuición detrás de esta definición es que sólo se consideran órdenes que respetan la causalidad. De este modo, si una variable $x$ es causa de una variable $y$, entonces $x$ siempre aparece antes que $y$ en las permutaciones admitidas. Esto tiende a favorecer a las variables causalmente anteriores y a reducir la importancia de variables que son meramente consecuencias de otras.
-
-\subsection{Redes bayesianas como modelo de distribución}
-
-Para evaluar los ASV no alcanza con fijar un modelo predictivo: también es necesario especificar una distribución sobre el espacio de entidades. En este trabajo utilizamos redes bayesianas para representar dicha distribución.
-
-\begin{definition}[Red bayesiana]
-	Una Red Bayesiana $\aBayesianNetwork$ sobre un conjunto de variables $X$ es una tupla
-	$\aBayesianNetwork=(X,E,\Pr)$, donde $(X,E)$ es un DAG y, para cada variable $x\in X$, se especifica una distribución condicional $\Pr(x\mid \parents(x)).$
-	Estas distribuciones se representan mediante tablas de probabilidad condicional (\emph{Conditional Probability Tables}, CPTs).
-\end{definition}
-
-La propiedad central de una red bayesiana es que factoriza la distribución conjunta usando únicamente dependencias locales. Si $X=\{X_1,\dots,X_n\}$, entonces
-\[
-\Pr(X_1,\dots,X_n)=\prod_{i=1}^n \Pr(X_i\mid \parents(X_i)).
-\]
-Esta factorización permite realizar inferencia probabilística de forma mucho más eficiente que manipulando directamente la distribución conjunta.
-
-Conviene distinguir con cuidado entre \emph{red causal} y \emph{red bayesiana}. Una red bayesiana modela dependencias condicionales y define una distribución conjunta; un grafo causal, en cambio, pretende reflejar relaciones de causa y efecto entre variables. En general, ambas nociones no coinciden necesariamente. Sin embargo, en este trabajo asumiremos que el DAG subyacente a la red bayesiana puede utilizarse también como grafo causal para caclular los ASV. Esta decisión responde a dos motivos: por un lado, es consistente con el tipo de datos y experimentos que analizamos; por otro, nos permite estudiar simultáneamente el costo de la inferencia probabilística y el efecto de imponer restricciones causales en el cálculo de explicaciones.
-
-Más precisamente, dado un modelo $M$, una entidad $e$ y una red bayesiana $\aBayesianNetwork$ sobre las features, utilizaremos la distribución inducida por $\aBayesianNetwork$ para calcular la función característica $\charFunML_{M,e,\Pr}$, y el DAG de $\aBayesianNetwork$ como estructura causal para definir $\assym_{M,e,\Pr}$.
-
-\subsection{Familias restringidas de redes bayesianas}
-
-La complejidad de la inferencia en redes bayesianas depende fuertemente de la estructura del grafo subyacente. En redes generales, calcular probabilidades marginales o condicionadas es un problema $\sharpPhard$, mientras que para ciertas familias restringidas la inferencia es tratable. Por esta razón nos centramos en grafos para los cuáles la inferencia puede realizarse en tiempo polinomial.
-
-La primera familia que consideramos es la de las redes \emph{Naive Bayes}. En este caso, existe una variable raíz $X_1$ tal que todas las demás variables son sus hijas, y no hay otras aristas. Es decir, el conjunto de aristas es $ E=\{(X_1,X_j):2\leq j\leq n\}.$.
-La distribución conjunta factoriza entonces como
-\[
-\Pr[e]=\Pr[X_1=e(X_1)]\prod_{j=2}^n \Pr[X_j=e(X_j)\mid X_1=e(X_1)].
-\]
-
-\echu{Hace falta mostrar la fórmula de la probabilidad o mejor mostrar la imagen de que estructure tiene y listo? Igual la imagen ocupa espacio y no suma tanto, tal vez no hace falta ninguna de las dos.}
-Esta familia es especialmente relevante porque, aunque su estructura es muy simple, ya permite exhibir una diferencia fundamental entre SHAP y ASV: se sabe que calcular SHAP sobre distribuciones Naive Bayes es intratable incluso para modelos muy simples \cite{van2022tractability}, mientras que uno de nuestros resultados muestra que ASV puede ser tratable en este escenario.
-
-La segunda familia central en este trabajo es la de los \emph{polytrees}, es decir, DAGs cuyo grafo subyacente no dirigido es un árbol. Esta clase resulta importante porque admite inferencia probabilística en tiempo polinomial \cite{pearl1986bayesianInference}. Como el cálculo de la función característica involucra predicciones promedio condicionadas a evidencia, la posibilidad de realizar inferencia eficiente en la distribución de entrada es un ingrediente fundamental para obtener algoritmos tratables para ASV.
-
-\echu{¿Se dice tratable o tractable?}
-
-En síntesis, a lo largo de esta tesis trabajaremos principalmente con dos tipos de restricciones estructurales sobre la distribución de los datos: redes Naive Bayes, que sirven como caso base para nuestros resultados de tractabilidad, y polytrees, que constituyen la clase más general sobre la que desarrollamos algoritmos eficientes para inferencia y cómputo de explicaciones.
-
-\echu{¿Este parrafo juega o este de más?}
-\end{comment}

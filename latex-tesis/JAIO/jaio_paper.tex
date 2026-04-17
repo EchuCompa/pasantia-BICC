@@ -71,7 +71,7 @@
 \begin{document}
 %
 % ENGLISH VERSION
-\title{Beyond Shapley: Efficient Computation of Assymetric Shapley Values}
+\title{Beyond Shapley: Efficient Computation of Asymmetric Shapley Values}
 
 %\titlerunning{Abbreviated paper title}
 % If the paper title is too long for the running head, you can set
@@ -86,7 +86,7 @@ Sergio Abriola\inst{2}}
 % If there are more than two authors, 'et al.' is used.
 %
 \institute{Departamento de Computación, Facultad de Ciencias Exactas y Naturales, UBA \and
-Institudo de Ciencias de la Computación (ICC), Conicet}
+Instituto de Ciencias de la Computación (ICC), Conicet}
 %
 \maketitle              % typeset the header of the contribution
 %
@@ -96,7 +96,7 @@ To extend this algorithmic result, we introduce a notion of equivalence classes 
 Finally, we develop an algorithm for approximating ASV in arbitrary causal DAGs which relies on a procedure to sample topological orderings uniformly at random. To implement this sampling mechanism we leverage known algorithms as well as simpler alternatives. Our experimental results demonstrate the practical viability of the proposed approach in realistic causal structures.
 
 % keywords in lowercase
-\keywords{Explicability, Asymmetric Shapley Values (ASV), Shap, Topological ordering}
+\keywords{Explainability, Asymmetric Shapley Values (ASV), SHAP}
 \end{abstract}
 
 % SPANISH VERSION
@@ -111,9 +111,9 @@ Finally, we develop an algorithm for approximating ASV in arbitrary causal DAGs 
 \end{center}
 
 \begin{abstract}
-\noindent Abordamos el problema de la explicabilidad en modelos de aprendizaje automático mediante métodos de \textit{feature attribution}. En particular, consideramos una variante de los \textit{Shapley values} conocida como \textit{Assymetric Shapley Values} (ASV), que permite incorporar conocimiento causal en explicaciones \textit{model-agnostic} mediante el uso de un grafo causal. Mostramos que, en ciertos contextos en los que el cálculo de SHAP es \#\textsc{P}-hard, el cálculo exacto de ASV puede realizarse en tiempo polinomial.
+\noindent Abordamos el problema de la explicabilidad en modelos de aprendizaje automático mediante métodos de \textit{feature attribution}. En particular, consideramos una variante de los \textit{Shapley values} conocida como \textit{Asymmetric Shapley Values} (ASV), que permite incorporar conocimiento causal en explicaciones \textit{model-agnostic} mediante el uso de un grafo causal. Mostramos que, en ciertos contextos en los que el cálculo de SHAP es \#\textsc{P}-hard, el cálculo exacto de ASV puede realizarse polinomial.
 Para extender este resultado algorítmico, introducimos una noción de clases de equivalencia sobre los ordenamientos topológicos del grafo causal subyacente, lo cual resulta útil para reducir el tiempo de cómputo de ASV. En particular, presentamos un algoritmo en tiempo polinomial (en el número de clases de equivalencia) para calcularlo cuando el grafo causal es un árbol dirigido enraizado.
-Finalmente, desarrollamos un algoritmo para aproximar ASV en DAGs causales arbitrarios, basado en un procedimiento para muestrear ordenamientos topológicos uniformemente al azar. Para implementar este mecanismo de muestreo, aprovechamos algoritmos conocidos, así como alternativas más simples. Nuestros resultados experimentales demuestran la viabilidad práctica del enfoque propuesto en estructuras causales realistas.
+Finalmente, desarrollamos un algoritmo para aproximar ASV en DAGs causales arbitrarios, basado en un procedimiento que muestrea ordenamientos topológicos uniformemente al azar. Para implementar este mecanismo de muestreo consideramos algoritmos conocidos así como alternativas más simples. Nuestros resultados experimentales demuestran la viabilidad práctica del enfoque propuesto en estructuras causales realistas.
 \bigskip
 
 
