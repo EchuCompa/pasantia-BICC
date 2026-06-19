@@ -32,7 +32,7 @@ In the context of machine learning explainability, the Shapley values are instan
 	\nu_{M,e}(S) = \mathbb{E}[M(e') | S, e] = \sum_{e'\in \entities(X)} M(e') \Pr[e'| \{e'(x) = e(x) : x \in S\}] 
 \end{align}
 %
-which represents the expected value of the model $M$ when restricting the features from $S$ to have the value dictated by entity $e$\footnote{In some proofs we may write the characteristic function as $\nu_{M,e,\Pr}$ to make the dependence on the distribution $\Pr$ explicit.}.
+which represents the expected value of the model $M$ when restricting the features from $S$ to have the value dictated by entity $e$.
 Intuitively, if some prediction $M(e) = 1$ depends strongly on the fact that some feature $x$ has value $e(x) = 1$, then it will hold that $\nu_{M,e}(S)$ is close to 1 if $x \in S$ and far from 1 otherwise. For example, if the model $M$ merely outputs the value of $x$ (i.e. $M(e) = e(x)$) and 
 we assume that the value of $x$ is independent of the other features and uniformly distributed between $0$ and $1$, then $\nu_{M,e}(S) = 1$ if $x\in S$ while $\nu_{M,e}(S) = \frac{1}{2}$ otherwise. Thus, it is expected that $\nu_{M,e,\Pr}$ will give a bigger value to those features more relevant for the prediction.
 

@@ -1,7 +1,7 @@
 \subsection{Tractability of ASV}
 
 As mentioned before, the computation of the Shapley Values is intractable (in particular, $\sharpPhard$) even for trivial models
-if the underlying distribution is represented by a Naive Bayes network. We show that this is not the case for the ASV whenever we use the bayesian network as the causal graph\footnote{Due to space limitations, we omit several proofs and defer the complete arguments to the supplementary material.}.
+if the underlying distribution is represented by a Naive Bayes network. We show that this is not the case for the ASV whenever we use the bayesian network as the causal graph\footnote{Due to space limitations, we omit all proofs and defer the complete arguments to the supplementary material.}.
 
 \begin{theorem}\label{the:asv_naive_bayes_tractable_clean}
 	Let $\mathcal{F}$ be any family of models. Then, the ASV can be computed in polynomial time for the family $\mathcal{F}$ under Naive Bayes distributions (where the causal graph is the network itself) if and only if the Shapley values can be computed in polynomial time for the family $\mathcal{F}$ under product distributions\footnote{With our notation, a product distribution over $\entities{}(X)$ is a distribution that factorizes as $\Pr\left[e\right] = \prod_{x \in X}\Pr\left[ x = e(x) \right]$.}.
@@ -151,25 +151,13 @@ by \textit{rooted directed trees}, polytrees with nodes that have one or fewer p
 	\label{fig:ASV_forest_example}
 \end{figure}
 
+\vspace{-0.5cm}
+
 We have a general bound on the size of $\equivalenceClasses$ depending only on the causal graph $C$:
 
 \begin{proposition}\label{prop:bound}
-	Let $C$ be a causal graph shaped as a rooted directed tree with $h$ leaves and depth $l$. Then, it holds that $|\equivalenceClasses|\leq h^l + 1$	
+	Let $C$ be a causal graph shaped as a rooted directed tree with $l$ leaves and depth $h$. Then, it holds that $|\equivalenceClasses|\leq h^l + 1$	
 \end{proposition}
-
-\begin{proof}
-	For every unrelated feature $y$ (in the sense that $y$ is neither a descendant nor ancestor of $x$) let $C_y \subseteq C$ be the directed tree rooted at $y$ induced by the nodes reachable by $y$. Let $f(y)$ denote the number of ways that the features in $C_y$ can be arranged in the permutations, i.e. $f(y) = \big| \{S \subseteq C_y : \exists \pi \in perm(C)$ such that $ \pi_{<x} \cap C_y = S\} \big|$. Note that
-	%
-	\begin{align}\label{eq:fun_for_equi_classes}
-		f(y) = \begin{cases}
-			2 & y \text{ is a leaf}\\
-			1 + \prod_{z \text{ child of } y} f(z) & \text{otherwise}
-		\end{cases}
-	\end{align}
-	%
-	In the base case the set of Eq.~\eqref{eq:fun_for_equi_classes} is $\{\emptyset, \{y\}\}$. For the recursive case the reasoning is the following: either we do not put $y$ in the set (and then all other features reachable from $y$ won't be in the set as well) or rather 
-	we put $y$ and have complete freedom to dfecide which features to put from the subtrees of $y$. The bound from the statement of the proposition can be derived using Eq.~\eqref{eq:fun_for_equi_classes}.
-\end{proof}
 
 Proposition~\ref{prop:bound} indicates that the number of equivalence classes will be small when the tree is shallow. From the point of view of the causal graph, this corresponds to the case in which there aren't long causal dependencies between the features. In particular, there will be many features that are mutually independent.
 
@@ -179,10 +167,6 @@ is polynomial on $|\equivalenceClasses|$.
 \begin{proposition}
 	There is an algorithm able to compute $|[\pi]|$ for each $[\pi] \in \Lambda^x_C$ given feature $x$ and the causal graph $C$ (shaped as a rooted directed tree) on time polynomial on $|C|$ and $|\equivalenceClasses|$. Moreover, the algorithm returns the size of each class $[\pi] \in \equivalenceClasses$.
 \end{proposition}
-
-\begin{proof}
-	The algorithm implements a recursion inspired on Eq.~\eqref{eq:fun_for_equi_classes}. First we recursively compute the equivalence classes of each unrelated subtree. We then combine these classes with one another, and finally integrate them with the ancestors and descendants while respecting the precedence constraints imposed by the DAG. In particular, descendants are added as a block on the right of $x_i$, while including ancestors requires counting the valid interleavings with the nodes placed to its left. This yields all equivalence classes and their sizes without explicitly enumerating topological orders.
-\end{proof}
 
 We note that once the set $\equivalenceClasses$ is computed it is possible to find any value $\phi_{M,e}^{ASV}(x)$ in time linear on $|\equivalenceClasses|$. Thus, even though this step can be costly
 (because the bound from Proposition~\ref{prop:bound} implies that the algorithm may take exponential time on the size of the causal graph) is must be done only once. Moreover, it is independent of the model $M$, and thus it can be reused even
@@ -250,7 +234,7 @@ This algorithm computes the number of topological orderings of a polytree by per
 
 \begin{figure}[ht]
 	\centering
-	\begin{tikzpicture}[scale=.7]
+	\begin{tikzpicture}[scale=.6]
 		% Define the rigth set of nodes
 		\foreach \i in {1,2,3,4,5}
 		\node[draw=none, circle, minimum size=5mm, inner sep=0pt] (L\i) at (4, -\i) {};
@@ -282,8 +266,10 @@ This algorithm computes the number of topological orderings of a polytree by per
 		
 		\node[draw=none,minimum size=3mm, inner sep=0pt] () at (0, -5) {\small \textcolor{orange}{$n_3$=200}};
 	\end{tikzpicture}
-	\caption{Illustration of the first step of the sampling algorithm. The candidate source nodes that may appear first in the ordering are shown in red, while the rest of the graph is shown in blue. Each source node $s$ is annotated with the number of topological orderings $n_s$ in which it appears first. Then we will assign a probability to each $s$ as $n_s / topos(C)$.}
+	\caption{Illustration of the first step of the sampling algorithm. The candidate source nodes that may appear first in the ordering are shown in red. Each source node $s$ is annotated with the number of topological orderings $n_s$ in which it appears first. We will assign a probability to each $s$ as $n_s / topos(C)$.}
 	\label{fig:topoSortSamplingExample}
 \end{figure}
+
+\vspace{-0.5cm}
 
 Alternatively, we consider known algorithms from the literature able to approximate uniform sampling of topological orderings from arbitrary DAGs. We implement an algorithm based on random walks \parencite{bubley1999faster} with a polynomial (although of high degree) complexity. We note that there are more modern and asymptotically better algorithms \parencite{HUBER2006420}, but we believe that the hidden constants in them make them inefficient for the input sizes we consider.

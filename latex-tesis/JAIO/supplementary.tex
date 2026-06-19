@@ -1,0 +1,329 @@
+\documentclass{llncs}
+%
+\usepackage[T1]{fontenc}
+% T1 fonts will be used to generate the final print and online PDFs,
+% so please use T1 fonts in your manuscript whenever possible.
+% Other font encondings may result in incorrect characters.
+%
+\usepackage{graphicx}
+
+% Used for displaying a sample figure. If possible, figure files should
+% be included in EPS format.
+%
+% If you use the hyperref package, please uncomment the following two lines
+% to display URLs in blue roman font according to Springer's eBook style:
+%\usepackage{color}
+%\renewcommand\UrlFont{\color{blue}\rmfamily}
+%\urlstyle{rm}
+%
+\usepackage[english]{babel}
+%\addto\captionsspanish{\renewcommand{\tablename}{Tabla}} %Para que diga Tabla en vez de Cuadro
+\usepackage{dsfont, amsmath}
+
+\usepackage{caption}
+\usepackage{subcaption}  % Para tener captions dentro de las subfiguras
+\captionsetup{font=small}%para que las captions de las figuras sean más chicas
+
+\usepackage{amssymb}
+\usepackage{booktabs} % For better table formatting
+\usepackage{graphicx} % Required for inserting images
+\usepackage[colorlinks=true, urlcolor=blue, linkcolor=blue, citecolor=green]{hyperref}
+%linkColor = citas internas cómo ref
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{decorations.pathmorphing}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{pgf} % For arithmetic operations in TikZ
+\usepackage{comment}
+\usepackage{booktabs}
+\usepackage{url} %For writing paths
+\usepackage[normalem]{ulem}
+\usepackage{multirow}
+\usepackage{placeins} % For removing strange spaces
+\newcommand{\scc}[1]{{\color{red}#1}}
+
+
+\usepackage[style=apa]{biblatex} % <- AGREGAR ESTA LÍNEA
+\addbibresource{biblio.bib} % <- AGREGAR ESTA LÍNEA
+
+\input{secciones/macros}
+
+\tikzset{
+	nodo/.style={
+		shape=circle,
+		draw=black,
+		line width=1pt,   
+		minimum size=7mm
+	},
+	arista/.style={
+		line width=1pt,  
+		-{Latex[length=3mm]}  
+	},  
+	mySnake/.style={
+		decorate, 
+		decoration={snake, amplitude=.4mm, segment length=4mm, post length=1mm}
+	}
+}
+
+\raggedbottom % This so that not all pages have the same height. 
+
+\begin{document}
+%
+% ENGLISH VERSION
+\title{Supplementary material of ``Beyond Shapley: Efficient Computation of Asymmetric Shapley Values''}
+
+%\titlerunning{Abbreviated paper title}
+% If the paper title is too long for the running head, you can set
+% an abbreviated paper title here
+%
+\author{Anonymous author}
+%\author{Ezequiel Companeetz\inst{1},
+%Santiago Cifuentes\inst{2},
+%Sergio Abriola\inst{2}}
+%
+\authorrunning{Anonymous et al.}
+% First names are abbreviated in the running head.
+% If there are more than two authors, 'et al.' is used.
+%
+\institute{Anonymous institution}
+%\institute{Departamento de Computación, Facultad de Ciencias Exactas y Naturales, UBA \and
+%Institudo de Ciencias de la Computación (ICC), Conicet}
+%
+\maketitle              % typeset the header of the contribution
+%
+
+% SPANISH VERSION
+% Clear the previous title info and set Spanish version
+
+% Spanish title and abstract
+
+In this material we state our results alongisde their full proofs.
+
+\begin{theorem}\label{the:asv_naive_bayes_tractable_clean}
+	Let $\mathcal{F}$ be any family of models. Then, the ASV can be computed in polynomial time for the family $\mathcal{F}$ under Naive Bayes distributions (where the causal graph is the network itself) if and only if the Shapley values can be computed in polynomial time for the family $\mathcal{F}$ under product distributions\footnote{With our notation, a product distribution over $\entities{}(X)$ is a distribution that factorizes as $\Pr\left[e\right] = \prod_{x \in X}\Pr\left[ x = e(x) \right]$.}.
+\end{theorem}
+
+\begin{proof}
+	First, we show the right-to-left implication, which is the hard one. Let $x_1$ be the root node of the causal graph, and let $x_2,\ldots, x_n$ be the rest of the nodes. The DAG has $(n-1)!$ topological sorts, and in particular it holds that, for any $2 \leq j \leq n$,\footnote{In the proofs we write the characteristic function as $\nu_{M,e,\Pr}$ to make the dependence on the distribution $\Pr$ explicit.}
+	%
+	\begin{align*}
+	\phi^{ASV}_{M,e,\Pr}(x_j) = \frac{1}{(n-1)!} \sum_{\pi \in \perm(\{x_2, \ldots, x_n\})} [ \charactheristicFunction_{M,e,\Pr}(\{x_1\} &\cup \pi_{<j} \cup \{x_j\}) \\
+	&- \charactheristicFunction_{M,e,\Pr}(\{x_1\} \cup \pi_{<j}) ]
+	\end{align*}
+	%
+	Note that once $x_1$ is fixed the distribution over $x_2,\ldots, x_n$ is a product distribution with probabilities $\Pr\left( x_j = 1 | x_1 = e(x_1) \right)$ for $2 \leq i \leq n$.
+	For simplicity, let's assume $e(x_1) = 1$. Then, if we define the product distribution $\Pr'$ given by
+	\[
+	\Pr\!'[X_i = 1] = 
+	\begin{cases}
+		1 & i = 1 \\
+		\Pr[X_i = 1 | X_1 = 1] & \text{otherwise}
+	\end{cases}
+	\]
+	it is easy to see that for any $S \subseteq X \setminus \{x_1\}$ it holds that
+	\begin{align}\label{eq:prob_prime_for_fixing_x1}
+		\nu_{M,e,\Pr}(\{x_1\} \cup S) = \nu_{M,e,\Pr'}(S) 
+	\end{align}
+	%
+	This is intuitive: the distribution $\Pr'$ is obtained by fixing the value of $x_1$ as $e(x_1)$, and thus having $x_1$ inside $\nu$ is equivalent to using the distribution $\Pr'$.
+	
+	From Eq.~\eqref{eq:prob_prime_for_fixing_x1} it can be proven easily that
+	\begin{align}
+		\phi^{ASV}_{M,e,\Pr} (x_j) = \phi^{Shap}_{M,e,\Pr'}(x_j)
+	\end{align}
+	%
+	which implies that we effectively reduced the problem of computing the asymmetric Shapley values for any feature $x_j$ with $j\geq 2$ to computing the Shapley values for some product distribution. Finally, for $x_1$ it can be seen that
+	%
+	\begin{align*}
+		\phi^{ASV}_{M,e,\Pr}(x_1) = \nu_{M,e,\Pr{}}(\{x_1\}) - \nu_{M,e,\Pr{}}(\emptyset)
+	\end{align*}
+	%
+	because $\pi_{<1} = \emptyset$ for any permutation consistent with the DAG. Computing the values $\nu_{M,e,\Pr{}}(\{x_1\})$ and $\nu_{M,e,\Pr{}}(\emptyset)$ reduces to computing averages of the model $M$ with some product distributions, and it is known that the capacity of computing 
+	the Shapley values for any product distribution entails the capacity of computing averages \parencite{van2022tractability}.
+	
+	The left-to-right implication is immediate by observing that product distributions are a particular case of Naive Bayes distribution, and thus we can ``simulate'' them: one possible way to do this is
+	to consider, for each $1 \leq i \leq n$, the Naive Bayes distribution $\Pr_i$ given by placing $x_i$ as parent node with no conditioning on its children (i.e. $\Pr_i\left[x_j=1 | x_i = 0\right] = \Pr_i\left[x_j=1 | x_i = 1\right]$). Then, it holds that
+	%
+	\begin{align*}
+		\phi^{Shap}_{M,e,\Pr}(x_j) = \frac{1}{n} \sum_{i=1}^n \phi^{ASV}_{M,e,\Pr_i}(x_j)
+	\end{align*}
+\end{proof}
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[scale=.55, transform shape, 
+		unrelated/.style={circle, draw=red},
+		ancestor/.style={circle, draw=blue},
+		mergebox/.style={draw=purple!70!black, rounded corners, fill=purple!8, align=center, inner sep=6pt},
+		wiggly/.style={decorate, decoration={snake, amplitude=.2mm, segment length=2mm}}
+		]
+		\node[text=blue] at (-5, 0) {Ancestors};
+		\node[text=teal] at (-5, -0.5) {Descendants};
+		\node[text=red] at (-5, -1) {Unrelated};        
+		
+		\node[ancestor] (a1) at (0, 0) {$a_1$};
+		\node[unrelated] (u1) at (-1, -2) {$u_1$};
+		\node[ancestor] (a2) at (1, -2) {$a_2$};
+		
+		\drawUnrelatedTree{u2}{-1}{-4}{$u_2$}
+		\node[ancestor] (a3) at (1, -4) {$a_3$};
+		\node[unrelated] (u3) at (3, -4) {$u_3$};
+		
+		\drawUnrelatedTree{u4}{0}{-7}{$u_4$}
+		\node[ancestor] (a4) at (3, -6) {$a_4$};
+		
+		\node[nodo] (xi) at (3, -8) {$x_i$};
+		
+		\drawUnrelatedTree{r1}{6}{0}{$u_5$} 
+		\drawUnrelatedTree{r2}{10}{0}{$u_6$} 
+		
+		\node[draw=none, fill=none] (hi) at (3, -10) {};
+		
+		\path [->] (a1) edge (u1);
+		\path [->] (a1) edge (a2);
+		\path [->] (a2) edge (u2);
+		\path [->] (a2) edge (a3);
+		\path [->] (a2) edge (u3);
+		\path [->] (a3) edge (u4);
+		\path [->] (a3) edge (a4);
+		\path [->] (a4) edge (xi);      
+		\path [->, teal] (xi) edge[decorate, decoration={snake}] (hi);
+		
+		% Merge box
+		\node[mergebox] (merge) at (9,-5) {
+			Merge unrelated\\
+			equivalence classes
+		};
+		
+		% Dashed arrows from unrelated roots
+		\draw[->, dashed, purple!70!black, thick] (u1) -- (merge.west);
+		\draw[->, dashed, purple!70!black, thick] (u2) -- (merge.west);
+		\draw[->, dashed, purple!70!black, thick] (u3) -- (merge.west);
+		\draw[->, dashed, purple!70!black, thick] (u4) -- (merge.west);
+		\draw[->, dashed, purple!70!black, thick] (r1) -- (merge.west);
+		\draw[->, dashed, purple!70!black, thick] (r2) -- (merge.west);
+		
+	\end{tikzpicture}
+	\caption{Graph partition into ancestors, descendants and unrelated nodes respect to $x_i$, the feature for which we want to calculate the ASV. The unrelated rooted subtrees can be processed independently and then merged to construct the full equivalence classes.}
+	\label{fig:ASV_forest_example}
+\end{figure}
+
+\begin{proposition}\label{prop:bound}
+	Let $C$ be a causal graph shaped as a rooted directed tree with $l$ leaves and depth $h$. Then, it holds that $|\Lambda|\leq h^l + 1$	
+\end{proposition}
+
+\begin{proof}
+	For every unrelated feature $y$ (in the sense that $y$ is neither a descendant nor ancestor of $x$) let $C_y \subseteq C$ be the directed tree rooted at $y$ induced by the nodes reachable by $y$. Let $f(y)$ denote the number of ways that the features in $C_y$ can be arranged in the permutations, i.e. 
+	%
+	\begin{align}\label{eq:f}
+		f(y) = \big| \{S \subseteq C_y : \exists \pi \in perm(C) \text{ such that } \pi_{<x} \cap C_y = S\} \big|.
+	\end{align}
+	%
+	Note that
+	%
+	\begin{align}\label{eq:fun_for_equi_classes}
+		f(y) = \begin{cases}
+			2 & y \text{ is a leaf}\\
+			1 + \prod_{z \text{ child of } y} f(z) & \text{otherwise}
+		\end{cases}
+	\end{align}
+	%
+	In the base case the set of Eq.~\eqref{eq:fun_for_equi_classes} is $\{\emptyset, \{y\}\}$. For the recursive case the reasoning is the following: either we do not put $y$ in the set (and then all other features reachable from $y$ won't be in the set as well) or rather 
+	we put $y$ and have complete freedom to decide which features to put from the subtrees of $y$.
+
+	We prove by induction that $f(y) \leq h_y^{l_y} + 1$ where $l_y$ is the number of leaves of $C_y$ and $h_y$ its depth. This clearly holds whenever $y$ is a leaf itself (in that case, we take $h_y = 1$). For the recursive case, note that
+	%
+	\begin{align}\label{eq:bounding}
+		f(y) &= 1 + \prod_{z \text{ child of } y} f(z) \leq 1\\
+		&\leq 1 + \prod_{z \text{ child of } y} h_z^{l_z} + 1\nonumber\\
+		&\leq 1 + \prod_{z \text{ child of } y} (h_z+1)^{l_z}\nonumber\\
+		&\leq 1 + \prod_{z \text{ child of } y} h_y^{l_z}\nonumber\\
+		&= 1 + h_y^{\sum_{z \text{ child of } y} l_z} = 1 + h_y^{l_y}\nonumber
+	\end{align}
+
+	Now, let $u_1,\ldots,u_k$ be nodes in the causal graph which are not ancestors of $x$ but are immediate descendants of some ancestor of $x$ (look Figure~\ref{fig:ASV_forest_example} for an example). It follows by the definition of $f$ that
+	%
+	\begin{align}\label{eq:Lambda}
+		|\Lambda_C^x| = \prod_{i=1}^k f(u_i)
+	\end{align}
+	%
+	and therefore
+	%
+	\begin{align*}
+		|\Lambda_C^x| \leq h^l + 1
+	\end{align*}
+	%
+	where the inequality is obtained using arguments similar to those from Eq.~\eqref{eq:bounding}.
+\end{proof}
+
+\begin{proposition}
+	There is an algorithm able to compute $|[\pi]|$ for each $[\pi] \in \Lambda^x_C$ given feature $x$ and the causal graph $C$ (shaped as a rooted directed tree) on time polynomial on $|C|$ and $|\Lambda^x_C|$. Moreover, the algorithm returns the size of each class $[\pi] \in \Lambda^x_C$.
+\end{proposition}
+
+\begin{proof}
+	The algorithm implements a recursion inspired on Eq.~\eqref{eq:fun_for_equi_classes}. First we recursively compute the equivalence classes of each unrelated subtree. We then combine these classes with one another, and finally integrate them with the ancestors and descendants while respecting the precedence constraints imposed by the DAG. In particular, descendants are added as a block on the right of $x_i$, while including ancestors requires counting the valid interleavings with the nodes placed to its left. This yields all equivalence classes and their sizes without explicitly enumerating topological orders.
+
+	To be more precise, let $u_1,\ldots,u_k$ be the nodes that are not ancestors of $x$ and are immediate descendants of some ancestor of $x$ (look Figure~\ref{fig:ASV_forest_example} for an example). Let $B_{i}$ be, for each $u_i$, the set inside the definition of $f(u_i)$ from Eq.~\eqref{eq:f}. What we need to count is, for every way of choosing $S_i \in B_{i}$, the number of topological sorts such that $\pi_{<x} = A \cup \bigcup_{i=1}^k S_i$ where $A$ are the ancestors of $x$.
+	This computation is not straightforward because, even though there are no immediate constraints in the ordering of the sets $B_i$, nodes from $B_i$ cannot appear in the topological sort before the ancestor $y_i$ of $u_i$. Nonetheless, these values can be computed in a recursive manner using standard counting techniques. Moreover, when implemented using dynamic programming such a recursion has a complexity that grows polynomially on the number of nodes and $\prod_{i=1}^k f(u_i)$, which equals $|\Lambda^x_C|$ (see Eq.~\eqref{eq:Lambda}).
+\end{proof}
+
+
+\newcommand{\subsetPerm}{K}
+\newcommand{\procedureSampling}{\mathcal{P}_{samp}}
+\newcommand{\procedureNu}{\mathcal{P}_{\nu}}
+
+\begin{proposition}\label{prop:sampling_to_compute_ASV}
+	Assume access to a procedure $\procedureSampling$ that samples topological orderings from a DAG with a distribution $\varepsilon_{samp}$-close to the uniform one\footnote{To measure distance between distributions we use the $1$-norm, i.e. given two distributions $\mathcal{D}_1$ and $\mathcal{D}_2$ over a finite domain $\Omega$ we define the distance between $\mathcal{D}_1$ and $\mathcal{D}_2$ as $||\mathcal{D}_1 - \mathcal{D}_2||_1 = \sum_{o \in \Omega} |\mathcal{D}_1(o) - \mathcal{D}_2(o)|$.},
+	and to a procedure $\procedureNu$ that computes, given any subset of features $S \subseteq X$, a $\varepsilon_{\nu}$-approximation of the value $\nu_{M,e}(S)$. Then, it is possible to compute, with high probability, a $O(\varepsilon_{samp} + \varepsilon_{\nu})$-approximation of $\phi^{ASV}_{M,e}(x)$ using $O(1/\varepsilon_{samp}^2)$ calls to $\procedureSampling$ and $\procedureNu$. 
+\end{proposition}
+
+\newcommand{\randomVar}{V^{M,e}}
+
+\begin{proof}
+	Consider the random variable $\randomVar$ over domain $topos(C)$ defined as $\randomVar(\pi) = \left[ \nu_{M,e}(\pi_{<x} \cup \{x\}) - \nu_{M,e}(\pi_{<x}) \right]$. It holds that
+	%
+	\begin{align*}
+		\mathbb{E}[\randomVar] = \phi^{ASV}_{M,e}(x)
+	\end{align*}
+	%
+	Now, if $\randomVar_{\varepsilon_{samp}}$ denotes the analogous random variable distributed according to the sampling procedure $\procedureSampling$,
+	%
+	\begin{align*}
+		|&\mathbb{E}[\randomVar] - \mathbb{E}[\randomVar_{\varepsilon_{samp}}]| = \\
+		&= \left|\sum_{\pi \in topos(C)} \left[\Pr\left( \randomVar = \pi \right) - \Pr\left( \randomVar_{\varepsilon_{samp}} = \pi \right) \right] \left[ \nu_{M,e}(\pi_{<x} \cup \{x\}) - \nu_{M,e}(\pi_{<x}) \right] \right|\\
+		&\leq \sum_{\pi \in topos(C)} \left|\Pr\left( \randomVar = \pi \right) - \Pr\left( \randomVar_{\varepsilon_{samp}} = \pi \right) \right| \leq \varepsilon_{samp}
+	\end{align*}
+	%
+	Then, to approximate $\mathbb{E}[\randomVar]$ we can simply estimate $\mathbb{E}[\randomVar_{\varepsilon_{samp}}]$. To do so we apply the procedure $\procedureSampling$ to compute a subset $\subsetPerm$ of the topological orderings and then use $\procedureNu$ to obtain
+	%
+	\begin{align*}
+		\mathbb{E}[\randomVar_{\varepsilon_{samp}}] \sim \frac{1}{|\subsetPerm|} \sum_{\pi \in \subsetPerm} \left[ \procedureNu(\pi_{<x} \cup \{x\}) - \procedureNu(\pi_{<x}) \right]
+	\end{align*}
+	%
+	Using Hoeffding's inequality \parencite{hoeffding1963probability} we can ensure that by taking $O(1/\varepsilon_{\nu}^2)$ samples the set $\subsetPerm$ is a good representation of the average with high probability, i.e.
+	%
+	\begin{align*}
+		\left|\mathbb{E}[\randomVar_{\varepsilon_{samp}}] - \frac{1}{|\subsetPerm|} \sum_{\pi \in \subsetPerm} \left[ \nu_{M,e}(\pi_{<x} \cup \{x\}) - \nu_{M,e}(\pi_{<x}) \right]\right| \leq \varepsilon_\nu
+	\end{align*}
+	%
+	Finally, after sampling $K$ we merely approximate each call to $\nu_{M,e}$ with $\procedureNu$. It holds that
+	%
+	\begin{align*}
+		\Bigg| \frac{1}{|\subsetPerm|} &\sum_{\pi \in \subsetPerm} \left[ \nu_{M,e}(\pi_{<x} \cup \{x\}) - \nu_{M,e}(\pi_{<x}) \right] - \frac{1}{|\subsetPerm|} \sum_{\pi \in \subsetPerm} \left[ \procedureNu(\pi_{<x} \cup \{x\}) - \procedureNu(\pi_{<x}) \right]\Bigg|\\
+		&\leq \frac{1}{|\subsetPerm|} \sum_{\pi \in \subsetPerm} \left[ |\nu_{M,e}(\pi_{<x} \cup \{x\}) - \procedureNu(\pi_{<x} \cup \{x\})| + |\nu_{M,e}(\pi_{<x}) - \procedureNu(\pi_{<x})| \right]\\
+		&\leq 2 \varepsilon_{\nu}
+	\end{align*}
+	%
+	The result from the statement is obtained applying the triangle inequality with all the obtained equations.
+\end{proof}
+
+\vspace{0.5cm}
+\setcounter{page}{1}
+
+%
+% ---- Bibliography ----
+%
+\printbibliography
+
+\end{document}
