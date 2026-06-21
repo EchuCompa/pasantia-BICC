@@ -247,10 +247,9 @@ Now we describe two ways to implement the procedure $\procedureSampling$. The fi
 In particular, we develop a simple algorithm to count topological orders applicable to polytrees whose complexity depends on the maximum degree of a node. 
 This algorithm computes the number of topological orderings of a polytree by performing a DFS over its underlying undirected graph and recursively combining the results of each node’s unvisited neighbors. Instead of only counting the number of orderings of each subtree, the algorithm keeps track of the positions in which a node may appear, together with how many topological orderings realize each position (this additional information is necessary to correctly handle nodes with multiple parents). At each step, the algorithm enumerates the valid relative orders of the current node and its unvisited neighbors, combines the recursive results of those neighbors, and merges equal positions. In this way, it computes all possible placements of the node and the corresponding number of topological orderings, yielding an exact counting algorithm for arbitrary polytrees.
 
-
 \begin{figure}[ht]
 	\centering
-	\begin{tikzpicture}[scale=.7]
+	\begin{tikzpicture}[scale=.6]
 		% Define the rigth set of nodes
 		\foreach \i in {1,2,3,4,5}
 		\node[draw=none, circle, minimum size=5mm, inner sep=0pt] (L\i) at (4, -\i) {};
