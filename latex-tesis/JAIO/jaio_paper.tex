@@ -1,5 +1,6 @@
 \documentclass{llncs}
 %
+
 \usepackage[T1]{fontenc}
 % T1 fonts will be used to generate the final print and online PDFs,
 % so please use T1 fonts in your manuscript whenever possible.
@@ -28,6 +29,7 @@
 \usepackage{booktabs} % For better table formatting
 \usepackage{graphicx} % Required for inserting images
 \usepackage[colorlinks=true, urlcolor=blue, linkcolor=blue, citecolor=green]{hyperref}
+\usepackage{orcidlink}
 %linkColor = citas internas cómo ref
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta}
@@ -69,25 +71,26 @@
 \raggedbottom % This so that not all pages have the same height. 
 
 \begin{document}
-%
+
 % ENGLISH VERSION
 \title{Beyond Shapley: Efficient Computation of Asymmetric Shapley Values}
 
-%\titlerunning{Abbreviated paper title}
-% If the paper title is too long for the running head, you can set
-% an abbreviated paper title here
-%
-\author{Ezequiel Companeetz\inst{1},
-Santiago Cifuentes\inst{2},
-Sergio Abriola\inst{2}}
-%
+\author{
+	Ezequiel Companeetz\inst{1}\orcidlink{0009-0004-7630-6644}
+	\and
+	Santiago Cifuentes\inst{2}\orcidlink{0000-0002-6375-2045}
+	\and
+	Sergio Abriola\inst{2}\orcidlink{0000-0002-1979-5443}
+}
 \authorrunning{Companeetz et al.}
-% First names are abbreviated in the running head.
-% If there are more than two authors, 'et al.' is used.
-%
-\institute{Departamento de Computación, Facultad de Ciencias Exactas y Naturales, UBA \and
-Instituto de Ciencias de la Computación (ICC), Conicet}
-%
+
+\institute{
+	Departamento de Computación, Facultad de Ciencias Exactas y Naturales, UBA\\
+	\email{scifuentes@dc.uba.ar}
+	\and
+	Instituto de Ciencias de la Computación (ICC), CONICET
+}
+
 \maketitle              % typeset the header of the contribution
 %
 \begin{abstract}
