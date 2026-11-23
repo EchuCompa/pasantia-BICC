@@ -4,8 +4,9 @@ from datasetManipulation import *
 from classesSizes.recursiveFormula import *
 from asvFormula.topoSorts.utils import allForestTopoSorts
 from functools import lru_cache
-from asvFormula.topoSorts.randomTopoSortsGeneration import randomTopoSorts
+from asvFormula.topoSorts.randomTopoSortsGeneration import mcmcTopoSorts, randomTopoSorts
 from asvFormula.classesSizes.naiveFormula import naiveEquivalenceClassesSizes
+from asvFormula.digraph import isPolyforest
 import numpy.typing as npt
 from typing import Optional
 
@@ -30,7 +31,7 @@ class ASV:
         equivalenceClasses = self.equivalenceClasses(feature)
         asvValue = np.zeros(len(self.valuesPerFeature[feature]))
         totalTopologicalOrders = 0
-        allTopologicalOrders = allForestTopoSorts(self.dag)
+        expectedTopologicalOrders = self.expectedTopologicalOrders()
 
         for i, equivalenceClass in enumerate(equivalenceClasses):
             classFeaturesOrder = equivalenceClass[0]
@@ -43,8 +44,11 @@ class ASV:
                                     self.meanPredictionForEquivalenceClass(fixedFeatures))
             if showProgress: print(f'Progress of classes processed: {i/len(equivalenceClass)}%')
 
-        self.assertToposortsMatches(totalTopologicalOrders, allTopologicalOrders)
+        self.assertToposortsMatches(totalTopologicalOrders, expectedTopologicalOrders)
         return asvValue/totalTopologicalOrders 
+
+    def expectedTopologicalOrders(self):
+        return allForestTopoSorts(self.dag)
 
     def assertToposortsMatches(self, totalTopologicalOrders, allTopologicalOrders):
         assert totalTopologicalOrders == allTopologicalOrders, f"The total number of topological orders for the equivalence classes is {totalTopologicalOrders} and the total number of topological orders for the graph is {allTopologicalOrders}"
@@ -146,11 +150,14 @@ class ApproximateASV(ASV):
 
     def __init__(self, bayesianNetwork : BayesianNetwork, model : DecisionTreeClassifier, featureDistributions : VariableElimination, valuesPerFeature : dict[str, list], featureToPredict : str, predictionFunction : str = 'Exact', instance : pd.Series = None, numTopologicalOrders : int = 1000):
         super().__init__(bayesianNetwork, model, featureDistributions, valuesPerFeature, featureToPredict, predictionFunction, instance)
+        if numTopologicalOrders <= 0:
+            raise ValueError("numTopologicalOrders must be positive")
         self.numberOfToposorts = numTopologicalOrders
 
     def equivalenceClasses(self, feature):
-        topologicalOrders = randomTopoSorts(self.dag, self.numberOfToposorts)
+        sampler = randomTopoSorts if isPolyforest(self.dag) else mcmcTopoSorts
+        topologicalOrders = sampler(self.dag, self.numberOfToposorts)
         return naiveEquivalenceClassesSizes(topologicalOrders, feature, TopoSortHasher(self.dag, feature)).values()
-    
-    def asssertToposortsMatches(self, totalTopologicalOrders, allTopologicalOrders):
-        assert totalTopologicalOrders == self.numberOfToposorts, f"The total number of topological orders for the equivalence classes is {totalTopologicalOrders} and the total number of topological orders generated for the graph is {self.numberOfToposorts}"
+
+    def expectedTopologicalOrders(self):
+        return self.numberOfToposorts
