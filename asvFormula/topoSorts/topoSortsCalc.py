@@ -20,6 +20,10 @@ class NodeInfo(NamedTuple):
         return f'Node: {str(self.node)} Position: {self.position}, PositionTopos: {self.positionTopos}'
 
 def allPolyTopoSorts(polyTree : nx.DiGraph) -> int:
+    if len(polyTree) == 0:
+        return 1
+    if not nx.is_directed_acyclic_graph(polyTree) or not nx.is_forest(polyTree.to_undirected()):
+        raise ValueError("The graph must be a directed forest")
     
     visited = {node : False for node in polyTree.nodes()}
     

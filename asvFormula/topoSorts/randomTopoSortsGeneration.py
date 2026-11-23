@@ -1,4 +1,4 @@
-from asvFormula.digraph import nx, isRootWithVisited
+from asvFormula.digraph import nx, isRootWithVisited, isPolyforest
 from asvFormula import Node
 from typing import List, Optional
 from topoSortsCalc import allPolyTopoSortsWithVisited
@@ -33,6 +33,8 @@ def randomTopoSort(polyTree : nx.DiGraph) -> List[Node]:
 
 def randomTopoSorts(polyTree : nx.DiGraph, numTopoSorts : int) -> List[List[Node]]:
     #print(f'It will take {numTopoSorts/60000} seconds in the naive way')
+    if not nx.is_directed_acyclic_graph(polyTree) or not isPolyforest(polyTree):
+        raise ValueError("The graph must be a directed forest")
     return randomTopoSortsAux(polyTree, numTopoSorts, {}, {node : False for node in polyTree.nodes()})
 
 #Using a cache and visited nodes to avoid recalculating the same thing multiple times, it's cleaner removing the nodes from the polytree but it's slower.

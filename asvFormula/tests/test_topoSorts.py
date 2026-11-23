@@ -13,6 +13,20 @@ class TestTopoSorts(unittest.TestCase):
 
     seed = 42
 
+    def test_polyforest_counter_and_sampler_reject_unsupported_graphs(self):
+        diamond = nx.DiGraph([("a", "b"), ("a", "c"), ("b", "d"), ("c", "d")])
+        directed_cycle = nx.DiGraph([("a", "b"), ("b", "a")])
+
+        for graph in (diamond, directed_cycle):
+            with self.subTest(edges=list(graph.edges)):
+                with self.assertRaises(ValueError):
+                    tp.allPolyTopoSorts(graph)
+                with self.assertRaises(ValueError):
+                    randomTopoSorts(graph, 1)
+
+    def test_empty_polyforest_has_one_order(self):
+        self.assertEqual(tp.allPolyTopoSorts(nx.DiGraph()), 1)
+
     @parameterized.expand(
         [("empty_graph", emptyGraph(8)),
         ('naive_bayes', naiveBayes(8))] + 
