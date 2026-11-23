@@ -1,0 +1,160 @@
+\documentclass{llncs}
+%
+
+\usepackage[T1]{fontenc}
+% T1 fonts will be used to generate the final print and online PDFs,
+% so please use T1 fonts in your manuscript whenever possible.
+% Other font encondings may result in incorrect characters.
+%
+\usepackage{graphicx}
+
+% Used for displaying a sample figure. If possible, figure files should
+% be included in EPS format.
+%
+% If you use the hyperref package, please uncomment the following two lines
+% to display URLs in blue roman font according to Springer's eBook style:
+%\usepackage{color}
+%\renewcommand\UrlFont{\color{blue}\rmfamily}
+%\urlstyle{rm}
+%
+\usepackage[english]{babel}
+%\addto\captionsspanish{\renewcommand{\tablename}{Tabla}} %Para que diga Tabla en vez de Cuadro
+\usepackage{dsfont, amsmath}
+
+\usepackage{caption}
+\usepackage{subcaption}  % Para tener captions dentro de las subfiguras
+\captionsetup{font=small}%para que las captions de las figuras sean más chicas
+
+\usepackage{amssymb}
+\usepackage{booktabs} % For better table formatting
+\usepackage{graphicx} % Required for inserting images
+\usepackage[colorlinks=true, urlcolor=blue, linkcolor=blue, citecolor=green]{hyperref}
+\usepackage{orcidlink}
+%linkColor = citas internas cómo ref
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{decorations.pathmorphing}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{pgf} % For arithmetic operations in TikZ
+\usepackage{comment}
+\usepackage{booktabs}
+\usepackage{url} %For writing paths
+\usepackage[normalem]{ulem}
+\usepackage{multirow}
+\usepackage{placeins} % For removing strange spaces
+\newcommand{\scc}[1]{{\color{red}#1}}
+
+
+\usepackage[style=apa]{biblatex} % <- AGREGAR ESTA LÍNEA
+\addbibresource{biblio.bib} % <- AGREGAR ESTA LÍNEA
+
+\input{secciones/macros}
+
+\tikzset{
+	nodo/.style={
+		shape=circle,
+		draw=black,
+		line width=1pt,   
+		minimum size=7mm
+	},
+	arista/.style={
+		line width=1pt,  
+		-{Latex[length=3mm]}  
+	},  
+	mySnake/.style={
+		decorate, 
+		decoration={snake, amplitude=.4mm, segment length=4mm, post length=1mm}
+	}
+}
+
+\raggedbottom % This so that not all pages have the same height. 
+
+\begin{document}
+
+% ENGLISH VERSION
+\title{Beyond Shapley: Efficient Computation of Asymmetric Shapley Values}
+
+\author{
+	Ezequiel Companeetz\inst{1}\orcidlink{0009-0004-7630-6644}
+	\and
+	Santiago Cifuentes\inst{2}\orcidlink{0000-0002-6375-2045}
+	\and
+	Sergio Abriola\inst{2}\orcidlink{0000-0002-1979-5443}
+}
+\authorrunning{Companeetz et al.}
+
+\institute{
+	Departamento de Computación, Facultad de Ciencias Exactas y Naturales, UBA\\
+	\email{scifuentes@dc.uba.ar}
+	\and
+	Instituto de Ciencias de la Computación (ICC), CONICET
+}
+
+\maketitle              % typeset the header of the contribution
+%
+\begin{abstract}
+We address the problem of explainability in machine learning models through feature attribution methods. In particular, we consider a variant of Shapley values known as Asymmetric Shapley Values (ASV), which enables the incorporation of causal knowledge into model-agnostic explanations through the use of a causal graph. We show that in certain contexts in which the computation of SHAP is \#\textsc{P}-hard, the exact computation of ASV can be done in polynomial time.
+To extend this algorithmic result, we introduce a notion of equivalence classes over the topological orderings of the underlying causal graph, which is useful to reduce the time to compute ASV. In particular, we present a polynomial-time algorithm (in the number of equivalence classes) to compute it whenever the causal graph is a rooted directed tree.
+Finally, we develop an algorithm for approximating ASV in arbitrary causal DAGs which relies on a procedure to sample topological orderings uniformly at random. To implement this sampling mechanism we leverage known algorithms as well as simpler alternatives. Our experimental results demonstrate the practical viability of the proposed approach in realistic causal structures.
+
+% keywords in lowercase
+\keywords{Explainability, Asymmetric Shapley Values (ASV), SHAP}
+\end{abstract}
+
+% SPANISH VERSION
+% Clear the previous title info and set Spanish version
+
+% Spanish title and abstract
+\begin{center}
+\vspace{1cm}
+{\Large \bfseries\boldmath Más allá de Shapley: Algoritmos Eficientes para calcular los Shapley Values Asimétricos}
+
+\vspace{0.5cm}
+\end{center}
+
+\begin{abstract}
+\noindent Abordamos el problema de la explicabilidad en modelos de aprendizaje automático mediante métodos de \textit{feature attribution}. En particular, consideramos una variante de los \textit{Shapley values} conocida como \textit{Asymmetric Shapley Values} (ASV), que permite incorporar conocimiento causal en explicaciones \textit{model-agnostic} mediante el uso de un grafo causal. Mostramos que, en ciertos contextos en los que el cálculo de SHAP es \#\textsc{P}-hard, el cálculo exacto de ASV puede realizarse polinomial.
+Para extender este resultado algorítmico, introducimos una noción de clases de equivalencia sobre los ordenamientos topológicos del grafo causal subyacente, lo cual resulta útil para reducir el tiempo de cómputo de ASV. En particular, presentamos un algoritmo en tiempo polinomial (en el número de clases de equivalencia) para calcularlo cuando el grafo causal es un árbol dirigido enraizado.
+Finalmente, desarrollamos un algoritmo para aproximar ASV en DAGs causales arbitrarios, basado en un procedimiento que muestrea ordenamientos topológicos uniformemente al azar. Para implementar este mecanismo de muestreo consideramos algoritmos conocidos así como alternativas más simples. Nuestros resultados experimentales demuestran la viabilidad práctica del enfoque propuesto en estructuras causales realistas.
+\bigskip
+
+
+\keywords{Explicabilidad, Asymmetric Shapley Values (ASV), Shap, Órdenes topológicos}
+\end{abstract}
+
+
+\vspace{0.5cm}
+\setcounter{page}{1}
+
+\section{Introduction}
+
+\input{secciones/1_introduccion}
+
+\section{Definitions}
+
+\input{secciones/2_definiciones}
+
+\section{Theoretical Results}
+
+\input{secciones/3_resultados_teoricos}
+
+\section{Experimental results}
+
+\input{secciones/4_resultados_experimentales}
+
+\section{Conclusions and open questions}
+
+\input{secciones/5_conclusion}
+
+\begin{credits}
+
+\subsubsection{\discintname}The authors have no competing interests to declare that are
+relevant to the content of this article.
+\end{credits}
+%
+% ---- Bibliography ----
+%
+\printbibliography
+
+\end{document}
