@@ -39,8 +39,8 @@ class ASV:
             featureIndex = classFeaturesOrder.index(feature)
             fixedFeatures = classFeaturesOrder[:featureIndex]
             fixedFeaturesWithFeature = classFeaturesOrder[:featureIndex+1]
-            asvValue += classSize * (self.meanPredictionForEquivalenceClass(fixedFeatures) -  
-                                    self.meanPredictionForEquivalenceClass(fixedFeaturesWithFeature))
+            asvValue += classSize * (self.meanPredictionForEquivalenceClass(fixedFeaturesWithFeature) -
+                                    self.meanPredictionForEquivalenceClass(fixedFeatures))
             if showProgress: print(f'Progress of classes processed: {i/len(equivalenceClass)}%')
 
         self.assertToposortsMatches(totalTopologicalOrders, allTopologicalOrders)
