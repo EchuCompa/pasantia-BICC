@@ -12,7 +12,9 @@ from typing import Optional
 
 class ASV:
     def __init__(self, bayesianNetwork : BayesianNetwork, model : DecisionTreeClassifier, featureDistributions : VariableElimination, valuesPerFeature : dict[Node, list], featureToPredict : Node, predictionFunction : str = 'Exact', instance : Optional[pd.Series] = None):
-        self.dag = bayesianNetworkToDigraph(bayesianNetwork)
+        modelFeatures = list(valuesPerFeature.keys())
+        modelFeatures.remove(featureToPredict)
+        self.dag = bayesianNetworkToDigraph(bayesianNetwork).subgraph(modelFeatures).copy()
         self.model = model
         self.featureDistributions = featureDistributions
         self.valuesPerFeature = valuesPerFeature
@@ -20,8 +22,6 @@ class ASV:
         self.instance = instance
         self.featureToPredict = featureToPredict
 
-        modelFeatures = list(valuesPerFeature.keys())
-        modelFeatures.remove(featureToPredict)
         self.modelAsTree = obtainDecisionTreeDigraph(model, list(modelFeatures))
 
     #It returns the ASV value for each possible value of the feature for that specific instance. 
@@ -29,7 +29,7 @@ class ASV:
         self.instance = instance
 
         equivalenceClasses = self.equivalenceClasses(feature)
-        asvValue = np.zeros(len(self.valuesPerFeature[feature]))
+        asvValue = None
         totalTopologicalOrders = 0
         expectedTopologicalOrders = self.expectedTopologicalOrders()
 
@@ -40,11 +40,16 @@ class ASV:
             featureIndex = classFeaturesOrder.index(feature)
             fixedFeatures = classFeaturesOrder[:featureIndex]
             fixedFeaturesWithFeature = classFeaturesOrder[:featureIndex+1]
-            asvValue += classSize * (self.meanPredictionForEquivalenceClass(fixedFeaturesWithFeature) -
-                                    self.meanPredictionForEquivalenceClass(fixedFeatures))
+            contribution = (self.meanPredictionForEquivalenceClass(fixedFeaturesWithFeature) -
+                            self.meanPredictionForEquivalenceClass(fixedFeatures))
+            if asvValue is None:
+                asvValue = np.zeros_like(contribution, dtype=float)
+            asvValue += classSize * contribution
             if showProgress: print(f'Progress of classes processed: {i/len(equivalenceClass)}%')
 
         self.assertToposortsMatches(totalTopologicalOrders, expectedTopologicalOrders)
+        if totalTopologicalOrders == 0:
+            raise ValueError("At least one topological ordering is required")
         return asvValue/totalTopologicalOrders 
 
     def expectedTopologicalOrders(self):

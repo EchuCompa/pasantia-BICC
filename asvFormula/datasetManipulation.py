@@ -15,12 +15,12 @@ def encodeCategoricalColumns(dataset):
 
 
 def initializeDataAndRemoveVariable(BNmodel : BayesianNetwork, variableToPredict : str, numberOfSamples : int, treeMaxDepth : int, seed = None):
+    """Train a target-free predictor while retaining the full BN for inference."""
     # Create a BNDatabaseGenerator object from the model
     np.random.seed(seed)
     random.seed(seed)
     dataFromBN = datasetFromBayesianNetwork(BNmodel, numberOfSamples, seed)
 
-    BNmodel.remove_node(variableToPredict) # We remove the variable to predict from the BN model so that we won't have this information when we are going to predict it
     BNInference = VariableElimination(BNmodel)
 
     valuesPerFeature, encodedDataset = encodeCategoricalColumns(dataFromBN)

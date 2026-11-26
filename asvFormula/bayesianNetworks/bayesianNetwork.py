@@ -62,14 +62,12 @@ def obtainDecisionTreeDigraph(decisionTree : tree.DecisionTreeClassifier, featur
     while len(stack) > 0:
         node_id, depth = stack.pop()
         classesValues = values[node_id][0]
-        # Modify the label to show the actual feature name, we asume that feature names has the same order as the original dataset
-        label = f"{featureNames[feature[node_id]]}" #Other option: f"{featureNames[feature[node_id]]}, node: {node_id}"
-        G.add_node(node_id, label=label, threshold = thresholds[node_id], classesProbabilities = classesValues, feature = featureNames[feature[node_id]])
-
-        # Check if it's a split node (non-leaf)
         is_split_node = children_left[node_id] != children_right[node_id]
         
         if is_split_node:
+            featureName = featureNames[feature[node_id]]
+            G.add_node(node_id, label=str(featureName), threshold=thresholds[node_id],
+                       classesProbabilities=classesValues, feature=featureName)
             # Add edges to left and right children
             G.add_edge(node_id, children_left[node_id], label=f"<= {thresholds[node_id]:.2f}")
             G.add_edge(node_id, children_right[node_id], label=f"> {thresholds[node_id]:.2f}")
@@ -80,7 +78,8 @@ def obtainDecisionTreeDigraph(decisionTree : tree.DecisionTreeClassifier, featur
         else:
             # Obtains the exact prediction of the node instead of the probabilities
             prediction = np.around(values[node_id], 3) if meanPrediction else np.argmax(classesValues)
-            G.add_node(node_id, label=f"Pred: {prediction}") #Other option: {node_id}: {prediction}
+            G.add_node(node_id, label=f"Pred: {prediction}", threshold=thresholds[node_id],
+                       classesProbabilities=classesValues)
     return G
 
 def drawDecisionTree(decisionTree: nx.DiGraph, filePath : str = ""):
