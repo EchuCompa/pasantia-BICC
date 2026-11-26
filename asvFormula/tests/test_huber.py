@@ -39,6 +39,8 @@ class TestHuberSampler(unittest.TestCase):
                         bound.slots, bound.active = list(slots), active
                         bound.step(position, coin)
                         state = (tuple(bound.slots), bound.active)
+                        if coin == 0:
+                            self.assertEqual(state, (slots, active))
                         if state not in seen:
                             seen.add(state)
                             pending.append(state)
@@ -71,9 +73,31 @@ class TestHuberSampler(unittest.TestCase):
 
     def test_failed_block_is_replayed_with_its_original_random_choices(self):
         graph = nx.empty_graph(2, create_using=nx.DiGraph)
-        with patch("asvFormula.topoSorts.huber.random.randrange", return_value=0):
-            with patch("asvFormula.topoSorts.huber.random.getrandbits", side_effect=[0, 1, 0]):
-                self.assertEqual(huberTopoSort(graph), [1, 0])
+        with patch("asvFormula.topoSorts.huber.random.getrandbits", side_effect=[0, 1, 0]):
+            self.assertEqual(huberTopoSort(graph), [1, 0])
+
+    def test_out_of_range_random_positions_are_rejected(self):
+        graph = nx.empty_graph(4, create_using=nx.DiGraph)
+        # Position 3 is invalid, and must not be reduced modulo three.
+        with patch("asvFormula.topoSorts.huber.random.getrandbits", side_effect=[6, 5]) as bits:
+            with patch.object(_BoundingChain, "step", autospec=True, side_effect=RuntimeError("stop")) as step:
+                with self.assertRaisesRegex(RuntimeError, "stop"):
+                    huberTopoSort(graph)
+        self.assertEqual(bits.call_count, 2)
+        self.assertEqual(step.call_args.args[1:], (2, 1))
+
+    def test_unique_order_skips_sampling_without_aliasing_results(self):
+        graph = nx.DiGraph([("c", "a"), ("a", "b"), ("c", "b")])
+        with patch("asvFormula.topoSorts.huber.random.getrandbits", side_effect=AssertionError):
+            samples = huberTopoSorts(graph, 2)
+        self.assertEqual(samples, [["c", "a", "b"], ["c", "a", "b"]])
+        samples[0].append("extra")
+        self.assertEqual(samples[1], ["c", "a", "b"])
+
+    def test_zero_samples_skip_closure_for_valid_dag(self):
+        graph = nx.empty_graph(4, create_using=nx.DiGraph)
+        with patch("asvFormula.topoSorts.huber.nx.transitive_closure_dag", side_effect=AssertionError):
+            self.assertEqual(huberTopoSorts(graph, 0), [])
 
     def test_small_dag_frequencies_and_consecutive_samples(self):
         graph = nx.DiGraph([("a", "c")])

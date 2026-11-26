@@ -21,7 +21,7 @@ class _BoundingChain:
         self.active = 1
 
     def step(self, position: int, coin: int, order: Optional[list[int]] = None) -> None:
-        left, right = self.slots[position:position + 2]
+        left, right = self.slots[position], self.slots[position + 1]
         unrelated = left is not None and right is not None and right not in self.successors[left]
 
         if order is not None:
@@ -30,7 +30,7 @@ class _BoundingChain:
             actual_coin = coin
             if right is not None and order[position] == right and (left is None or unrelated):
                 actual_coin = 1 - coin
-            first, second = order[position:position + 2]
+            first, second = order[position], order[position + 1]
             if actual_coin and second not in self.successors[first]:
                 order[position], order[position + 1] = second, first
 
@@ -72,9 +72,11 @@ def huberTopoSorts(dag: nx.DiGraph, numTopoSorts: int) -> list[list[Node]]:
         raise ValueError("numTopoSorts must be nonnegative")
     if not nx.is_directed_acyclic_graph(dag):
         raise ValueError("The graph must be a directed acyclic graph")
+    if numTopoSorts == 0:
+        return []
 
     nodes = list(nx.topological_sort(dag))
-    if len(nodes) <= 1:
+    if len(nodes) <= 1 or all(dag.has_edge(a, b) for a, b in zip(nodes, nodes[1:])):
         return [nodes.copy() for _ in range(numTopoSorts)]
 
     indices = {node: index for index, node in enumerate(nodes)}
@@ -85,8 +87,10 @@ def huberTopoSorts(dag: nx.DiGraph, numTopoSorts: int) -> list[list[Node]]:
 
 def _sample(successors: list[set[int]]) -> list[int]:
     n = len(successors)
-    blocks: list[list[tuple[int, int]]] = []
+    blocks: list[list[int]] = []
     length = 1
+    position_bits = (n - 2).bit_length()
+    getrandbits = random.getrandbits
 
     # Each recursive CFTP call uses fresh randomness; retain failed blocks
     # so their same random choices can be replayed after the deeper call.
@@ -94,9 +98,14 @@ def _sample(successors: list[set[int]]) -> list[int]:
         bound = _BoundingChain(successors)
         block = []
         for _ in range(length):
-            position, coin = random.randrange(n - 1), random.getrandbits(1)
-            block.append((position, coin))
-            bound.step(position, coin)
+            choice = getrandbits(position_bits + 1)
+            while choice >> 1 >= n - 1:
+                choice = getrandbits(position_bits + 1)
+            block.append(choice)
+            # A zero coin cannot change the bound; activation already happens
+            # in the step that frees its last slot.
+            if choice & 1:
+                bound.step(choice >> 1, 1)
         if bound.coalesced():
             order = bound.result()
             break
@@ -105,6 +114,6 @@ def _sample(successors: list[set[int]]) -> list[int]:
 
     for block in reversed(blocks):
         bound = _BoundingChain(successors)
-        for position, coin in block:
-            bound.step(position, coin, order)
+        for choice in block:
+            bound.step(choice >> 1, choice & 1, order)
     return order
