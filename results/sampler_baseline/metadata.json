@@ -1,0 +1,16 @@
+{
+  "python": "3.11.15",
+  "networkx": "3.2.1",
+  "numpy": "1.26.4",
+  "samples": [
+    100,
+    500
+  ],
+  "seeds": [
+    11,
+    23,
+    47
+  ],
+  "mcmc_steps": "n^3 burn-in and between samples",
+  "oracle": "synthetic nonlinear vector; not Bayesian inference"
+}
