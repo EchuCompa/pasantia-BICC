@@ -1,0 +1,181 @@
+stage,graph,nodes,max_degree,method,samples,repeat,elapsed_seconds,python,platform,cpu,networkx_version,matplotlib_version,scipy_version,seed
+count,path,6,2,topoSortsCalc,0,1,0.0008171999943442643,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,path,6,2,topoSortsCalc,0,2,0.0006760999967809767,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,path,6,2,topoSortsCalc,0,3,0.0007496000034734607,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,path,6,2,topoSortsCalc,0,4,0.0007680999988224357,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,path,6,2,topoSortsCalc,0,5,0.0007173999911174178,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,path,6,2,Atkinson,0,1,0.0013128999853506684,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,path,6,2,Atkinson,0,2,0.0017626000044401735,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,path,6,2,Atkinson,0,3,0.0019432999833952636,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,path,6,2,Atkinson,0,4,0.0013281000137794763,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,path,6,2,Atkinson,0,5,0.0011347999970894307,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,binary_tree,6,3,topoSortsCalc,0,1,0.0007215999939944595,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,binary_tree,6,3,topoSortsCalc,0,2,0.0006933999829925597,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,binary_tree,6,3,topoSortsCalc,0,3,0.0005471000040415674,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,binary_tree,6,3,topoSortsCalc,0,4,0.0009033000096678734,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,binary_tree,6,3,topoSortsCalc,0,5,0.0006985999934840947,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,binary_tree,6,3,Atkinson,0,1,0.0010337999847251922,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,binary_tree,6,3,Atkinson,0,2,0.0011099999828729779,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,binary_tree,6,3,Atkinson,0,3,0.0010197999945376068,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,binary_tree,6,3,Atkinson,0,4,0.0010216999799013138,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,binary_tree,6,3,Atkinson,0,5,0.0010054000013042241,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,star,6,5,topoSortsCalc,0,1,0.0006223000236786902,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,star,6,5,topoSortsCalc,0,2,0.0006786000158172101,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,star,6,5,topoSortsCalc,0,3,0.0005463999987114221,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,star,6,5,topoSortsCalc,0,4,0.0008236999856308103,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,star,6,5,topoSortsCalc,0,5,0.000744100019801408,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,star,6,5,Atkinson,0,1,0.0012040000001434237,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,star,6,5,Atkinson,0,2,0.0011688999948091805,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,star,6,5,Atkinson,0,3,0.0012561999901663512,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,star,6,5,Atkinson,0,4,0.0010935000027529895,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,star,6,5,Atkinson,0,5,0.0011106999882031232,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,path,8,2,topoSortsCalc,0,1,0.002328200003830716,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,path,8,2,topoSortsCalc,0,2,0.001673899998422712,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,path,8,2,topoSortsCalc,0,3,0.0013806000060867518,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,path,8,2,topoSortsCalc,0,4,0.0014611000078730285,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,path,8,2,topoSortsCalc,0,5,0.0013556000194512308,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,path,8,2,Atkinson,0,1,0.0017639999859966338,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,path,8,2,Atkinson,0,2,0.001660399982938543,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,path,8,2,Atkinson,0,3,0.0015894999960437417,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,path,8,2,Atkinson,0,4,0.0016617999935988337,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,path,8,2,Atkinson,0,5,0.0018609999970067292,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,binary_tree,8,3,topoSortsCalc,0,1,0.001946700009284541,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,binary_tree,8,3,topoSortsCalc,0,2,0.08530569999129511,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,binary_tree,8,3,topoSortsCalc,0,3,0.0019188000005669892,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,binary_tree,8,3,topoSortsCalc,0,4,0.001647400000365451,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,binary_tree,8,3,topoSortsCalc,0,5,0.003534799994667992,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,binary_tree,8,3,Atkinson,0,1,0.001859000010881573,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,binary_tree,8,3,Atkinson,0,2,0.013315399992279708,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,binary_tree,8,3,Atkinson,0,3,0.0029731999966315925,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,binary_tree,8,3,Atkinson,0,4,0.008488299994496629,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,binary_tree,8,3,Atkinson,0,5,0.002217299974290654,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,star,8,7,topoSortsCalc,0,1,0.012914600025396794,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,star,8,7,topoSortsCalc,0,2,0.010773499991046265,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,star,8,7,topoSortsCalc,0,3,0.005472899996675551,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,star,8,7,topoSortsCalc,0,4,0.026846399996429682,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,star,8,7,topoSortsCalc,0,5,0.02889139999751933,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,star,8,7,Atkinson,0,1,0.005589700012933463,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,star,8,7,Atkinson,0,2,0.002088800014462322,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,star,8,7,Atkinson,0,3,0.0026861999940592796,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,star,8,7,Atkinson,0,4,0.0025482999917585403,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,star,8,7,Atkinson,0,5,0.002067299996269867,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,path,10,2,topoSortsCalc,0,1,0.0025006999785546213,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,path,10,2,topoSortsCalc,0,2,0.004874899983406067,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,path,10,2,topoSortsCalc,0,3,0.00787030000356026,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,path,10,2,topoSortsCalc,0,4,0.03211120000923984,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,path,10,2,topoSortsCalc,0,5,0.0030915999959688634,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,path,10,2,Atkinson,0,1,0.00316319998819381,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,path,10,2,Atkinson,0,2,0.01054149999981746,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,path,10,2,Atkinson,0,3,0.00232020000112243,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,path,10,2,Atkinson,0,4,0.0030408999882638454,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,path,10,2,Atkinson,0,5,0.0023612999939359725,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,binary_tree,10,3,topoSortsCalc,0,1,0.00291140002082102,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,binary_tree,10,3,topoSortsCalc,0,2,0.003420299995923415,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,binary_tree,10,3,topoSortsCalc,0,3,0.057599699997808784,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,binary_tree,10,3,topoSortsCalc,0,4,0.007947599980980158,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,binary_tree,10,3,topoSortsCalc,0,5,0.014285399985965341,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,binary_tree,10,3,Atkinson,0,1,0.017886699992232025,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,binary_tree,10,3,Atkinson,0,2,0.014007799996761605,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,binary_tree,10,3,Atkinson,0,3,0.0021074000105727464,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,binary_tree,10,3,Atkinson,0,4,0.013581100007286295,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,binary_tree,10,3,Atkinson,0,5,0.004839100001845509,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,star,10,9,topoSortsCalc,0,1,1.6510570000100415,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,star,10,9,topoSortsCalc,0,2,1.2801548999850638,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,star,10,9,topoSortsCalc,0,3,1.170542599982582,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,star,10,9,topoSortsCalc,0,4,0.915261099988129,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,star,10,9,topoSortsCalc,0,5,1.1046876999898814,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,star,10,9,Atkinson,0,1,0.002294600009918213,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,star,10,9,Atkinson,0,2,0.009444299997994676,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,star,10,9,Atkinson,0,3,0.003825799998594448,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,star,10,9,Atkinson,0,4,0.002737000002525747,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+count,star,10,9,Atkinson,0,5,0.004379199992399663,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,path,10,2,legacy sampler,1,1,0.0029334999853745103,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,path,10,2,legacy sampler,1,2,0.0010925999958999455,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,path,10,2,legacy sampler,1,3,0.0030759999935980886,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,path,10,2,legacy sampler,1,4,0.0015410000050906092,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,path,10,2,legacy sampler,1,5,0.0010923999943770468,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,path,10,2,Atkinson sampler,1,1,0.05185509999864735,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,path,10,2,Atkinson sampler,1,2,0.07353219998185523,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,path,10,2,Atkinson sampler,1,3,0.04986480000661686,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,path,10,2,Atkinson sampler,1,4,0.015524999995250255,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,path,10,2,Atkinson sampler,1,5,0.016583199991146103,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,path,10,2,legacy sampler,100,1,0.040980299992952496,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,path,10,2,legacy sampler,100,2,0.0073481999861542135,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,path,10,2,legacy sampler,100,3,0.002896699996199459,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,path,10,2,legacy sampler,100,4,0.004086100001586601,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,path,10,2,legacy sampler,100,5,0.014483400009339675,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,path,10,2,Atkinson sampler,100,1,0.022396799991838634,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,path,10,2,Atkinson sampler,100,2,0.030514300015056506,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,path,10,2,Atkinson sampler,100,3,0.01615109998965636,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,path,10,2,Atkinson sampler,100,4,0.15888870001072064,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,path,10,2,Atkinson sampler,100,5,0.02457239999785088,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,path,10,2,legacy sampler,1000,1,0.03124579999712296,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,path,10,2,legacy sampler,1000,2,0.019969999993918464,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,path,10,2,legacy sampler,1000,3,0.03649200001382269,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,path,10,2,legacy sampler,1000,4,0.026835500000743195,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,path,10,2,legacy sampler,1000,5,0.014394700003322214,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,path,10,2,Atkinson sampler,1000,1,0.061522699979832396,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,path,10,2,Atkinson sampler,1000,2,0.04120479998528026,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,path,10,2,Atkinson sampler,1000,3,0.06752390001202002,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,path,10,2,Atkinson sampler,1000,4,0.06647910000174306,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,path,10,2,Atkinson sampler,1000,5,0.04609410002012737,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,binary_tree,10,3,legacy sampler,1,1,0.007528199988882989,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,binary_tree,10,3,legacy sampler,1,2,0.002379599987762049,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,binary_tree,10,3,legacy sampler,1,3,0.002373399998759851,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,binary_tree,10,3,legacy sampler,1,4,0.002208299993071705,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,binary_tree,10,3,legacy sampler,1,5,0.002183000004151836,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,binary_tree,10,3,Atkinson sampler,1,1,0.044281700014835224,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,binary_tree,10,3,Atkinson sampler,1,2,0.11538609999115579,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,binary_tree,10,3,Atkinson sampler,1,3,0.03602359999786131,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,binary_tree,10,3,Atkinson sampler,1,4,0.030430300015723333,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,binary_tree,10,3,Atkinson sampler,1,5,0.07583960000192747,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,binary_tree,10,3,legacy sampler,100,1,0.02373980000265874,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,binary_tree,10,3,legacy sampler,100,2,0.05571720001171343,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,binary_tree,10,3,legacy sampler,100,3,0.034962300007464364,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,binary_tree,10,3,legacy sampler,100,4,0.034055199997965246,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,binary_tree,10,3,legacy sampler,100,5,0.013837700011208653,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,binary_tree,10,3,Atkinson sampler,100,1,0.13112800000817515,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,binary_tree,10,3,Atkinson sampler,100,2,0.14695280001615174,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,binary_tree,10,3,Atkinson sampler,100,3,0.18071960000088438,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,binary_tree,10,3,Atkinson sampler,100,4,0.13199799999711104,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,binary_tree,10,3,Atkinson sampler,100,5,0.1271732999884989,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,binary_tree,10,3,legacy sampler,1000,1,0.08957179999561049,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,binary_tree,10,3,legacy sampler,1000,2,0.09736990000237711,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,binary_tree,10,3,legacy sampler,1000,3,0.0981960000062827,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,binary_tree,10,3,legacy sampler,1000,4,0.09666899999137968,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,binary_tree,10,3,legacy sampler,1000,5,0.08741600002394989,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,binary_tree,10,3,Atkinson sampler,1000,1,0.17879129998618737,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,binary_tree,10,3,Atkinson sampler,1000,2,0.2026052000001073,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,binary_tree,10,3,Atkinson sampler,1000,3,0.23706230000243522,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,binary_tree,10,3,Atkinson sampler,1000,4,0.16406560002360493,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,binary_tree,10,3,Atkinson sampler,1000,5,0.14519240002846345,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,star,10,9,legacy sampler,1,1,0.0020244000188540667,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,star,10,9,legacy sampler,1,2,0.0019452999986242503,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,star,10,9,legacy sampler,1,3,0.0019114000024273992,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,star,10,9,legacy sampler,1,4,0.00188610001350753,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,star,10,9,legacy sampler,1,5,0.0019320000137668103,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,star,10,9,Atkinson sampler,1,1,0.04006989998742938,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,star,10,9,Atkinson sampler,1,2,0.03871699998853728,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,star,10,9,Atkinson sampler,1,3,0.04714130001957528,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,star,10,9,Atkinson sampler,1,4,0.07107220002217218,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,star,10,9,Atkinson sampler,1,5,0.03433870000299066,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,star,10,9,legacy sampler,100,1,0.13335380001808517,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,star,10,9,legacy sampler,100,2,0.08424490000470541,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,star,10,9,legacy sampler,100,3,0.09340410001459531,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,star,10,9,legacy sampler,100,4,0.08620379999047145,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,star,10,9,legacy sampler,100,5,0.08766929997364059,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,star,10,9,Atkinson sampler,100,1,0.6448675999999978,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,star,10,9,Atkinson sampler,100,2,0.9993476999807172,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,star,10,9,Atkinson sampler,100,3,0.8588271999906283,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,star,10,9,Atkinson sampler,100,4,1.059081299987156,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,star,10,9,Atkinson sampler,100,5,1.3944110000156797,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,star,10,9,legacy sampler,1000,1,0.806422499998007,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,star,10,9,legacy sampler,1000,2,0.7486275999981444,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,star,10,9,legacy sampler,1000,3,0.43955389998154715,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,star,10,9,legacy sampler,1000,4,0.6336618999775965,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,star,10,9,legacy sampler,1000,5,0.6816995000117458,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,star,10,9,Atkinson sampler,1000,1,1.296332900004927,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,star,10,9,Atkinson sampler,1000,2,1.1232120000058785,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,star,10,9,Atkinson sampler,1000,3,1.9144528999750037,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,star,10,9,Atkinson sampler,1000,4,2.630512700008694,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126
+sampling,star,10,9,Atkinson sampler,1000,5,2.7485627999994904,3.11.15,Windows-10-10.0.22621-SP0,"Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",3.2.1,3.9.4,1.13.1,20261126

@@ -62,44 +62,33 @@ Figure~\ref{fig:equivalenceClassesVsToposortsTimePlot} highlights the main advan
 
 \paragraph{Sampling-Based Approximation of Topological Orders} We now evaluate the sampling-based approach.
 
-\begin{figure}[H]
+\paragraph{Separating Counting and Sampling Costs} To distinguish the cost of counting linear extensions from that of generating samples, we benchmarked both operations separately on directed paths, binary trees, and stars. For standalone counting, we compare the implementation in \texttt{topoSortsCalc.py} with the Atkinson-based counter. We use 6, 8, and 10 nodes and report the maximum undirected degree of each graph family. For sampling, we fix the graph size at 10 nodes and vary the number of generated orders. We compare the legacy sampler with the current Atkinson-based sampler. Each point is the median of five runs; the count cache is cleared before each run, and all sampled orders are validated outside the timed interval. The benchmark script and raw measurements are available in the repository.\footnote{The additional benchmark was run on Windows (build 22621), Python 3.11.15, NetworkX 3.2.1, SciPy 1.13.1, and Matplotlib 3.9.4, on an Intel64 Family 6 Model 158 processor.}
+
+\begin{figure}[ht]
 	\centering
-	
-	\begin{subfigure}[t]{0.32\linewidth}
-		\vspace{0pt}
-		\centering
-		\small
-		\setlength{\tabcolsep}{4pt}
-		\renewcommand{\arraystretch}{1.1}
-		\begin{tabular}{|r|r|}
-			\hline
-			\textbf{\# Samples} & \textbf{Time (s)}\\
-			\hline
-			100   & 0.9270 \\
-			1000  & 1.1170 \\
-			10000 & 4.7170 \\
-			20000 & 7.7170 \\
-			30000 & 10.8387 \\
-			\hline
-		\end{tabular}
-		\caption{Sampling times for topological orders in \childNetwork{} using our developed algorithm.}
-		\label{fig:samplingTimesTopoSorts}
-	\end{subfigure}
-	\hfill
-	\begin{subfigure}[t]{0.64\linewidth}
-		\vspace{0pt}
-		\centering
-		\includegraphics[width=0.6\linewidth]{img/ChildAllSeedsASVBoxplot.png}
-		\caption{Relative error between approximate and exact ASV values in \childNetwork{}.}
-		\label{fig:boxplotASVApproximateDifferences}
-	\end{subfigure}
-	\label{fig:sampling_results_combined}
+	\includegraphics[width=\linewidth]{img/toposort_count_runtime.png}
+	\caption{Standalone counting time by graph family and size.}
+	\label{fig:toposortCountRuntime}
 \end{figure}
 
-Table~\ref{fig:samplingTimesTopoSorts} shows that when using our algorithm the sampling remains efficient even for large numbers of samples. Moreover, the runtime is not linear in the number of samples, as multiple candidates are generated simultaneously during recursive calls due to our efficient implementation.
-We conclude that in the bounded-degree setting (observe that in all the examples considered here most nodes have small degree) our algorithm is more efficient than the alternative options such as \cite{HUBER2006420}. Nevertheless, we recall that their algorithm is more general, as it applies beyond polytrees and runs in polynomial time.
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\linewidth]{img/toposort_sampling_runtime.png}
+	\caption{End-to-end sampling time for 10-node graphs. Sampling times include the counts performed internally by each sampler; they are not obtained by adding the standalone counting times.}
+	\label{fig:toposortSamplerRuntime}
+\end{figure}
 
-Finally, we evaluate the approximation error of ASV using sampled orders. Figure~\ref{fig:boxplotASVApproximateDifferences} shows that using 1000 samples yields an average relative error of around $8\%$. Larger ASV values exhibit smaller relative error, while larger deviations correspond to very small true values.
+In the 10-node star, standalone counting with \texttt{topoSortsCalc.py} takes 1.17 seconds, compared with 0.0038 seconds for Atkinson. The path and binary-tree counts remain in the millisecond range for both methods. This supports the concern that enumerating neighbor products and permutations can become costly at high degree, while also showing that the effect depends on graph structure.
+The end-to-end results do not follow the standalone count timings: for 1000 samples, the legacy and Atkinson-based samplers take 0.682 and 1.914 seconds, respectively, on the star; 0.097 and 0.179 seconds on the binary tree; and 0.027 and 0.062 seconds on the path. Thus, a faster standalone counter does not by itself guarantee a faster sampler. The sampler repeatedly evaluates counts on residual graphs, and its total cost also includes cache management, graph operations, and sample generation. These measurements cover only the tested small graph families and should not be extrapolated to arbitrary polytrees.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.6\linewidth]{img/ChildAllSeedsASVBoxplot.png}
+	\caption{Relative error between approximate and exact ASV values in \childNetwork{}.}
+	\label{fig:boxplotASVApproximateDifferences}
+\end{figure}
+
+Figure~\ref{fig:boxplotASVApproximateDifferences} evaluates the approximation error of ASV using sampled orders. Using 1000 samples yields an average relative error of around $8\%$. Larger ASV values exhibit smaller relative error, while larger deviations correspond to very small true values.
 These results indicate that sampling provides a practical trade-off between accuracy and computational cost.
 
 \vspace{-3mm}
