@@ -28,9 +28,14 @@ from asvFormula.topoSorts.randomTopoSortsGeneration import (
 from asvFormula.topoSorts.topoSortsCalc import allPolyTopoSorts, allPossibleOrders
 
 
-COUNT_SIZES = (6, 8, 10)
-SAMPLING_NODES = 10
-SAMPLE_SIZES = (1, 100, 1000)
+COUNT_SIZES_BY_GRAPH = {
+    "path": (6, 8, 10, 12, 14, 16, 18),
+    "binary_tree": (6, 8, 10, 12, 14, 16, 18),
+    # Keep stars small because the legacy counter permutes all neighbors.
+    "star": (6, 8, 10),
+}
+SAMPLING_NODES_BY_GRAPH = {"path": 20, "binary_tree": 14, "star": 10}
+SAMPLE_SIZES = (100, 1000, 2000)
 RANDOM_SEED = 20261126
 OUTPUT_CSV = REPO_ROOT / "results" / "toposortBenchmarks" / "count_sampling_timings.csv"
 FIGURE_DIR = REPO_ROOT / "latex-tesis" / "JAIO_extension" / "img"
@@ -92,8 +97,9 @@ def benchmark(repeats):
     }
     rows = []
 
-    for node_count in COUNT_SIZES:
-        for graph_name, graph in make_graphs(node_count).items():
+    for graph_name, node_counts in COUNT_SIZES_BY_GRAPH.items():
+        for node_count in node_counts:
+            graph = make_graphs(node_count)[graph_name]
             max_degree = max(dict(graph.to_undirected().degree()).values(), default=0)
             legacy_count = allPolyTopoSorts(graph)
             atkinson_count = allPolyforestTopoSortsAtkinson(graph)
@@ -125,8 +131,8 @@ def benchmark(repeats):
                         }
                     )
 
-    sampling_graphs = make_graphs(SAMPLING_NODES)
-    for graph_name, graph in sampling_graphs.items():
+    for graph_name, node_count in SAMPLING_NODES_BY_GRAPH.items():
+        graph = make_graphs(node_count)[graph_name]
         max_degree = max(dict(graph.to_undirected().degree()).values(), default=0)
         for sample_count in SAMPLE_SIZES:
             samplers = {
@@ -156,7 +162,7 @@ def benchmark(repeats):
                         {
                             "stage": "sampling",
                             "graph": graph_name,
-                            "nodes": SAMPLING_NODES,
+                            "nodes": node_count,
                             "max_degree": max_degree,
                             "method": method_name,
                             "samples": sample_count,
@@ -203,8 +209,8 @@ def median_rows(rows, stage, graph_name, method_name):
     ]
     grouped = {}
     for row in selected:
-        key = row["nodes"] if stage == "count" else row["samples"]
-        grouped.setdefault(key, []).append(row["elapsed_seconds"])
+        key = int(row["nodes"] if stage == "count" else row["samples"])
+        grouped.setdefault(key, []).append(float(row["elapsed_seconds"]))
     return sorted(
         (key, statistics.median(values)) for key, values in grouped.items()
     )
@@ -239,6 +245,14 @@ def plot_results(rows):
             )
         axis.set_title(title)
         axis.set_xlabel("Number of nodes")
+        axis.set_xticks(
+            [
+                node_count
+                for node_count, _ in median_rows(
+                    rows, "count", graph_name, count_methods[0]
+                )
+            ]
+        )
         axis.set_yscale("log")
         axis.grid(True, which="both", alpha=0.25)
     axes[0].set_ylabel("Median runtime (seconds, log scale)")
@@ -259,7 +273,7 @@ def plot_results(rows):
                 color=sampler_colors[method_name],
                 label=method_name,
             )
-        axis.set_title(title)
+        axis.set_title(f"{title} (n={SAMPLING_NODES_BY_GRAPH[graph_name]})")
         axis.set_xlabel("Number of sampled orders")
         axis.set_xscale("log")
         axis.set_yscale("log")
@@ -267,7 +281,7 @@ def plot_results(rows):
     axes[0].set_ylabel("Median end-to-end runtime (seconds, log scale)")
     axes[-1].legend(loc="best", fontsize="small")
     figure.suptitle(
-        f"End-to-end sampling runtime ({SAMPLING_NODES} nodes; includes internal counts)"
+        "End-to-end sampling runtime (includes internal counts)"
     )
     figure.tight_layout()
     figure.savefig(FIGURE_DIR / "toposort_sampling_runtime.png", dpi=300)

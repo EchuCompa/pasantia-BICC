@@ -123,7 +123,7 @@ dag = nx.DiGraph([("a", "b"), ("a", "c"), ("b", "d"), ("c", "d")])
 orders = huberTopoSorts(dag, 100)
 ```
 
-Se rechazan grafos que no sean DAGs y cantidades negativas; el número de pasos y la memoria son variables y no se impone un cutoff silencioso. `ApproximateASV` no cambia de sampler automáticamente: Huber se ofrece por separado para comparar.
+Se rechazan grafos que no sean DAGs y cantidades negativas; el número de pasos y la memoria son variables y no se impone un cutoff silencioso. Si el DAG tiene un único orden, se devuelve directamente. La generación optimizada usa bits aleatorios de manera distinta a la versión anterior: la misma semilla no reproduce sus muestras históricas. `ApproximateASV` no cambia de sampler automáticamente: Huber se ofrece por separado para comparar.
 
 ---
 

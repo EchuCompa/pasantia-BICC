@@ -24,3 +24,39 @@ Registro acumulativo de contenido nuevo incorporado al paper, sus experimentos y
 - `python -m experiments.sampler_baseline` produjo `results/sampler_baseline/`, con CSV y trece gráficos de frecuencias, tiempos, error y correlación para cuatro grafos de seis nodos, tres semillas y 100/500 muestras. Se comparan Huber y MCMC en todos, y los dos samplers ponderados en los bosques.
 - Para 500 muestras, tiempos medios de generación de Huber frente a MCMC: 0,692 s frente a 0,136 s en la estrella y 0,745 s frente a 0,170 s en el diamante. El conteo aislado de la estrella de ocho nodos dio medianas de 0,0051 s anterior y 0,0017 s Atkinson. Son mediciones locales, no cotas; la predicción cronometrada es un oráculo sintético, no inferencia BN real. La evidencia condicionante imposible y una comparación más amplia siguen pendientes.
 - Pruebas ejecutadas: `python -m pytest asvFormula\tests\test_genericASV.py asvFormula\tests\test_linearExtensionsTree.py asvFormula\tests\test_mean_prediction_baseline.py asvFormula\tests\test_asv.py asvFormula\tests\test_asv_sign.py asvFormula\tests\test_mcmcTopoSorts.py -q -k "not Distribution"` (32 aprobadas, cuatro deseleccionadas); `python -m pytest asvFormula\tests\test_huber.py -q` (cinco aprobadas); además, 14 pruebas seleccionadas de conteo existente aprobaron.
+
+## 26 de noviembre de 2026 — Optimización de Huber
+
+- En `asvFormula/topoSorts/huber.py` se evita el sampler cuando existe un único orden, se empacan posición y moneda en un entero con rechazo de posiciones inválidas, y se evita actualizar la cota ante una moneda cero. Se mantiene la reproducción de las elecciones en los bloques fallidos. Como cambia el consumo de bits, la misma semilla ya no reproduce la secuencia de la versión anterior.
+- Se ampliaron las pruebas en `asvFormula/tests/test_huber.py`: verifican el rechazo de posiciones inválidas, el atajo para orden único, la ausencia de aliasing y que una moneda cero mantiene cada estado acotante alcanzable enumerado.
+- En una medición exploratoria local con Python 3.11.15 y NetworkX 3.2.1, se compararon 300 órdenes de la versión original `405a7b2` y la optimizada para siete semillas, alternando el orden de ejecución. Las medianas anterior/optimizada fueron: cadena de 6 nodos 0,67769/0,00013 s; diamante de 6, 0,68280/0,32065 s; estrella de 6, 0,65234/0,37588 s; anticadena de 8, 1,74220/0,87647 s. Se verificó la validez de todos los órdenes. Las secuencias aleatorias son distintas, hubo variación y no se controló la carga de la máquina: no son cotas ni tiempos ASV end-to-end.
+- Para repetir desde PowerShell, con el commit original disponible y el código optimizado en el working tree:
+
+```powershell
+@'
+import random, statistics, subprocess, time, types
+import networkx as nx
+from asvFormula.topoSorts.huber import huberTopoSorts
+source = subprocess.check_output(['git', 'show', '405a7b2:asvFormula/topoSorts/huber.py'], text=True)
+before = types.ModuleType('huber_before')
+exec(compile(source, 'huber_before.py', 'exec'), before.__dict__)
+cases = {
+    'cadena6': nx.path_graph(6, create_using=nx.DiGraph),
+    'diamante6': nx.DiGraph([(0,1),(0,2),(1,3),(2,3),(3,4),(3,5)]),
+    'estrella6': nx.DiGraph([(0,i) for i in range(1,6)]),
+    'anticadena8': nx.empty_graph(8, create_using=nx.DiGraph),
+}
+for name, graph in cases.items():
+    times = {'antes': [], 'ahora': []}
+    for seed in range(7):
+        samplers = [('antes', before.huberTopoSorts), ('ahora', huberTopoSorts)]
+        if seed % 2: samplers.reverse()
+        for label, sampler in samplers:
+            random.seed(seed)
+            start = time.perf_counter(); orders = sampler(graph, 300); elapsed = time.perf_counter() - start
+            assert len(orders) == 300
+            assert all(len(o)==len(graph) and set(o)==set(graph) and all(o.index(a)<o.index(b) for a,b in graph.edges()) for o in orders)
+            times[label].append(elapsed)
+    print(name, {k: round(statistics.median(v), 5) for k,v in times.items()}, 'corridas', times, flush=True)
+'@ | uv run --offline --no-project --python 3.11 --with networkx==3.2.1 --with matplotlib==3.9.4 --with scipy==1.13.1 python -
+```
