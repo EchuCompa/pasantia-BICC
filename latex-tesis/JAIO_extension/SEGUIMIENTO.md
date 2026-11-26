@@ -26,16 +26,7 @@
 
 El paper ya propone clases de equivalencia, conteo y muestreo para estructuras restringidas, y una aproximación conceptualmente aplicable a DAGs arbitrarios. Por lo tanto, «implementar otro sampler» o «permitir otros modelos» no es, por sí solo, una contribución teórica nueva. Una hipótesis de trabajo más fuerte es **ASV confiable y práctico: implementación validada, mejor conteo/muestreo y evaluación reproducible**, complementada con ejemplos que expliquen qué cambia al incorporar el orden causal. La novedad concreta y la conferencia quedan por decidir.
 
-Hallazgos del código actual, a confirmar con pruebas ejecutables antes de comparar resultados:
-
-- [`ApproximateASV`](../../asvFormula/ASV.py) llama al sampler ponderado `randomTopoSorts`, no a `mcmcTopoSorts` como indica el README. Su método `asssertToposortsMatches` tiene una `s` de más y no sobrescribe `assertToposortsMatches`; la clase base compara el número de muestras contra el conteo del grafo. Además, `allForestTopoSorts` está diseñado para bosques dirigidos, no DAGs arbitrarios. Es una limitación práctica, aunque la idea matemática sea más general.
-- La acumulación en `asvForFeature` usa `v(S) - v(S ∪ {x})`, al revés de la definición del paper. Hay que validar el signo, la dimensión del vector de salida y la propiedad de eficiencia contra enumeración exacta antes de usar los CSV existentes como verdad de referencia.
-- [`randomTopoSortsGeneration.py`](../../asvFormula/topoSorts/randomTopoSortsGeneration.py) contiene tanto muestreo ponderado por conteos para polytrees como una cadena MCMC de intercambios adyacentes para DAGs. La cadena no implementa el muestreo perfecto de Huber 2006. El valor `n³` predeterminado es una elección de implementación, no una garantía demostrada de error o independencia para esta cadena concreta. La prueba existente de proporción de órdenes distintos no alcanza para demostrar uniformidad.
-- [`topoSortsCalc.py`](../../asvFormula/topoSorts/topoSortsCalc.py) enumera productos y permutaciones de vecinos; el grado puede afectar fuertemente su costo. El conteo y el sampler deben medirse por separado.
-- Los experimentos del [paper original](../JAIO/secciones/4_resultados_experimentales.tex) usan Cancer y una Child modificada para que sea polytree, y parte del tiempo de enumeración es extrapolado. El código de comparación usa `shap.TreeExplainer` con datos de fondo, mientras ASV usa expectativas condicionales de una red bayesiana: hay que verificar la semántica y el output de cada baseline antes de atribuir diferencias exclusivamente al orden causal.
-- El enunciado y la demostración de la cota de sampleo en el paper y el suplemento usan parámetros distintos. Además, Hoeffding requiere las hipótesis de independencia apropiadas; no se puede trasladar automáticamente a muestras consecutivas correlacionadas de MCMC. Revisar también las hipótesis de acotación y la precisión del oráculo.
-
-La suite no se pudo recolectar en este entorno: `python -m pytest asvFormula\tests\ --collect-only -q` invoca el alias de Microsoft Store y no hay un intérprete de Python disponible en PATH. No se verificaron los hallazgos de código mediante ejecución ni se ejecutaron nuevos experimentos.
+Hallazgos de la primera inspección, anteriores a los fixes descritos más abajo:
 
 ### Líneas de investigación y prioridad
 
@@ -56,13 +47,49 @@ La suite no se pudo recolectar en este entorno: `python -m pytest asvFormula\tes
 - **Rendimiento y precisión:** curvas de error absoluto y RMSE frente a tiempo total y número de muestras; informar error relativo solo con umbral explícito para valores cercanos a cero. Registrar preprocesamiento, inferencia, memoria, semillas, hardware, versiones, número de réplicas e intervalos de incertidumbre. Comparar métodos bajo igual presupuesto y misma función característica; separar comparaciones de semánticas distintas.
 - **Ablaciones:** conteo original vs. Atkinson; caché activado/desactivado; exacto vs. muestreado; distribución condicional exacta vs. aproximada. No afirmar mejoras hasta medirlas.
 
+## Resultados de pruebas e implementación inicial
+
+- Corregido en `asvFormula/ASV.py` el signo de las contribuciones: ahora calcula `v(S ∪ {x}) - v(S)`, como en la definición del paper. Una prueba con un oráculo controlado reproduce la diferencia.
+- Corregida la normalización de `ApproximateASV`: compara el peso de las clases con el número de muestras solicitado, no con el número exacto de órdenes. Para DAGs cuyo grafo subyacente no es un bosque utiliza MCMC; para polyforests conserva el sampler ponderado existente. La cadena sigue siendo aproximada y no tiene garantía de mezcla o muestras independientes.
+- Contraejemplo reproducible: en el DAG diamond `a→b,a→c,b→d,c→d` hay 2 órdenes, mientras el conteo polytree antiguo daba 3 (y `allForestTopoSorts` daba 6). Se añadieron guardas a `allPolyTopoSorts` y al sampler ponderado para rechazar DAGs fuera de su dominio. **No se agregó una guarda a `allForestTopoSorts` ni a la ruta exacta de ASV**, que sigue restringida y no debe usarse con DAGs generales sin validación.
+- Implementado `linearExtensionsTree.py`, con espectro de posiciones y conteo de órdenes por la recurrencia de Atkinson para árboles y bosques dirigidos. Se contrasta contra enumeración exhaustiva en árboles orientados aleatorios pequeños y bosques desconectados. Su sampler está disponible para comparar, pero **no se usa como default**: el costo de copiar/procesar subgrafos puede degradar el tiempo total de muestreo.
+- Implementado `genericASV.py`: referencia independiente de pgmpy que recibe una función característica arbitraria y órdenes topológicos, y cachea consultas repetidas a `v(S)`. Esto demuestra la separación entre explicador y oráculo, pero la clase optimizada `ASV` sigue integrada a redes bayesianas y árboles de scikit-learn.
+- Verificación final: `pytest asvFormula\tests\ -q` pasó **88 pruebas** (Python 3.14.5, dependencias temporales); queda un `FutureWarning` de pgmpy sobre `StructureScore`. El ejemplo sintético también se ejecutó correctamente como módulo.
+- El experimento ejecutable `experiments/synthetic_asv_example.py` compara ambas atribuciones con la misma función característica observacional para `X→Y`, `Y=X XOR ruido`, `f(X,Y)=Y` y entidad `(1,1)`. La eficiencia suma `0.5` en todos los casos:
+
+  | Ruido | SHAP(X,Y) | ASV(X,Y), orden X→Y |
+  |---:|---:|---:|
+  | 0.00 | (0.250, 0.250) | (0.500, 0.000) |
+  | 0.10 | (0.200, 0.300) | (0.400, 0.100) |
+  | 0.25 | (0.125, 0.375) | (0.250, 0.250) |
+
+  Es un ejemplo de atribución observacional y ordenamiento causal asumido, no una comparación de efectos de intervención.
+
+### Benchmarks preliminares
+
+Mediciones locales exploratorias, Python 3.14.5/Windows, sin fijar afinidad ni estado de CPU. No son resultados publicables; medir de nuevo con protocolo controlado antes de citar:
+
+| Conteo | Grafo | Conteo actual | Atkinson | Resultado |
+|---|---:|---:|---:|---|
+| Estrella | 8 nodos | mediana 0.0044 s | mediana 0.0040 s | iguales |
+| Estrella | 10 nodos | mediana 0.652 s | mediana 0.0029 s | iguales; gran mejora en alto grado |
+| Estrella | 100 nodos | — | 0.156 s | 156 dígitos en el conteo |
+| Camino | 100 nodos | — | 0.190 s | una extensión |
+| Árbol balanceado | 127 nodos | — | 0.056 s | 164 dígitos en el conteo |
+
+En generación de 1000 órdenes, el sampler nuevo fue más lento que el actual en las tres familias probadas: estrella de 10 nodos 0.816 s vs. 0.496 s; camino de 10 nodos 0.034 s vs. 0.016 s; árbol balanceado de 15 nodos 3.731 s vs. 0.623 s. Por eso se conserva como alternativa experimental y no se cambia el default. La granularidad del experimento es preliminar y el generador de grafos debe fijarse antes de repetirlo.
+
+Para el diamond, MCMC generó 10 000 órdenes válidos con frecuencias 5023/4977 entre los dos órdenes; el sampler ponderado antiguo generó 5069/4931 en este ejemplo pese a que su conteo total es erróneo. Esto **no prueba** mezcla, independencia ni uniformidad general. En una estrella de 4 nodos, ambos samplers cubrieron los seis órdenes con 12 000 muestras y frecuencias compatibles con uniformidad en una prueba de tolerancia fija.
+
 ### Próximos hitos sugeridos
 
 - [ ] Elegir con el equipo la conferencia, extensión y contribución principal.
-- [ ] Configurar Python y dependencias; establecer una suite reproducible y un baseline exacto pequeño.
-- [ ] Corregir y probar las discrepancias detectadas en ASV y muestreo, sin modificar silenciosamente la interpretación de resultados previos.
-- [ ] Prototipar Atkinson y benchmarkear conteo por grado y tamaño; decidir si integrarlo al sampler.
-- [ ] Implementar el ejemplo sintético analítico y variantes, comparando con la misma función característica.
+- [x] Encontrar un intérprete Python y ejecutar las pruebas con dependencias temporales.
+- [x] Corregir el signo de ASV y la normalización/selección del sampler aproximado.
+- [x] Prototipar Atkinson y comparar conteo y muestreo; mantener el sampler antiguo como default por rendimiento observado.
+- [x] Implementar un oráculo genérico y el ejemplo sintético analítico.
+- [ ] Fijar dependencias/semillas/hardware y repetir benchmarks con réplicas e intervalos.
+- [ ] Probar la clase optimizada `ASV` de extremo a extremo con modelos/distribuciones no-BN y decidir el contrato de oráculo público.
 - [ ] Ejecutar el protocolo de tiempo/error y decidir, según resultados, si profundizar en Huber, clases para polytrees o modelos generales.
 
 ### Fuentes
@@ -75,3 +102,111 @@ La suite no se pudo recolectar en este entorno: `python -m pytest asvFormula\tes
 - [Inoue y Minato, «An Efficient Method for Indexing All Topological Orders of a Directed Graph» (2014)](https://doi.org/10.1007/978-3-319-13075-0_9), indexación de órdenes.
 - [Frye, Rowat y Feige, «Asymmetric Shapley values» (NeurIPS 2020)](https://arxiv.org/abs/1910.06358), formulación original y aplicaciones.
 - [Vignette de shapr: asymmetric y causal Shapley](https://cran.r-project.org/web/packages/shapr/vignettes/asymmetric_causal.html), contraste entre semánticas marginal, condicional e intervencional y baseline potencial sujeto a compatibilidad de órdenes.
+
+## Investigación: qué mejorar y con qué benchmarks — 23 de noviembre de 2026
+
+### Resumen para discutir con el equipo
+
+**Recomendación:** orientar la extensión a una implementación **confiable en DAGs generales y evaluada con un protocolo reproducible**, y usar velocidad como resultado medido, no como promesa de antemano. Comparar ASV y Shapley con la misma función característica y sumar un caso interpretativo. Esto combina un avance práctico respecto del paper con una experimentación más convincente; la novedad concreta y el alcance deben acordarse con los coautores.
+
+- **Más general:** el paper ya plantea el esquema aproximado para DAGs arbitrarios, pero su implementación y evaluación completa siguen por validar para ellos. No afirmar como novedad teórica algo que ya está en el paper. La implementación actual usa MCMC en el camino aproximado para DAGs no polyforest; es una aproximación heurística, no el sampler uniforme exacto requerido por la garantía original. La ruta exacta sigue especializada en árboles dirigidos.
+- **Más confiable:** contrastar contra referencias exactas en casos pequeños, aclarar cuál es la distribución que se explica, comprobar probabilidades y dimensión del output, y dar diagnósticos si el grafo, la evidencia o la inferencia no son válidos.
+- **Más rápida:** primero perfilar y luego optimizar el cuello de botella. Puede interesar disminuir tiempo total, responder muchas consultas o alcanzar cierto error antes; no son el mismo objetivo. Las mejoras aisladas de conteo no prueban una mejora de punta a punta.
+- **Más útil:** mostrar de manera controlada cuándo el orden causal cambia la atribución, pero también sus limitaciones y sensibilidad a un grafo mal especificado. ASV condicional no es automáticamente una estimación de un efecto de intervención.
+
+### Qué cubre el trabajo actual y qué falta
+
+El [paper original](../JAIO/secciones/4_resultados_experimentales.tex) usa Cancer y Child modificada, datos simulados y árboles de decisión; también compara familias sintéticas. Child se transforma eliminando seis aristas antes de la evaluación. La tabla del paper da, para esa Child, 1,117 s para generar 1.000 órdenes y 10,8387 s para 30.000; son tiempos **de muestreo**, no de explicación end-to-end. Reporta alrededor de 8 % de error relativo promedio con 1.000 muestras, con dificultades para valores verdaderos pequeños. Parte del tiempo de enumeración se **extrapola**, no se mide por ejecución completa.
+
+El paper sostiene que el sampler de grado acotado es más eficiente que alternativas generales, pero la sección experimental no muestra una comparación cronometrada directa con Huber. Conviene presentarlo como hipótesis hasta correr ambos métodos con el mismo protocolo, si se logra una implementación correcta de referencia.
+
+El repositorio ya tiene [Cancer, Child y Student](../../networksExamples/) y resultados en [results](../../results/). Los CSV existentes son históricos: fueron generados antes de verificar los fixes de signo y normalización, y no deben tomarse como ground truth sin regenerarlos. [`writeASVAndShapleyIntoFile`](../../asvFormula/experiments.py) usa `shap.TreeExplainer` con datos de fondo, mientras ASV usa una esperanza condicional de la red. Además, `ASV` usa por defecto la clase predicha codificada one-hot y no necesariamente probabilidades del clasificador. Hay que alinear explícitamente distribución, función característica y output antes de interpretar una diferencia como efecto del orden. La [documentación de TreeExplainer](https://shap.readthedocs.io/en/stable/generated/shap.TreeExplainer.html) distingue opciones de dependencia y outputs; «interventional» en SHAP no debe confundirse sin más con aplicar `do` a nuestro SCM.
+
+### Hallazgo: al eliminar el target puede cambiar la distribución
+
+En [`initializeDataAndRemoveVariable`](../../asvFormula/datasetManipulation.py) se generan datos con la red original y luego se llama `BNmodel.remove_node(variableToPredict)` antes de hacer inferencia. En pgmpy 1.1.2 esto elimina la CPD del nodo y marginaliza las CPD de sus hijos **localmente**, lo que en general no equivale a marginalizar el target de la distribución conjunta original.
+
+Lo comprobé con [`cancer.bif`](../../networksExamples/cancer.bif), el target `Smoker` usado en la configuración existente y `VariableElimination`: antes de eliminarlo, `P(Cancer=True)=0,01163`; después, `0,01745`. Esto no invalida automáticamente el algoritmo: indica que se entrenó con una distribución y se explicó usando otra, por lo que la interpretación y comparaciones requieren revisión. `Age` es hoja en Child original; allí quitarlo no modifica CPD de hijos, aunque la modificación previa de Child debe evaluarse por separado.
+
+**Próximo paso prioritario:** mantener la red original para inferencia y marginalizar el target sin usarlo como evidencia ni como input del predictor; construir por separado el grafo de precedencias sobre las features. Verificar contra enumeración que las consultas den la marginal/condicional correcta y que no haya filtración del target. Si el target conecta features causalmente, quitarlo del grafo sin considerar caminos a través de él también puede alterar precedencias: decidir y documentar el modelo causal apropiado, no asumir que es la misma operación.
+
+### Redes candidatas y forma de los grafos
+
+Las redes discretas del [repositorio bnlearn](https://www.bnlearn.com/bnrepository/) incluyen estructura y CPD; [pgmpy](https://pgmpy.org/guides/example_models.html) también ofrece una API de modelos. Son buenas instancias estándar, pero una red bayesiana no es automáticamente un grafo causal validado. Si se usa como generador sintético, decirlo; si se hacen afirmaciones causales sobre datos reales, justificar estructura, variables y supuestos.
+
+Medí los grafos **completos**, antes de quitar el target, con modelos `bnlearn` cargados por `pgmpy.example_models.load_model` (pgmpy 1.1.2 y NetworkX 3.7). `ciclos` es el número ciclomático del esqueleto no dirigido `m−n+componentes`; es cero exactamente cuando es bosque. `tw≤` es una **cota superior heurística**, no el treewidth exacto, calculada con `networkx.approximation.treewidth_min_fill_in` sobre el grafo moralizado. No confundirla con el treewidth del esqueleto usado en teoría de órdenes.
+
+| Red | Nodos | Aristas | Ciclos | Máx. padres | Máx. grado esqueleto | tw moral ≤ | Utilidad |
+|---|---:|---:|---:|---:|---:|---:|---|
+| Cancer | 5 | 4 | 0 | 2 | 4 | 2 | Control pequeño e histórico; al quitar `Smoker` queda un árbol dirigido de 4 nodos. |
+| Asia | 8 | 8 | 1 | 2 | 4 | 2 | Primer DAG no polyforest; pequeño para enumeración exacta. |
+| Sachs | 11 | 17 | 8 | 3 | 7 | 3 | Caso biológico; contraste entre modelo de benchmark y estudio causal original. |
+| Child original | 20 | 25 | 6 | 2 | 8 | 3 | Comparación con Child modificada; al quitar `Age` quedan 19 nodos, 23 aristas y 5 ciclos. |
+| Alarm | 37 | 46 | 10 | 4 | 6 | 4 | Escala intermedia, monitorización médica. |
+| Insurance | 27 | 52 | 26 | 3 | 9 | 7 | Caso más conectado y con inferencia potencialmente más exigente. |
+
+Fuentes de los tamaños y dominios: [bnlearn: redes pequeñas](https://www.bnlearn.com/bnrepository/discrete-small.html) y [medianas](https://www.bnlearn.com/bnrepository/discrete-medium.html). Sachs se vincula al trabajo de [Sachs et al.](https://doi.org/10.1126/science.1105809), que utilizó perturbaciones experimentales. El BIF discreto de benchmark no debe confundirse sin verificación con los datos originales ni tratarse como verdad causal indiscutible.
+
+**No encontré evidencia suficiente para decir que una forma de grafo predomina en todos los dominios causales.** Estos ejemplos son una muestra seleccionada, no representativa. Aun así, ilustran que pocos padres por nodo **no implica** ser polytree; el grado máximo, ciclos, componentes, cantidad de órdenes, ancho y la complejidad de inferencia pueden afectar costos de formas distintas. Para cada target registrar las métricas del **grafo efectivamente usado**, no solo de la red completa. Incluir también cadenas, estrellas, árboles balanceados, colliders y diamonds sintéticos para aislar los factores estructurales.
+
+### Medición exploratoria nueva: solo generación MCMC
+
+En Windows, Intel i5-7500 3,40 GHz, Python 3.14.5, NetworkX 3.7 y pgmpy 1.1.2, medí el MCMC existente sobre los grafos completos de arriba. Son **3 corridas** de 100 órdenes, semillas de `random` 0, 1 y 2; el tiempo con `perf_counter` incluye cierre transitivo, burn-in y generación. Cada muestra pasó la verificación de aristas del orden topológico. Los pasos de burn-in y entre muestras usan el default `n³`. Sin controlar carga del sistema; es un sondeo local, no un benchmark publicable ni tiempo total de ASV.
+
+| Red | Tres tiempos (s) | Mediana (s) |
+|---|---|---:|
+| Cancer | 0,0118; 0,0132; 0,0110 | 0,0118 |
+| Asia | 0,0403; 0,0404; 0,0384 | 0,0403 |
+| Sachs | 0,1265; 0,1137; 0,1103 | 0,1137 |
+| Child original | 0,7099; 0,7701; 0,7012 | 0,7099 |
+| Alarm | 4,1131; 4,1304; 5,6146 | 4,1304 |
+| Insurance | 1,4680; 1,4377; 1,4231 | 1,4377 |
+
+La validez de los órdenes **no demuestra** mezcla ni uniformidad. No se midió error de ASV, inferencia, agrupación ni costo por todas las features; tampoco se comparó contra el sampler ponderado, que no admite los DAGs no polyforest. El costo de MCMC varía con `n³` y la cantidad de muestras por construcción; no extrapolar estos datos como tiempo final ni como comparación controlada con el paper.
+
+Para repetir el sondeo, con versiones compatibles instaladas, ejecutar desde la raíz:
+
+```python
+import random, statistics, time
+import networkx as nx
+from pgmpy.example_models import load_model
+from asvFormula.topoSorts.randomTopoSortsGeneration import mcmcTopoSorts
+from asvFormula.topoSorts.utils import isTopologicalSort
+
+for name in ("cancer", "asia", "sachs", "child", "alarm", "insurance"):
+    model = load_model("bnlearn/" + name)
+    dag = nx.DiGraph(model.edges())
+    dag.add_nodes_from(model.nodes())
+    times = []
+    for seed in range(3):
+        random.seed(seed)
+        start = time.perf_counter()
+        orders = mcmcTopoSorts(dag, 100)
+        times.append(time.perf_counter() - start)
+        assert len(orders) == 100
+        assert all(isTopologicalSort(dag, order) for order in orders)
+    print(name, times, statistics.median(times))
+```
+
+La API puede descargar modelos al primer uso; para un experimento final fijar versiones y guardar la versión y hash de cada BIF/CPD, ya que el contenido remoto puede cambiar.
+
+### ¿300 segundos a 30?
+
+Es una mejora de 10×, pero **no hay todavía un caso medido aquí que justifique adoptarla como requisito**. Para una explicación ocasional, cinco minutos podrían ser aceptables; para un panel interactivo, explicar miles de registros, repetir muchos modelos o explorar grafos, podrían no serlo. El presupuesto debe especificar por instancia, feature, output y volumen de consultas, incluyendo preparación y reutilización de caché. Sin esos datos, ni 30 ni 300 segundos son una meta universal.
+
+Propuesta para comparar sin decidir prematuramente un umbral:
+
+1. Medir tiempos de preparación, generación, agrupación, consultas del oráculo y total; distinguir primera ejecución y reutilización, una feature y todas las features, además de memoria.
+2. Elegir instancias y salidas concretas; informar mediana y dispersión con varias semillas/réplicas, hardware, límites de tiempo y fallos. Los *timeouts* se reportan, no se descartan.
+3. En grafos pequeños calcular referencia exacta; en medianos, usarla solo cuando sea factible, o una referencia aproximada independiente y más costosa, señalando su incertidumbre. Comparar **error absoluto/RMSE y tiempo**, no solo muestras por segundo; reportar errores relativos con denominador cercano a cero por separado.
+4. Proponer umbrales de error y tiempo para cada caso de uso **después** de obtener la línea de base. Si un caso tarda aproximadamente 300 s, evaluar 30 s como objetivo aspiracional a igual precisión y semántica, no como resultado asumido. Para MCMC estudiar burn-in, autocorrelación y múltiples cadenas; más muestras correlacionadas no implican igual precisión que muestras independientes.
+
+### Plan experimental concreto
+
+1. **Corrección antes que escala:** probar Cancer, Asia, diamond y otras redes pequeñas contra enumeración de órdenes y esperanza condicional exacta para todos los subconjuntos necesarios. Controlar suma de atribuciones, clases y vectores; usar un modelo e instancia fijos. Auditar especialmente eliminación del target y valores con probabilidad cero.
+2. **Ejemplos explicativos:** ejecutar el [ejemplo sintético](../../experiments/synthetic_asv_example.py) ya implementado y extender con grafo vacío, cadena con ruido, causa común y collider. Conservar modelo, distribución, instancia y `v(S)` al comparar SHAP simétrico con ASV; variar el grafo supuesto por separado y reportar diferencias y limitaciones.
+3. **Escala en capas:** Cancer/Child modificada como continuidad histórica; Asia/Sachs/Child original para DAGs con ciclos en el esqueleto; Alarm/Insurance como pruebas más exigentes. Para la ruta exacta usar únicamente su dominio comprobado. Para DAGs generales usar la aproximación validada, sin prometer que todas las redes terminan dentro de un plazo.
+4. **Baselines justos:** enumeración exhaustiva donde sea posible; sampler ponderado en polyforests; MCMC en todos los DAGs válidos; Atkinson como alternativa experimental solo en su dominio. Comparar el mismo modelo, output y distribución; medir coste completo y precisión. [shapr](https://cran.r-project.org/web/packages/shapr/vignettes/asymmetric_causal.html) es un candidato externo para órdenes compatibles: verificar primero que represente exactamente las mismas restricciones y pesos, además de la misma `v(S)`. [Heskes et al.](https://proceedings.neurips.cc/paper/2020/hash/32e54441e6382a7fbacbbbaf3c450059-Abstract.html) es una referencia de valores causales intervencionales, no un baseline numéricamente equivalente por defecto.
+5. **Optimizar según perfil:** reutilización segura de coaliciones y consultas entre features, mejoras al sampler o inferencia; medir por separado y luego end-to-end. Repetir Atkinson contra el original con muestras y precisión comparables antes de decidir si reemplazarlo.
+
+Preguntas para acordar: ¿uso individual offline o lotes de explicaciones?, ¿qué precisión y recursos son aceptables?, ¿un caso biológico aplicado con supuestos sustentados o solo proof of concept sintético?, ¿la contribución principal será robustez/escala o un resultado algorítmico nuevo? No se asumieron respuestas en este documento.
