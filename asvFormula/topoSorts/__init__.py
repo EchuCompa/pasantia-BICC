@@ -8,4 +8,12 @@ if module_path not in sys.path:
 
 from topoSortsCalc import allPolyTopoSorts
 from utils import allForestTopoSorts, TopoSortHasher
-from asvFormula.topoSorts.randomTopoSortsGeneration import randomTopoSorts
+from asvFormula.topoSorts.linearExtensionsTree import (
+    allPolyforestTopoSortsAtkinson,
+    linearExtensionPositionCounts,
+)
+from asvFormula.topoSorts.randomTopoSortsGeneration import (
+    randomTopoSorts,
+    randomTopoSortsAtkinson,
+)
+from asvFormula.topoSorts.huber import huberTopoSort, huberTopoSorts
