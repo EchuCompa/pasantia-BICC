@@ -1,0 +1,9 @@
+networkx==3.2.1
+numpy==1.26.4
+scipy==1.13.1
+pandas==2.2.3
+scikit-learn==1.5.2
+matplotlib==3.9.4
+pgmpy==0.1.25
+parameterized==0.9.0
+pytest==8.3.5

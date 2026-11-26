@@ -24,5 +24,6 @@
 #Pycache files.
 
 *.pyc
+.venv/
 latex-tesis/JAIO/jaio_paper.bcf
 latex-tesis/JAIO/jaio_paper.run.xml
