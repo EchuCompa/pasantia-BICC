@@ -70,6 +70,10 @@ La fórmula del ASV está implementada en **`asvFormula/ASV.py`**:
 - `ASV.asvForFeature(feature, instance)` — calcula el ASV exacto iterando sobre las clases de equivalencia ponderadas por su tamaño.
 - El baseline SHAP usado para comparación se computa con la librería `shap` dentro de `asvFormula/experiments.py` (`writeASVAndShapleyIntoFile`).
 
+La inicialización conserva la red bayesiana completa para la inferencia, pero el target no es entrada del predictor ni jugador de ASV. El DAG de precedencias contiene solo features: al quitar nodos se preservan los caminos dirigidos entre ellas (por ejemplo, `X → target → Z` exige `X` antes que `Z`). Se consideran uniformemente los órdenes válidos de features, no las multiplicidades de órdenes de la red completa. Las aristas añadidas expresan precedencia, no necesariamente causalidad directa.
+
+El cálculo exacto de `ASV` requiere que el DAG resultante sea un bosque dirigido con a lo sumo un padre por nodo; de lo contrario informa un error. `ApproximateASV` usa el sampler ponderado en polyforests y MCMC en otros DAGs; este último aproxima la distribución uniforme sin garantía de mezcla con sus valores predeterminados. La proyección puede cambiar la estructura del DAG y los resultados, por lo que los CSV anteriores no se deben mezclar con nuevas corridas.
+
 ---
 
 ### Cap. 3 – Redes Bayesianas y predicción promedio

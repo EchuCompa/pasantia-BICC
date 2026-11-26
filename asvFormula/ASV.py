@@ -14,7 +14,20 @@ class ASV:
     def __init__(self, bayesianNetwork : BayesianNetwork, model : DecisionTreeClassifier, featureDistributions : VariableElimination, valuesPerFeature : dict[Node, list], featureToPredict : Node, predictionFunction : str = 'Exact', instance : Optional[pd.Series] = None):
         modelFeatures = list(valuesPerFeature.keys())
         modelFeatures.remove(featureToPredict)
-        self.dag = bayesianNetworkToDigraph(bayesianNetwork).subgraph(modelFeatures).copy()
+        causalDag = bayesianNetworkToDigraph(bayesianNetwork)
+        missingFeatures = set(modelFeatures) - set(causalDag)
+        if missingFeatures:
+            raise ValueError(f"Features missing from the causal DAG: {missingFeatures}")
+        self.dag = causalDag.copy()
+        for node in list(self.dag):
+            if node not in modelFeatures:
+                parents = list(self.dag.predecessors(node))
+                children = list(self.dag.successors(node))
+                self.dag.remove_node(node)
+                for parent in parents:
+                    for child in children:
+                        if not nx.has_path(self.dag, parent, child):
+                            self.dag.add_edge(parent, child)
         self.model = model
         self.featureDistributions = featureDistributions
         self.valuesPerFeature = valuesPerFeature
@@ -52,13 +65,19 @@ class ASV:
             raise ValueError("At least one topological ordering is required")
         return asvValue/totalTopologicalOrders 
 
+    def _validateExactDag(self):
+        if not nx.is_branching(self.dag):
+            raise ValueError("Exact ASV requires a directed forest; use ApproximateASV for other DAGs")
+
     def expectedTopologicalOrders(self):
+        self._validateExactDag()
         return allForestTopoSorts(self.dag)
 
     def assertToposortsMatches(self, totalTopologicalOrders, allTopologicalOrders):
         assert totalTopologicalOrders == allTopologicalOrders, f"The total number of topological orders for the equivalence classes is {totalTopologicalOrders} and the total number of topological orders for the graph is {allTopologicalOrders}"
 
     def equivalenceClasses(self, feature):
+        self._validateExactDag()
         return equivalenceClassesFor(self.dag, feature)#This is the normalization for the ASV value
 
     def meanPredictionForEquivalenceClass(self, fixedFeatures : List[Node]) -> npt.NDArray[np.float64]:
